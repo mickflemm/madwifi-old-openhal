@@ -1,0 +1,48 @@
+HIGH PRIO:
+
+- allow sending of management packets in other states than IEEE80211_S_RUN
+  (e.g. PROBE_REQUESTS in IEEE80211_S_SCAN state)
+- check locking (especially the macros in ieee80211_linux.h)
+    - too strict locking -> loose performance
+    - too soft -> oops
+- send multicast / broadcast frames with highest possible basic rate
+    -  allow user configuration of basic rates
+- IBSS merging, sychronization and beaconing
+- implement "right" iwconfig ath0 key open / restricted behaviour
+    - authentication mode open / shared key
+    - accept unencrypted frames
+- check if private crypto tkip implementation works for cards without hardware 
+  crypto support (SWMIC, SWCRYPT).
+- duration in 802.11 frames is always 0
+- when a wrong WEP key is configured, the hardware decryption does not fail
+  but results in bogus packets 
+    - cause HAL_RXERR_DECRYPT is ignored
+- bandwidth with 2 cards (one in, one out) is only 1/2 of possible rate
+    - may be a locking problem
+
+
+LOW PRIO:
+
+- define commonly used macros global
+- cleanup code
+- remove redundant definitions which have been copied from FreeBSD
+    - e.g.: struct ether_header
+- consistent configuration either thru sysctl or iwpriv commands
+    - i'd suggest iwpriv (br1)
+- antenna reconfiguration in ad-hoc mode does not affect beacons
+  if it is done after the beacon is set up (the IBSS is started)
+
+
+LONG TERM:
+
+- integration with linux ieee80211 stack (work in progress)
+- inclusion into linux kernel
+
+
+IDEAS:
+
+- generate a Configure script to create a Makefile fitting the build environment
+- write a userspace tool to control all the things wireless_tools do but
+  furthermore also things which are not supported by them
+    - e.g.: wme + parameters, beacon interval, ack/cts timeouts...
+
