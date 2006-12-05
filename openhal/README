@@ -1,0 +1,117 @@
+Linux OpenHAL 20062302
+======================
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+ * This is a port of the ar5k hal for atheros device drivers that is         *
+ * source-compatible with the Madwifi driver for linux 			     *
+ * (before the BSD - HEAD merge).					     *
+ *									     *
+ * Code ported, modified for combatibility and some bugs were fixed by 	     *
+ * Nick "Mick Flemm" Kossifidis (Athens Wireless Metropolitan Network)	     *
+ * <mickflemm'at'gmail.com> so ar5k can work propertly on Linux.	     *
+ * Currently only the 5212 code has been tested due to lack of hardware.     *
+ *									     *
+ * Some code from John Bicket's port (roofnet project) was taken, you can    *
+ * can find his OpenHAL here -> http://pdos.csail.mit.edu/~jbicket/openhal/  *
+ *									     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  *
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF 	     *
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   *
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    *
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     *
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   *
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+DEVELOPMENT
+===========
+
+We are basing our openhal on OpenBSD's ar5k. Because of this and since the GPL does not
+allow us to commit changes on the GPL version back to the BSD version please sumbit your 
+non-linux enhancements to the HAL to "Reyk Floeter" <reyk@openbsd.org> and CC madwifi-devel.
+
+
+About AR5K
+=================
+ar5k is a free replacement of the binary-only HAL used by some drivers
+for Atheros chipsets. While using a different ABI, it tries to be
+source-compatible with the original (non-free) HAL interface.
+
+It is maintained by Reyk Floeter and many others. You can find more 
+infos at http://team.vantronix.net/ar5k/ or inside ar5k's source.
+
+The ar5k hal maintained at OpenBSD
+http://www.openbsd.org/cgi-bin/cvsweb/src/sys/dev/ic/#dirlist
+
+
+About channels and regulatory domains
+=====================================
+
+Regulatory domain restrictions are enabled by default to follow ETSI and FCC standards.
+If you want to be legal you shouldn't disable regdomains, althow if you want to
+experiment etc there are 2 ways you can override regdomains:
+
+a) Change SUPERCHANNEL to 1 (opt_ah.h)
+b) Change your card's regulatory domain (EEPROM) to 0x00
+
+WARNING: Whatever you do with your hardware is YOUR resposibility, don't blame the developers
+if you get caught using your hardware outside legal ranges etc, you 've been warned...
+
+The goal of this project is to create an open-source free alternative to binary HAL from Atheros, 
+NOT to allow more channels/frequencies etc.
+
+
+About AWMN
+==========
+Athens Wireless Metropolitan Network is a community radio network based in Athens, Greece. 
+Its members are node owners, comprising the Athens metropolitan area network, which at the
+moment has roughly 750 active nodes, using 802.11b and 802.11a wireless technology for interconnection.
+
+Its aims include:
+
+    * The development and use of community wireless network throughout the greater Athens area.
+    * The development of wireless technology and its implementation.
+    * Making the public aware of wireless networks and their use.
+    * Educating it's members and the public on the use and benefits of wireless networks.
+
+The Athens Wireless Metropolitan Network
+http://www.awmn.net
+
+
+Building 
+========
+To build OpenHAL with MadWiFi, place the OpenHAL source directory in the
+MadWiFi directory. Edit Makefile.inc and set the following:
+
+HAL=${DEPTH}/<OpenHAL directory>
+ATH_HAL=${DEPTH}/<OpenHAL directory>
+
+After that, go to the top directory and build like you normally would. 
+
+WARNING: Don't delete the empty files included (ah_desc.h etc)
+
+Note: Currenty works for MadWiFi versions before HEAD - BSD merge
+(that means it works with 07/11/05 snapshot).
+
+Use
+=====
+You 'll have to set everything propertly for things to work
+e.g. you 'll first need to set the mode (a/b/g) using 
+
+iwpriv mode X
+
+Then if you want to use it as an AP you'll have to set channel
+
+iwconfig athX channel x
+
+Txpower currently seems to be buggy, in measurements I did it seems that
+tx power differs from -56 to -41 dbm, setting txpower does change txpower
+but not in a normal way -needs revision.
+
+
+TODO
+====
+* Lot's of tests and fixes.
+* Make it combatible with newer versions of MadWiFi (after the merge).
+* Test 5210/5211 code.
+
