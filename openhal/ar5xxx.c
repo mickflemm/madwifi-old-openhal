@@ -226,6 +226,19 @@ ath_hal_attach(u_int16_t device, HAL_SOFTC sc, HAL_BUS_TAG st, HAL_BUS_HANDLE sh
 	hal->ah_software_retry = AH_FALSE;
 	hal->ah_ant_diversity = AR5K_TUNE_ANT_DIVERSITY;
 
+	switch (device) {
+	case PCI_PRODUCT_ATHEROS_AR2413:
+	case PCI_PRODUCT_ATHEROS_AR5413:
+	case PCI_PRODUCT_ATHEROS_AR5424:
+		/* Known single chip solutions */
+		hal->ah_single_chip = AH_TRUE;
+		break;
+	default:
+		/* Multi chip solutions */
+		hal->ah_single_chip = AH_FALSE;
+		break;
+	}
+
 	if ((attach)(device, hal, st, sh, status) == NULL)
 		goto failed;
 
