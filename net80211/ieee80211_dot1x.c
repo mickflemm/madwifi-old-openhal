@@ -50,7 +50,9 @@
  * non-802.11 devices but for now it is tightly integrated with the
  * 802.11 code.
  */
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

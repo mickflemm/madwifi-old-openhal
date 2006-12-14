@@ -88,7 +88,11 @@ static const struct {
 	{ PCI_VENDOR_ATHEROS, PCI_PRODUCT_ATHEROS_AR5212_0019,
 	    ar5k_ar5212_attach },
 	{ PCI_VENDOR_ATHEROS, PCI_PRODUCT_ATHEROS_AR2413,
-	    ar5k_ar5212_attach }
+	    ar5k_ar5212_attach },
+	{ PCI_VENDOR_ATHEROS, PCI_PRODUCT_ATHEROS_AR5413,
+	    ar5k_ar5212_attach },
+	{ PCI_VENDOR_ATHEROS, PCI_PRODUCT_ATHEROS_AR5424,
+	    ar5k_ar5212_attach },
 };
 
 static const HAL_RATE_TABLE ar5k_rt_11a = AR5K_RATES_11A;
@@ -227,16 +231,20 @@ ath_hal_attach(u_int16_t device, HAL_SOFTC sc, HAL_BUS_TAG st, HAL_BUS_HANDLE sh
 	hal->ah_ant_diversity = AR5K_TUNE_ANT_DIVERSITY;
 
 	switch (device) {
-	case PCI_PRODUCT_ATHEROS_AR2413:
-	case PCI_PRODUCT_ATHEROS_AR5413:
-	case PCI_PRODUCT_ATHEROS_AR5424:
-		/* Known single chip solutions */
-		hal->ah_single_chip = AH_TRUE;
-		break;
-	default:
-		/* Multi chip solutions */
-		hal->ah_single_chip = AH_FALSE;
-		break;
+		case PCI_PRODUCT_ATHEROS_AR2413:
+		case PCI_PRODUCT_ATHEROS_AR5413:
+		case PCI_PRODUCT_ATHEROS_AR5424:
+			/*
+			 * Known single chip solutions
+			 */
+			hal->ah_single_chip = AH_TRUE;
+			break;
+		default:
+			/*
+			 * Multi chip solutions
+			 */
+			hal->ah_single_chip = AH_FALSE;
+			break;
 	}
 
 	if ((attach)(device, hal, st, sh, status) == NULL)
@@ -437,9 +445,9 @@ ath_hal_init_channels(struct ath_hal *hal, HAL_CHANNEL *channels,
 		    IEEE80211_CHAN_2GHZ);
 		max = ath_hal_mhz2ieee(IEEE80211_CHANNELS_2GHZ_MAX,
 		    IEEE80211_CHAN_2GHZ);
-		flags = CHANNEL_B | CHANNEL_TG |
+		flags = CHANNEL_B /*| CHANNEL_TG |
 		    (hal->ah_version == AR5K_AR5211 ?
-		    CHANNEL_PUREG : CHANNEL_G);
+		    CHANNEL_PUREG : CHANNEL_G)*/;
 
  debugchan:
 		for (i = min; i <= max && c < max_channels; i++) {
@@ -521,10 +529,12 @@ for loop starts from 1 and all channels are marked as 5GHz M.F.*/
 			continue;
 
 		/* Match modes */
-		if (ar5k_2ghz_channels[i].rc_mode & IEEE80211_CHAN_CCK)
+		if ((hal->ah_capabilities.cap_mode & HAL_MODE_11B) &&
+		   (ar5k_2ghz_channels[i].rc_mode & IEEE80211_CHAN_CCK))
 			all_channels[c].c_channel_flags = CHANNEL_B;
 
-		if (ar5k_2ghz_channels[i].rc_mode & IEEE80211_CHAN_OFDM) {
+		if ((hal->ah_capabilities.cap_mode & HAL_MODE_11G) &&
+		   (ar5k_2ghz_channels[i].rc_mode & IEEE80211_CHAN_OFDM)) {
 			all_channels[c].c_channel_flags |=
 			    hal->ah_version == AR5K_AR5211 ?
 			    CHANNEL_PUREG : CHANNEL_G;
@@ -556,6 +566,14 @@ ar5k_printver(enum ar5k_srev_type type, u_int32_t val)
 	int i;
 
 	for (i = 0; i < AR5K_ELEMENTS(names); i++) {
+		if (type == AR5K_VERSION_DEV) {
+			if (names[i].sr_type == type &&
+				names[i].sr_val == val) {
+				name = names[i].sr_name;
+				break;
+			}
+			continue;
+		}
 		if (names[i].sr_type != type ||
 		    names[i].sr_val == AR5K_SREV_UNKNOWN)
 			continue;
@@ -1773,11 +1791,11 @@ ar5k_txpower_table(struct ath_hal *hal, HAL_CHANNEL *channel, int16_t max_power)
 	max = AR5K_EEPROM_PCDAC_STOP;
 	for (i = 0; i < n; i += AR5K_EEPROM_PCDAC_STEP)
 		hal->ah_txpower.txp_pcdac[i] =
-#ifdef notyet
+//#ifdef notyet
 		min + ((i * (max - min)) / n);
-#else
-		min;
-#endif
+//#else
+//		min;
+//#endif
 }
 
 /* Functions not found in OpenBSD */

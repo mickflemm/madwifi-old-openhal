@@ -39,7 +39,9 @@ __KERNEL_RCSID(0, "$NetBSD: ieee80211_proto.c,v 1.5 2003/10/13 04:23:56 dyoung E
 /*
  * IEEE 802.11 protocol support.
  */
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/kmod.h>
 #include <linux/module.h>

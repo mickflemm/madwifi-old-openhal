@@ -42,7 +42,9 @@
  * you want; e.g. insmod ccmp_test tests=7 will run only test mpdu's
  * 1, 2, and 3.
  */
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

@@ -43,7 +43,9 @@
 /*
  * Wireless extensions support for 802.11 common code.
  */
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/netdevice.h>

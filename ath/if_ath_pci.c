@@ -42,7 +42,9 @@
 #define	EXPORT_SYMTAB
 #endif
 
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0))

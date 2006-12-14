@@ -38,7 +38,9 @@ __FBSDID("$FreeBSD: src/sys/net80211/ieee80211_input.c,v 1.32 2005/01/24 19:32:0
 /*
  * IEEE 802.11 input handling.
  */
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/skbuff.h>

@@ -182,13 +182,14 @@ ar5k_ar5211_fill(struct ath_hal *hal)
 	AR5K_HAL_FUNCTION(hal, ar5211, num_tx_pending);
 	AR5K_HAL_FUNCTION(hal, ar5211, phy_disable);
 	AR5K_HAL_FUNCTION(hal, ar5211, set_pcu_config);
+	AR5K_HAL_FUNCTION(hal, ar5211, set_txpower_limit);
+	AR5K_HAL_FUNCTION(hal, ar5211, set_def_antenna);
+	AR5K_HAL_FUNCTION(hal, ar5211, get_def_antenna);
 	/*Totaly unimplemented*/
 	AR5K_HAL_FUNCTION(hal, ar5211, set_capability);
 	AR5K_HAL_FUNCTION(hal, ar5211, proc_mib_event);
 	AR5K_HAL_FUNCTION(hal, ar5211, get_tx_inter_queue);
-	AR5K_HAL_FUNCTION(hal, ar5211, set_txpower_limit);
-	AR5K_HAL_FUNCTION(hal, ar5211, set_def_antenna);
-	AR5K_HAL_FUNCTION(hal, ar5211, get_def_antenna);
+
 
 }
 
@@ -447,23 +448,29 @@ ar5k_ar5211_reset(struct ath_hal *hal, HAL_OPMODE op_mode, HAL_CHANNEL *channel,
 	 */
 	hal->ah_op_mode = op_mode;
 
-	if (channel->c_channel_flags & IEEE80211_CHAN_A) {
+	 switch (channel->c_channel_flags & CHANNEL_MODES) {
+ 	 case CHANNEL_A:
 		mode = AR5K_INI_VAL_11A;
 		freq = AR5K_INI_RFGAIN_5GHZ;
 		ee_mode = AR5K_EEPROM_MODE_11A;
-	} else if (channel->c_channel_flags & IEEE80211_CHAN_T) {
+		break ;
+	case CHANNEL_T:
 		mode = AR5K_INI_VAL_11A_TURBO;
 		freq = AR5K_INI_RFGAIN_5GHZ;
 		ee_mode = AR5K_EEPROM_MODE_11A;
-	} else if (channel->c_channel_flags & IEEE80211_CHAN_B) {
+		break;
+	case CHANNEL_B: 
 		mode = AR5K_INI_VAL_11B;
 		freq = AR5K_INI_RFGAIN_2GHZ;
 		ee_mode = AR5K_EEPROM_MODE_11B;
-	} else if (channel->c_channel_flags & IEEE80211_CHAN_G) {
+		break;
+	case CHANNEL_G:
+	case CHANNEL_PUREG:
 		mode = AR5K_INI_VAL_11G;
 		freq = AR5K_INI_RFGAIN_2GHZ;
 		ee_mode = AR5K_EEPROM_MODE_11G;
-	} else {
+		break;
+	default:
 		AR5K_PRINTF("invalid channel: %d\n", channel->c_channel);
 		return (AH_FALSE);
 	}
@@ -524,15 +531,10 @@ ar5k_ar5211_reset(struct ath_hal *hal, HAL_OPMODE op_mode, HAL_CHANNEL *channel,
 	AR5K_REG_MASKED_BITS(AR5K_AR5211_PHY(0x44),
 	    hal->ah_antenna[ee_mode][0], 0xfffffc06);
 
-	ant[0] = HAL_ANT_FIXED_A;
-	ant[1] = HAL_ANT_FIXED_B;
-
-	if (hal->ah_ant_diversity == AH_FALSE) {
 		if (freq == AR5K_INI_RFGAIN_2GHZ)
-			ant[0] = HAL_ANT_FIXED_B;
-		else if (freq == AR5K_INI_RFGAIN_5GHZ)
-			ant[1] = HAL_ANT_FIXED_A;
-	}
+			ant[0] = ant[1] =HAL_ANT_FIXED_B;
+		else
+			ant[0] = ant[1] = HAL_ANT_FIXED_A;
 
 	AR5K_REG_WRITE(AR5K_AR5211_PHY_ANT_SWITCH_TABLE_0,
 	    hal->ah_antenna[ee_mode][ant[0]]);
@@ -666,18 +668,21 @@ ar5k_ar5211_reset(struct ath_hal *hal, HAL_OPMODE op_mode, HAL_CHANNEL *channel,
 	return (AH_TRUE);
 }
 
-void /*Unimplemented*/
+void /*New*/
 ar5k_ar5211_set_def_antenna(struct ath_hal *hal, u_int ant)
 {
 	AR5K_TRACE;
+	/*Just a try M.F.*/
+	AR5K_REG_WRITE(AR5K_AR5211_DEFAULT_ANTENNA, ant);
 	return;
 }
 
-u_int/*Unimplemented*/
+u_int/*New*/
 ar5k_ar5211_get_def_antenna(struct ath_hal *hal)
 {
 	AR5K_TRACE;
-	return 0;
+	/*Just a try M.F.*/
+	return AR5K_REG_READ(AR5K_AR5211_DEFAULT_ANTENNA);
 }
 
 void
@@ -807,7 +812,7 @@ ar5k_ar5211_update_tx_triglevel(struct ath_hal *hal, HAL_BOOL increase)
 
 int
 ar5k_ar5211_setup_tx_queue(struct ath_hal *hal, HAL_TX_QUEUE queue_type,
-    const HAL_TXQ_INFO *queue_info)
+     HAL_TXQ_INFO *queue_info)
 {
 	u_int queue;
 
@@ -836,6 +841,7 @@ ar5k_ar5211_setup_tx_queue(struct ath_hal *hal, HAL_TX_QUEUE queue_type,
 	hal->ah_txq[queue].tqi_type = queue_type;
 
 	if (queue_info != NULL) {
+		queue_info->tqi_type = queue_type;
 		if (ar5k_ar5211_setup_tx_queueprops(hal, queue, queue_info)
 		    != AH_TRUE)
 			return (-1);
@@ -852,7 +858,7 @@ ar5k_ar5211_setup_tx_queueprops(struct ath_hal *hal, int queue,
 {
 	AR5K_ASSERT_ENTRY(queue, hal->ah_capabilities.cap_queues.q_tx_num);
 
-	if (hal->ah_txq[queue].tqi_type == HAL_TX_QUEUE_INACTIVE)
+	if (hal->ah_txq[queue].tqi_type != HAL_TX_QUEUE_INACTIVE)
 		return (AH_FALSE);
 
 	bcopy(queue_info, &hal->ah_txq[queue], sizeof(HAL_TXQ_INFO));
@@ -2224,8 +2230,11 @@ ar5k_ar5211_disable_pspoll(struct ath_hal *hal)
 HAL_BOOL /*Unimplemented*/
 ar5k_ar5211_set_txpower_limit(struct ath_hal *hal, u_int32_t power)
 {
+	HAL_CHANNEL *channel = &hal->ah_current_channel;
+
 	AR5K_TRACE;
-	return (AH_FALSE);
+	AR5K_PRINTF("changing txpower to %d\n unimplemented ;-(",power);
+	return AH_FALSE;
 }
 
 /*
@@ -2514,12 +2523,13 @@ ar5k_ar5211_get_capabilities(struct ath_hal *hal)
 	if (AR5K_EEPROM_HDR_11B(ee_header) || AR5K_EEPROM_HDR_11G(ee_header)) {
 		hal->ah_capabilities.cap_range.range_2ghz_min = 2412; /* 2312 */
 		hal->ah_capabilities.cap_range.range_2ghz_max = 2732;
-		hal->ah_capabilities.cap_mode |= HAL_MODE_11B;
 
 		if (AR5K_EEPROM_HDR_11B(ee_header))
 			hal->ah_capabilities.cap_mode |= HAL_MODE_11B;
+#if 0
 		if (AR5K_EEPROM_HDR_11G(ee_header))
 			hal->ah_capabilities.cap_mode |= HAL_MODE_11G;
+#endif
 	}
 
 	/* GPIO */

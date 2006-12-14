@@ -44,7 +44,9 @@ __FBSDID("$FreeBSD: src/sys/dev/ath/if_ath.c,v 1.76 2005/01/24 20:31:24 sam Exp 
  * This software is derived from work of Atsushi Onoe; his contribution
  * is greatly appreciated.
  */
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -581,7 +583,10 @@ ath_attach(u_int16_t devid, struct net_device *dev)
  	dev->change_mtu = &ath_change_mtu;
 	dev->tx_queue_len = ATH_TXBUF;			/* TODO? 1 for mgmt frame */
 #ifdef CONFIG_NET_WIRELESS
+/*get_wireless_stats moved from net_device to iw_handler_def*/
+# if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,10)
 	dev->get_wireless_stats = ath_iw_getstats;
+# endif
 	ieee80211_ioctl_iwsetup(&ath_iw_handler_def);
 	dev->wireless_handlers = &ath_iw_handler_def;
 #endif /* CONFIG_NET_WIRELESS */
@@ -840,8 +845,17 @@ ath_shutdown(struct net_device *dev)
 /*
  * Interrupt handler.  Most of the actual processing is deferred.
  */
+
+/*
+ *Port r1752 - Starting linux kernel v2.6.19 and later 
+ *interrupt handlers are not passed.
+ */
 irqreturn_t
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,19) 
+ath_intr(int irq, void *dev_id) 
+#else
 ath_intr(int irq, void *dev_id, struct pt_regs *regs)
+#endif
 {
 	struct net_device *dev = dev_id;
 	struct ath_softc *sc = dev->priv;
@@ -1350,11 +1364,11 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 {
 #define	CTS_DURATION \
 	ath_hal_computetxtime(ah, rt, IEEE80211_ACK_LEN, cix, AH_TRUE)
-#define	updateCTSForBursting(_ah, _ds, _txq) \
+/*#define	updateCTSForBursting(_ah, _ds, _txq) \
 	ath_hal_updateCTSForBursting(_ah, _ds, \
 	    _txq->axq_linkbuf != NULL ? _txq->axq_linkbuf->bf_desc : NULL, \
 	    _txq->axq_lastdsWithCTS, _txq->axq_gatingds, \
-	    txopLimit, CTS_DURATION)
+	    txopLimit, CTS_DURATION)*/
 	struct ath_softc *sc = dev->priv;
 	struct ieee80211com *ic = &sc->sc_ic;
 	struct ath_hal *ah = sc->sc_ah;
@@ -1578,9 +1592,9 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 		 * (live) hardware queue.  The logic is buried in the hal
 		 * because it's highly chip-specific.
 		 */
-		if (txopLimit != 0) {
-			sc->sc_stats.ast_tx_ctsburst++;
-			if (updateCTSForBursting(ah, ds, txq) == 0) {
+//		if (txopLimit != 0) {
+//			sc->sc_stats.ast_tx_ctsburst++;
+//			if (updateCTSForBursting(ah, ds, txq) == 0) {
 				/*
 				 * This frame was not covered by RTS/CTS from
 				 * the previous frame in the burst; update the
@@ -1588,13 +1602,13 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 				 * treated as the last frame for extending a
 				 * burst.
 				 */
-				txq->axq_lastdsWithCTS = ds;
+//				txq->axq_lastdsWithCTS = ds;
 				/* set gating Desc to final desc */
-				txq->axq_gatingds =
-					(struct ath_desc *)txq->axq_link;
-			} else
-				sc->sc_stats.ast_tx_ctsext++;
-		}
+//				txq->axq_gatingds =
+//					(struct ath_desc *)txq->axq_link;
+//			} else
+//				sc->sc_stats.ast_tx_ctsext++;
+//		}
 	}
 	ATH_TXQ_INSERT_TAIL(txq, bf, bf_list);
 	DPRINTF(sc, ATH_DEBUG_TX_PROC, "%s: txq depth = %d\n",
@@ -1627,7 +1641,7 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 	sc->sc_rawdev.trans_start = jiffies;
 
 	return 0;
-#undef updateCTSForBursting
+//#undef updateCTSForBursting
 #undef CTS_DURATION
 }
 
@@ -4085,11 +4099,11 @@ ath_tx_start(struct net_device *dev, struct ieee80211_node *ni, struct ath_buf *
 {
 #define	CTS_DURATION \
 	ath_hal_computetxtime(ah, rt, IEEE80211_ACK_LEN, cix, AH_TRUE)
-#define	updateCTSForBursting(_ah, _ds, _txq) \
+/*#define	updateCTSForBursting(_ah, _ds, _txq) \
 	ath_hal_updateCTSForBursting(_ah, _ds, \
 	    _txq->axq_linkbuf != NULL ? _txq->axq_linkbuf->bf_desc : NULL, \
 	    _txq->axq_lastdsWithCTS, _txq->axq_gatingds, \
-	    txopLimit, CTS_DURATION)
+	    txopLimit, CTS_DURATION)*/
 	struct ath_softc *sc = dev->priv;
 	struct ieee80211com *ic = &sc->sc_ic;
 	struct ath_hal *ah = sc->sc_ah;
@@ -4512,9 +4526,9 @@ ath_tx_start(struct net_device *dev, struct ieee80211_node *ni, struct ath_buf *
 		 * (live) hardware queue.  The logic is buried in the hal
 		 * because it's highly chip-specific.
 		 */
-		if (txopLimit != 0) {
-			sc->sc_stats.ast_tx_ctsburst++;
-			if (updateCTSForBursting(ah, ds, txq) == 0) {
+//		if (txopLimit != 0) {
+//			sc->sc_stats.ast_tx_ctsburst++;
+//			if (updateCTSForBursting(ah, ds, txq) == 0) {
 				/*
 				 * This frame was not covered by RTS/CTS from
 				 * the previous frame in the burst; update the
@@ -4522,13 +4536,13 @@ ath_tx_start(struct net_device *dev, struct ieee80211_node *ni, struct ath_buf *
 				 * treated as the last frame for extending a
 				 * burst.
 				 */
-				txq->axq_lastdsWithCTS = ds;
+//				txq->axq_lastdsWithCTS = ds;
 				/* set gating Desc to final desc */
-				txq->axq_gatingds =
-					(struct ath_desc *)txq->axq_link;
-			} else
-				sc->sc_stats.ast_tx_ctsext++;
-		}
+//				txq->axq_gatingds =
+//					(struct ath_desc *)txq->axq_link;
+//			} else
+//				sc->sc_stats.ast_tx_ctsext++;
+//		}
 	}
 	ATH_TXQ_INSERT_TAIL(txq, bf, bf_list);
 	DPRINTF(sc, ATH_DEBUG_TX_PROC, "%s: txq depth = %d\n",
@@ -4558,7 +4572,7 @@ ath_tx_start(struct net_device *dev, struct ieee80211_node *ni, struct ath_buf *
 	dev->trans_start = jiffies;
 	sc->sc_rawdev.trans_start = jiffies;
 	return 0;
-#undef updateCTSForBursting
+//#undef updateCTSForBursting
 #undef CTS_DURATION
 }
 
@@ -5904,6 +5918,10 @@ static const iw_handler ath_priv_handlers[] = {
 
 static struct iw_handler_def ath_iw_handler_def = {
 #define	N(a)	(sizeof (a) / sizeof (a[0]))
+/*get_wireless_stats moved from net_device to iw_handler_def*/
+# if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,10)
+	.get_wireless_stats	= ath_iw_getstats,
+# endif
 	.standard		= (iw_handler *) ath_handlers,
 	.num_standard		= N(ath_handlers),
 	.private		= (iw_handler *) ath_priv_handlers,

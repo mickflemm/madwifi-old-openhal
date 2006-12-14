@@ -1,4 +1,4 @@
-Linux OpenHAL 20062302
+Linux OpenHAL 20061412
 ======================
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * This is a port of the ar5k hal for atheros device drivers that is         *
@@ -23,11 +23,12 @@ Linux OpenHAL 20062302
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            *
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+
 DEVELOPMENT
 ===========
 
 We are basing our openhal on OpenBSD's ar5k. Because of this and since the GPL does not
-allow us to commit changes on the GPL version back to the BSD version please sumbit your 
+allow us to commit changes on the GPL version back to the BSD version please sumbit your
 non-linux enhancements to the HAL to "Reyk Floeter" <reyk@openbsd.org> and CC madwifi-devel.
 
 
@@ -114,4 +115,3 @@ TODO
 * Lot's of tests and fixes.
 * Make it combatible with newer versions of MadWiFi (after the merge).
 * Test 5210/5211 code.
-

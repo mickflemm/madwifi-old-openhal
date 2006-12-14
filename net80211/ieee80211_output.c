@@ -39,7 +39,9 @@ __KERNEL_RCSID(0, "$NetBSD: ieee80211_output.c,v 1.9 2003/11/02 00:17:27 dyoung 
 /*
  * IEEE 802.11 output handling.
  */
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/skbuff.h>

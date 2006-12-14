@@ -178,13 +178,15 @@ ar5k_ar5210_fill(struct ath_hal *hal)
 	AR5K_HAL_FUNCTION(hal, ar5210, num_tx_pending);
 	AR5K_HAL_FUNCTION(hal, ar5210, phy_disable);
 	AR5K_HAL_FUNCTION(hal, ar5210, set_pcu_config);
+	AR5K_HAL_FUNCTION(hal, ar5210, set_txpower_limit);
+	AR5K_HAL_FUNCTION(hal, ar5210, set_def_antenna);
+	AR5K_HAL_FUNCTION(hal, ar5210, get_def_antenna);
 	/*Totaly unimplemented*/
 	AR5K_HAL_FUNCTION(hal, ar5210, set_capability);
 	AR5K_HAL_FUNCTION(hal, ar5210, proc_mib_event);
 	AR5K_HAL_FUNCTION(hal, ar5210, get_tx_inter_queue);
-	AR5K_HAL_FUNCTION(hal, ar5210, set_txpower_limit);
-	AR5K_HAL_FUNCTION(hal, ar5210, set_def_antenna);
-	AR5K_HAL_FUNCTION(hal, ar5210, get_def_antenna);
+
+
 
 }
 
@@ -461,7 +463,7 @@ void /*Unimplemented*/
 ar5k_ar5210_set_def_antenna(struct ath_hal *hal, u_int ant)
 {
 	AR5K_TRACE;
-	return;
+	return 0;
 }
 
 u_int/*Unimplemented*/
@@ -732,7 +734,7 @@ ar5k_ar5210_update_tx_triglevel(struct ath_hal *hal, HAL_BOOL increase)
 
 int
 ar5k_ar5210_setup_tx_queue(struct ath_hal *hal, HAL_TX_QUEUE queue_type,
-    const HAL_TXQ_INFO *queue_info)
+     HAL_TXQ_INFO *queue_info)
 {
 	u_int queue;
 
@@ -758,6 +760,7 @@ ar5k_ar5210_setup_tx_queue(struct ath_hal *hal, HAL_TX_QUEUE queue_type,
 	hal->ah_txq[queue].tqi_type = queue_type;
 
 	if (queue_info != NULL) {
+		queue_info->tqi_type = queue_type;
 		if (ar5k_ar5210_setup_tx_queueprops(hal,
 			queue, queue_info) != AH_TRUE)
 			return (-1);
@@ -2127,8 +2130,11 @@ ar5k_ar5210_disable_pspoll(struct ath_hal *hal)
 HAL_BOOL /*Unimplemented*/
 ar5k_ar5210_set_txpower_limit(struct ath_hal *hal, u_int32_t power)
 {
+	HAL_CHANNEL *channel = &hal->ah_current_channel;
+
 	AR5K_TRACE;
-	return (AH_FALSE);
+	AR5K_PRINTF("changing txpower to %d\n unimplemented ;-(",power);
+	return AH_FALSE;
 }
 
 /*

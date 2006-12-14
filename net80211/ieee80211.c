@@ -39,7 +39,9 @@ __KERNEL_RCSID(0, "$NetBSD: ieee80211.c,v 1.7 2003/10/16 22:25:00 matt Exp $");
 /*
  * IEEE 802.11 generic handler
  */
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/skbuff.h>

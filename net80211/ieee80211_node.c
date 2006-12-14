@@ -39,7 +39,9 @@ __KERNEL_RCSID(0, "$NetBSD: ieee80211_node.c,v 1.8 2003/11/02 01:29:05 dyoung Ex
 /*
  * IEEE 802.11 node handling support.
  */
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/skbuff.h>

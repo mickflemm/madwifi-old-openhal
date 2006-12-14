@@ -45,7 +45,9 @@ __FBSDID("$FreeBSD: src/sys/net80211/ieee80211_acl.c,v 1.3 2004/12/31 22:42:38 s
  * and if found the frame is either accepted (ACL_POLICY_ALLOW)
  * or rejected (ACL_POLICY_DENT).
  */
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/skbuff.h>

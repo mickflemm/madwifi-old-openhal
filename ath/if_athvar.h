@@ -384,7 +384,15 @@ int	ath_detach(struct net_device *);
 void	ath_resume(struct net_device *);
 void	ath_suspend(struct net_device *);
 void	ath_shutdown(struct net_device *);
-irqreturn_t ath_intr(int irq, void *dev_id, struct pt_regs *regs);
+/*
+ *Port r1752 - Starting linux kernel v2.6.19 and later 
+ *interrupt handlers are not passed.
+ */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,19) 
+irqreturn_t ath_intr(int, void *); 
+#else 
+irqreturn_t ath_intr(int, void *, struct pt_regs *regs); 
+#endif 
 #ifdef CONFIG_SYSCTL
 void	ath_sysctl_register(void);
 void	ath_sysctl_unregister(void);

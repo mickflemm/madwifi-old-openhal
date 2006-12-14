@@ -97,16 +97,16 @@ enum ar5k_radio {
  * error occurs--i.e. you cannot check it for success.
  */
 typedef enum {
-	HAL_OK			= 0,		/* No error */
-	HAL_ENXIO		= 1,		/* No hardware present */
-	HAL_ENOMEM		= 2,		/* Memory allocation failed */
-	HAL_EIO			= 3,		/* Hardware didn't respond as expected */
-	HAL_EEMAGIC		= 4,		/* EEPROM magic number invalid */
-	HAL_EEVERSION		= 5,		/* EEPROM version invalid */
-	HAL_EELOCKED		= 6,		/* EEPROM unreadable */
-	HAL_EEBADSUM		= 7,		/* EEPROM checksum invalid */
-	HAL_EEREAD		= 8,		/* EEPROM read problem */
-	HAL_EEBADMAC		= 9,		/* EEPROM mac address invalid */
+	HAL_OK			= 0,	/* No error */
+	HAL_ENXIO		= 1,	/* No hardware present */
+	HAL_ENOMEM		= 2,	/* Memory allocation failed */
+	HAL_EIO			= 3,	/* Hardware didn't respond as expected */
+	HAL_EEMAGIC		= 4,	/* EEPROM magic number invalid */
+	HAL_EEVERSION		= 5,	/* EEPROM version invalid */
+	HAL_EELOCKED		= 6,	/* EEPROM unreadable */
+	HAL_EEBADSUM		= 7,	/* EEPROM checksum invalid */
+	HAL_EEREAD		= 8,	/* EEPROM read problem */
+	HAL_EEBADMAC		= 9,	/* EEPROM mac address invalid */
 	HAL_EESIZE		= 10,	/* EEPROM size not supported */
 	HAL_EEWRITE		= 11,	/* Attempt to change write-locked EEPROM */
 	HAL_EINVAL		= 12,	/* Invalid parameter to function */
@@ -121,17 +121,17 @@ typedef enum {
 } HAL_BOOL;
 
 enum {
-	HAL_MODE_11A			= 0x001,		/* 11a channels */
-	HAL_MODE_TURBO			= 0x002,		/* 11a turbo-only channels */
-	HAL_MODE_11B			= 0x004,		/* 11b channels */
-	HAL_MODE_PUREG			= 0x008,		/* 11g channels (OFDM only) */
-	HAL_MODE_11G			= 0x010,		/* 11g channels (OFDM/CCK) */
-//	HAL_MODE_11G			= 0x008,		/* XXX historical */
-	HAL_MODE_108G			= 0x020,		/* 11g+Turbo channels */
-	HAL_MODE_108A			= 0x040,		/* 11a+Turbo channels */
-	HAL_MODE_XR			= 0x100,		/* XR channels */
-	HAL_MODE_11A_HALF_RATE 		= 0x200,		/* 11A half rate channels */
-	HAL_MODE_11A_QUARTER_RATE 	= 0x400,		/* 11A quarter rate channels */
+	HAL_MODE_11A			= 0x001,	/* 11a channels */
+	HAL_MODE_TURBO			= 0x002,	/* 11a turbo-only channels */
+	HAL_MODE_11B			= 0x004,	/* 11b channels */
+	HAL_MODE_PUREG			= 0x008,	/* 11g channels (OFDM only) */
+	HAL_MODE_11G			= 0x010,	/* 11g channels (OFDM/CCK) */
+//	HAL_MODE_11G			= 0x008,	/* XXX historical */
+	HAL_MODE_108G			= 0x020,	/* 11g+Turbo channels */
+	HAL_MODE_108A			= 0x040,	/* 11a+Turbo channels */
+	HAL_MODE_XR			= 0x100,	/* XR channels */
+	HAL_MODE_11A_HALF_RATE 		= 0x200,	/* 11A half rate channels */
+	HAL_MODE_11A_QUARTER_RATE 	= 0x400,	/* 11A quarter rate channels */
 	HAL_MODE_ALL			= 0xfff
 };
 
@@ -164,11 +164,11 @@ typedef enum {
 #define	HAL_NUM_TX_QUEUES	10		/* max possible # of queues */
 
 typedef enum {
-	HAL_TX_QUEUE_ID_DATA_MIN 	= 0,
-	HAL_TX_QUEUE_ID_DATA_MAX 	= 6,
-	HAL_TX_QUEUE_ID_PSPOLL 	= 7,
-	HAL_TX_QUEUE_ID_BEACON 	= 8,
-	HAL_TX_QUEUE_ID_CAB 		= 9,
+	HAL_TX_QUEUE_ID_DATA_MIN = 0,
+	HAL_TX_QUEUE_ID_DATA_MAX = 6,
+	HAL_TX_QUEUE_ID_PSPOLL 	 = 7,
+	HAL_TX_QUEUE_ID_BEACON 	 = 8,
+	HAL_TX_QUEUE_ID_CAB 	 = 9,
 } HAL_TX_QUEUE_ID;
 
 /*
@@ -615,7 +615,10 @@ typedef struct {
 #define CHANNEL_PUREG		(IEEE80211_CHAN_2GHZ | IEEE80211_CHAN_OFDM)
 #define CHANNEL_T		(CHANNEL_A | IEEE80211_CHAN_TURBO)
 #define CHANNEL_TG		(CHANNEL_PUREG | IEEE80211_CHAN_TURBO)
+#define CHANNEL_108G		CHANNEL_TG
 #define CHANNEL_XR		(CHANNEL_A | IEEE80211_CHAN_XR)
+#define CHANNEL_MODES   	(CHANNEL_A | CHANNEL_B | CHANNEL_G | CHANNEL_PUREG | \
+				CHANNEL_T | CHANNEL_TG | CHANNEL_XR)
 
 typedef enum {
 	HAL_CHIP_5GHZ = IEEE80211_CHAN_5GHZ,
@@ -1156,7 +1159,7 @@ struct ath_desc {
 	_t HAL_BOOL (_a _n##_update_tx_triglevel)(struct ath_hal*, \
 	    HAL_BOOL level); \
 	_t int (_a _n##_setup_tx_queue)(struct ath_hal *, HAL_TX_QUEUE, \
-	    const HAL_TXQ_INFO *); \
+	     HAL_TXQ_INFO *); \
 	_t HAL_BOOL (_a _n##_setup_tx_queueprops)(struct ath_hal *, int queue, \
 	    const HAL_TXQ_INFO *); \
 	_t HAL_BOOL (_a _n##_release_tx_queue)(struct ath_hal *, u_int queue); \
@@ -1215,9 +1218,9 @@ struct ath_desc {
 	_t void (_a _n##_set_ledstate)(struct ath_hal*, HAL_LED_STATE); \
 	_t void (_a _n##_set_associd)(struct ath_hal*, \
 	    const u_int8_t *bssid, u_int16_t assocId); \
-	_t HAL_BOOL (_a _n##_set_gpio_output)(struct ath_hal *, \
-	    u_int32_t gpio); \
 	_t HAL_BOOL (_a _n##_set_gpio_input)(struct ath_hal *, \
+	    u_int32_t gpio); \
+	_t HAL_BOOL (_a _n##_set_gpio_output)(struct ath_hal *, \
 	    u_int32_t gpio); \
 	_t u_int32_t (_a _n##_get_gpio)(struct ath_hal *, u_int32_t gpio); \
 	_t HAL_BOOL (_a _n##_set_gpio)(struct ath_hal *, u_int32_t gpio, \
@@ -1230,8 +1233,6 @@ struct ath_desc {
 	_t HAL_BOOL (_a _n##_detect_card_present)(struct ath_hal*); \
 	_t void (_a _n##_update_mib_counters)(struct ath_hal*, \
 	    HAL_MIB_STATS*); \
-	_t HAL_BOOL (_a _n##_is_cipher_supported)(struct ath_hal*, \
-	    HAL_CIPHER); \
 	_t HAL_RFGAIN (_a _n##_get_rf_gain)(struct ath_hal*); \
 	_t HAL_BOOL (_a _n##_set_slot_time)(struct ath_hal*, u_int);	\
 	_t u_int (_a _n##_get_slot_time)(struct ath_hal*);		\
@@ -1240,6 +1241,8 @@ struct ath_desc {
 	_t HAL_BOOL (_a _n##_set_cts_timeout)(struct ath_hal*, u_int);	\
 	_t u_int (_a _n##_get_cts_timeout)(struct ath_hal*);		\
 	/* Key Cache Functions */ \
+	_t HAL_BOOL (_a _n##_is_cipher_supported)(struct ath_hal*, \
+	    HAL_CIPHER); \
 	_t u_int32_t (_a _n##_get_keycache_size)(struct ath_hal*); \
 	_t HAL_BOOL (_a _n##_reset_key)(struct ath_hal*, \
 	    u_int16_t); \
@@ -1287,13 +1290,14 @@ struct ath_desc {
 	_t u_int32_t  (_a _n##_num_tx_pending)(struct ath_hal *, u_int); \
 	_t HAL_BOOL (_a _n##_phy_disable)(struct ath_hal *);\
 	_t void (_a _n##_set_pcu_config)(struct ath_hal *);\
+	_t HAL_BOOL (_a _n##_set_txpower_limit)(struct ath_hal *, u_int); \
+	_t void (_a _n##_set_def_antenna)(struct ath_hal *, u_int);\
+	_t u_int  (_a _n ##_get_def_antenna)(struct ath_hal *);\
 	/*Totaly unimplemented*/ \
 	_t HAL_BOOL (_a _n##_set_capability)(struct ath_hal *, HAL_CAPABILITY_TYPE, u_int32_t, u_int32_t, HAL_STATUS *) ; \
 	_t void (_a _n##_proc_mib_event)(struct ath_hal *, const HAL_NODE_STATS *) ; \
-	_t void (_a _n##_get_tx_inter_queue)(struct ath_hal *, u_int32_t *); \
-	_t HAL_BOOL (_a _n##_set_txpower_limit)(struct ath_hal *, u_int32_t); \
-	_t void (_a _n##_set_def_antenna)(struct ath_hal *, u_int);\
-	_t u_int  (_a _n ##_get_def_antenna)(struct ath_hal *);
+	_t void (_a _n##_get_tx_inter_queue)(struct ath_hal *, u_int32_t *);
+
 
 #define AR5K_MAX_GPIO		10
 #define AR5K_MAX_RF_BANKS	8
@@ -1317,6 +1321,7 @@ struct ath_hal {
 	HAL_BOOL		ah_turbo;
 	HAL_BOOL		ah_calibration;
 	HAL_BOOL		ah_running;
+	HAL_BOOL		ah_single_chip;
 	HAL_RFGAIN		ah_rf_gain;
 
 	HAL_RATE_TABLE		ah_rt_11a;
@@ -1340,7 +1345,7 @@ struct ath_hal {
 	HAL_BOOL		ah_2ghz;
 
 #define ah_regdomain		ah_capabilities.cap_regdomain.reg_current
-#define ah_regdomain_hw		ah_capabilities.cap_regdomain.reg_hw
+#define ah_regdomain_hw	ah_capabilities.cap_regdomain.reg_hw
 #define ah_modes		ah_capabilities.cap_mode
 #define ah_ee_version		ah_capabilities.cap_eeprom.ee_version
 #define ah_countryCode		ah_country_code
@@ -1403,7 +1408,8 @@ struct ath_hal {
 enum ar5k_srev_type {
 	AR5K_VERSION_VER,
 	AR5K_VERSION_REV,
-	AR5K_VERSION_RAD
+	AR5K_VERSION_RAD,
+	AR5K_VERSION_DEV
 };
 
 struct ar5k_srev_name {
@@ -1425,10 +1431,14 @@ struct ar5k_srev_name {
 	{ "5111",	AR5K_VERSION_RAD,	AR5K_SREV_RAD_5111 },	\
 	{ "2111",	AR5K_VERSION_RAD,	AR5K_SREV_RAD_2111 },	\
 	{ "5112",	AR5K_VERSION_RAD,	AR5K_SREV_RAD_5112 },	\
-	{ "5112a",	AR5K_VERSION_RAD,	AR5K_SREV_RAD_5112A },	\ 
+	{ "5112a",	AR5K_VERSION_RAD,	AR5K_SREV_RAD_5112A },	\
 	{ "2112",	AR5K_VERSION_RAD,	AR5K_SREV_RAD_2112 },	\
 	{ "2112a",	AR5K_VERSION_RAD,	AR5K_SREV_RAD_2112A },	\
-	{ "xxxx",	AR5K_VERSION_RAD,	AR5K_SREV_UNKNOWN }	\
+	{ "xxxx",	AR5K_VERSION_RAD,	AR5K_SREV_UNKNOWN },	\
+	{ "2413",	AR5K_VERSION_DEV,	AR5K_DEVID_AR2413 },	\
+ 	{ "5413",	AR5K_VERSION_DEV,	AR5K_DEVID_AR5413 },	\
+ 	{ "5424",	AR5K_VERSION_DEV,	AR5K_DEVID_AR5424 },	\
+ 	{ "xxxx",	AR5K_VERSION_DEV,	AR5K_SREV_UNKNOWN }	\
 }
 
 #define AR5K_SREV_UNKNOWN		0xffff
@@ -1508,7 +1518,7 @@ typedef HAL_BOOL (ar5k_rfgain_t)
  */
 
 #define AR5K_INIT_MODE				(			\
-	IEEE80211_CHAN_2GHZ | IEEE80211_CHAN_DYN			\
+	IEEE80211_CHAN_2GHZ | IEEE80211_CHAN_CCK			\
 )
 #define AR5K_INIT_TX_LATENCY			502
 #define AR5K_INIT_USEC				39
@@ -2153,7 +2163,7 @@ u_int			 ath_hal_ieee2mhz(u_int, u_int);
 HAL_BOOL		 ath_hal_init_channels(struct ath_hal *, HAL_CHANNEL *,
     u_int, u_int *, HAL_CTRY_CODE, u_int16_t, HAL_BOOL, HAL_BOOL);
 
-const char		*ar5k_printver(enum ar5k_srev_type, u_int);
+const char		*ar5k_printver(enum ar5k_srev_type, u_int32_t);
 void			 ar5k_radar_alert(struct ath_hal *);
 ieee80211_regdomain_t	 ar5k_regdomain_to_ieee(u_int16_t);
 u_int16_t		 ar5k_regdomain_from_ieee(ieee80211_regdomain_t);

@@ -53,7 +53,9 @@
  * of these settings while the client is running the device must be marked
  * down and up again, or similar (e.g. change authentication mode).
  */
+#ifndef AUTOCONF_INCLUDED
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

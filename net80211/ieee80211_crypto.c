@@ -36,7 +36,9 @@ __KERNEL_RCSID(0, "$NetBSD: ieee80211_crypto.c,v 1.4 2003/09/23 16:03:46 dyoung 
 /*
  * IEEE 802.11 generic crypto support.
  */
+#ifndef AUTOCONF_INCLUDED 
 #include <linux/config.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/kmod.h>
