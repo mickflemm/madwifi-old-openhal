@@ -133,10 +133,6 @@ else
 MODULEPATH ?=	/lib/modules/${KERNELRELEASE}/net
 endif
 
-# WIRELESSEXT contains information about the version of the wireless
-# extensions that are available in the target kernel
-WIRELESSEXT ?=	$(shell cat $(KERNELPATH)/include/linux/wireless.h | grep "\#define WIRELESS_EXT" | cut -f2)
-
 # Some settings that depend on actual kernel release
 ifneq ($(findstring 2.6,$(KERNELRELEASE)),)
 export-objs	:=

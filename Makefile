@@ -100,7 +100,6 @@ info:
 	    echo "DESTDIR      : $(DESTDIR)"; \
 	    echo "SYSTEMMAP    : $(SYSTEMMAP)"; \
 	fi
-	@echo "WIRELESSEXT  : $(WIRELESSEXT)"
 
 dotconfig:
 	@#
@@ -125,13 +124,6 @@ configcheck: dotconfig
 	    echo "You have $(KERNELRELEASE)."; \
 	    exit 1; \
 	}
-	
-	@if [ "$(WIRELESSEXT)" -lt 14 ]; then \
-	    echo "FAILED"; \
-	    echo "Wireless extensions v14 or better is needed."; \
-	    echo "You have v$(WIRELESSEXT)."; \
-	    exit 1; \
-	fi
 	
 	@# check kernel configuration
 	@if [ -z "$(CONFIG_SYSCTL)" ]; then \
