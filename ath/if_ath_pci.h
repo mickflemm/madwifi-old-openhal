@@ -60,4 +60,8 @@
 #define BUS_DMA_FROMDEVICE	PCI_DMA_FROMDEVICE
 #define BUS_DMA_TODEVICE	PCI_DMA_TODEVICE
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,11)
+#define pm_message_t u32
+#endif
+
 #endif   /* _DEV_ATH_PCI_H_ */
