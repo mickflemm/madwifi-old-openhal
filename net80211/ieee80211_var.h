@@ -43,9 +43,9 @@
 /* NB: portability glue must go first */
 #ifdef __NetBSD__
 #include <net80211/ieee80211_netbsd.h>
-#elif __FreeBSD__
+#elif defined(__FreeBSD__)
 #include <net80211/ieee80211_freebsd.h>
-#elif __linux__
+#elif defined (__linux__)
 #include <net80211/ieee80211_linux.h>
 #else
 #error	"No support for your operating system!"
@@ -138,7 +138,7 @@ struct ieee80211com {
 	u_int8_t		ic_dtim_period;	/* DTIM period */
 	u_int8_t                ic_dtim_count;  /* DTIM count for last bcn */
 	struct ifmedia		ic_media;	/* interface media config */
-#if NBPFILTER > 0
+#if defined(NBPFILTER) && (NBPFILTER > 0)
 	struct bpf_if		*ic_rawbpf;	/* packet filter structure */
 #endif
 	struct ieee80211_node	*ic_bss;	/* information for this node */
