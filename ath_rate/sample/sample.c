@@ -903,7 +903,7 @@ ATH_SYSCTL_DECL(ath_sysctl_rate_stats, ctl, write, filp, buffer,
 		lenp, ppos)
 {
 	struct ath_softc *sc = ctl->extra1;
-	int packet_size = (int) ctl->extra2;
+	int packet_size = (long) ctl->extra2;
 	struct ieee80211com *ic = &sc->sc_ic;
 	char tmp_buf[PAGE_SIZE]; 
 	int tmp_buf_size = MIN(PAGE_SIZE, *lenp);
