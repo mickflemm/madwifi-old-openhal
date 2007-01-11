@@ -85,7 +85,6 @@ clean:
 
 info:
 	@echo "The following settings will be used for compilation:"
-	@echo "TARGET       : $(TARGET)"
 	@echo "OS           : $(OS)"
 	@echo "BUS          : $(BUS)"
 	@if [ ! -z "$(TOOLPATH)" ]; then \

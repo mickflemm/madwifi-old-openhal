@@ -44,25 +44,17 @@ list-multi	:= ath_hal.o
 
 include $(obj)/${DEPTH}/Makefile.inc
 
-UUDECODE?=uudecode
-
-INCS+=	-I${HAL} -I${HAL}/${OS} -I${HAL}/public -I${obj}/${ATH_HAL} -I${obj}/${DEPTH}
+INCS+=	-I${HAL} -I${HAL}/${OS} -I${obj}/${ATH_HAL} -I${obj}/${DEPTH}
 
 EXTRA_CFLAGS+= ${INCS} ${COPTS}
 
 -include $(TOPDIR)/Rules.make
 
-all:	ah_osdep.c hal.o opt_ah.h
+all:	ah_osdep.c hal.o
 	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) MODVERDIR=$(shell pwd)/${SYMBOLSDIR} modules
 
 ah_osdep.c:
 	cp ${HAL}/${OS}/ah_osdep.c ah_osdep.c
-
-$(obj)/hal.o:
-	${UUDECODE} ${HAL}/public/${TARGET}.hal.o.uu
-
-opt_ah.h: ${HAL}/public/${TARGET}.opt_ah.h
-	cp ${HAL}/public/${TARGET}.opt_ah.h opt_ah.h
 
 install:
 	test -d ${DESTDIR}/${MODULEPATH} || mkdir -p ${DESTDIR}/${MODULEPATH}
@@ -74,7 +66,7 @@ clean:
 	-rm -f .version .*.o.flags .*.o.d .*.o.cmd .*.ko.cmd
 	-rm -rf .tmp_versions
 # remove the files we copied to this dir
-	-rm -f ah_osdep.c opt_ah.h hal.o
+	-rm -f ah_osdep.c hal.o
 
 ath_hal.o: ${ath_hal-objs}
 	$(LD) $(LDOPTS) -o ath_hal.$(KMODSUF) -r $(ath_hal-objs)

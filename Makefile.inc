@@ -46,16 +46,6 @@ export LC_ALL = POSIX
 # OS is the target operating system. Currently only Linux is supported.
 OS=		linux
 
-# TARGET defines the target platform ISA per GNU rules.
-# It must match one of the target platforms supported by
-# the HAL.  To see the set of target platforms look at
-# hal/linux/*.inc.  You can set this in the environment
-# to override the default setting.
-#
-ifeq ($(TARGET),)
-TARGET=		openhal
-endif
-
 # BUS defines the bus type to which the wireless devices is attached.
 # Currently, the valid BUS types are PCI and AHB.  If BUS is not
 # defined, then, we assume the bus type is PCI
@@ -164,7 +154,5 @@ INCS=	-include ${obj}/${DEPTH}/include/compat.h -I${obj}/${DEPTH}/include
 ifeq ($(strip ${BUS}),AHB)
 INCS+= -isystem ${TOOLPATH}/include
 endif
-
-include ${HAL}/public/${TARGET}.inc
 
 SYMBOLSDIR=${DEPTH}/symbols

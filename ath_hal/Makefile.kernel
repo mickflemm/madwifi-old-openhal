@@ -5,33 +5,13 @@
 ##2.4##src=.
 ##2.4##obj=.
 
-TARGET = openhal
-
 EXTRA_CFLAGS+=	-I. -I${HAL}/.. -I${HAL} -I${HAL}/linux
 
 ifndef OS
 OS = linux
 endif
 
-ifndef HAL_OBJDIR
-#
-# Use release version of HAL.
-#
-# NB: binary HAL's are distributed in a uuencode'd file; on some
-#     systems uuencode is not installed by default and you must
-#     specially install it from the sharutils package.
-#
-UUDECODE?=	uudecode
-
-HAL=		$(src)/../hal
-OPT_AH_H=	${HAL}/public/${TARGET}.opt_ah.h
-else
-#
-# Use private version of HAL.
-#
-HAL=		$(shell dirname `dirname ${HAL_OBJDIR}`)
-OPT_AH_H=	${HAL_OBJDIR}/opt_ah.h
-endif
+HAL=		$(src)/../openhal
 
 ##2.6##obj-$(CONFIG_ATHEROS_HAL) += ath_hal.o
 ##2.6##ath_hal-objs	:= ah_osdep.o hal.o
@@ -44,16 +24,5 @@ endif
 ##2.4##O_TARGET	:= ath_hal.o
 ##2.4##include $(TOPDIR)/Rules.make
 
-ifndef HAL_OBJDIR
-$(obj)/hal.o:	${HAL}/public/${TARGET}.hal.o.uu
-	${UUDECODE} -o $(obj)/hal.o < $<
-else
-$(obj)/hal.o:	${HAL_OBJDIR}/hal.o
-	cp ${HAL_OBJDIR}/hal.o $(obj)/hal.o
-endif
-
-# XXX need opt_ah.h to do dependencies so give this bogus dependency
-$(obj)/ah_osdep.c: ${HAL}/${OS}/ah_osdep.c $(obj)/opt_ah.h
+$(obj)/ah_osdep.c: ${HAL}/${OS}/ah_osdep.c
 	cp ${HAL}/${OS}/ah_osdep.c $(obj)/ah_osdep.c
-$(obj)/opt_ah.h: ${OPT_AH_H}
-	cp ${OPT_AH_H} $(obj)/opt_ah.h

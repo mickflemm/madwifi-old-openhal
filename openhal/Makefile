@@ -11,7 +11,7 @@ list-multi	:= ath_hal.o
 
 include $(obj)/${DEPTH}/Makefile.inc
 
-INCS+=	-I${HAL} -I${HAL}/${OS} -I${HAL}/public -I${obj}/${ATH_HAL} -I${obj}/${DEPTH} -I${WLAN}
+INCS+=	-I${HAL} -I${HAL}/${OS} -I${obj}/${ATH_HAL} -I${obj}/${DEPTH} -I${WLAN}
 
 EXTRA_CFLAGS+= ${INCS} ${COPTS}
 

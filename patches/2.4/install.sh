@@ -90,11 +90,6 @@ INSTALL ${DST_HAL} ${SRC_HAL}/version.h
 MKDIR ${DST_HAL}/linux
 INSTALL ${DST_HAL}/linux ${SRC_HAL}/linux/ah_osdep.c
 INSTALL ${DST_HAL}/linux ${SRC_HAL}/linux/ah_osdep.h
-# XXX copy only target or use arch? 
-MKDIR ${DST_HAL}/public
-INSTALL ${DST_HAL}/public ${SRC_HAL}/public/*.inc
-INSTALL ${DST_HAL}/public ${SRC_HAL}/public/*.opt_ah.h
-INSTALL ${DST_HAL}/public ${SRC_HAL}/public/*.hal.o.uu
 if [ -d ${SRC_HAL}/ar5212 ]; then
 	MKDIR ${DST_HAL}/ar5212
 	INSTALL ${DST_HAL}/ar5212 ${SRC_HAL}/ar5212/ar5212desc.h
