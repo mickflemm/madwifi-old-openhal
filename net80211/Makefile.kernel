@@ -7,7 +7,7 @@
 ##2.4##COMPAT=	compat
 ##2.6##COMPAT=	drivers/net/wireless/net80211/compat
 
-EXTRA_CFLAGS+=	-include ${COMPAT}/compat.h -I${COMPAT} -I${src}/..
+EXTRA_CFLAGS+=	-include $(COMPAT)/compat.h -I$(COMPAT) -I$(src)/..
 
 #
 # There are two authenticator mechanisms: an in-kernel implementation

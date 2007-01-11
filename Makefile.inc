@@ -83,7 +83,7 @@ endif
 # in that file.
 # This trick has been inspired by the lm_sensors project.
 ifndef KERNELRELEASE
-KERNELRELEASE := $(shell $(CC) -I $(KERNELPATH)/include -E ${obj}/${DEPTH}/kernelversion.c | grep uts_release | cut -f2 -d'"')
+KERNELRELEASE := $(shell $(CC) -I $(KERNELPATH)/include -E $(obj)/$(DEPTH)/kernelversion.c | grep uts_release | cut -f2 -d'"')
 ifeq (,$(KERNELRELEASE))
 $(error Cannot detect kernel version - please check compiler and KERNELPATH)
 endif
@@ -101,14 +101,14 @@ endif
 # SYSTEMMAP is the name of the System.map file for the target
 # kernel. This will be needed when DESTDIR is defined in order
 # to run depmod properly.
-SYSTEMMAP ?= 	${KERNELPATH}/System.map
+SYSTEMMAP ?= 	$(KERNELPATH)/System.map
 
 # MODULEPATH nominates the directory where the modules will be
 # installed to
-ifeq ($(strip ${BUS}),AHB)
-MODULEPATH := 	${KERNELPATH}/arch/mips/ar531x/RAMDISK/rootdir/lib/modules/${KERNELRELEASE}/net
+ifeq ($(strip $(BUS)),AHB)
+MODULEPATH := 	$(KERNELPATH)/arch/mips/ar531x/RAMDISK/rootdir/lib/modules/$(KERNELRELEASE)/net
 else
-MODULEPATH ?=	/lib/modules/${KERNELRELEASE}/net
+MODULEPATH ?=	/lib/modules/$(KERNELRELEASE)/net
 endif
 
 # Some settings that depend on actual kernel release
@@ -127,20 +127,20 @@ AWK=           awk
 # Path to the HAL source code.
 #
 ifeq ($(HAL),)
-HAL=	${obj}/${DEPTH}/openhal
+HAL=	$(obj)/$(DEPTH)/openhal
 endif
 #
 # Path to the HAL build area.
 #
-ATH_HAL=${DEPTH}/openhal
+ATH_HAL=$(DEPTH)/openhal
 #
 # Path to the 802.11 include files.
 #
-WLAN=	${DEPTH}/net80211
+WLAN=	$(DEPTH)/net80211
 #
 # Path to the Atheros device driver.
 #
-ATH=	${DEPTH}/ath
+ATH=	$(DEPTH)/ath
 #
 # Path to the rate control algorithm.
 #
@@ -149,10 +149,10 @@ ifeq ($(ATH_RATE),)
 ATH_RATE=ath_rate/sample
 endif
 
-INCS=	-include ${obj}/${DEPTH}/include/compat.h -I${obj}/${DEPTH}/include
+INCS=	-include $(obj)/$(DEPTH)/include/compat.h -I$(obj)/$(DEPTH)/include
 
-ifeq ($(strip ${BUS}),AHB)
-INCS+= -isystem ${TOOLPATH}/include
+ifeq ($(strip $(BUS)),AHB)
+INCS+= -isystem $(TOOLPATH)/include
 endif
 
-SYMBOLSDIR=${DEPTH}/symbols
+SYMBOLSDIR=$(DEPTH)/symbols

@@ -42,24 +42,24 @@ ath_hal-objs	:= ah_osdep.o hal.o
 export-objs	:= ah_osdep.o
 list-multi	:= ath_hal.o
 
-include $(obj)/${DEPTH}/Makefile.inc
+include $(obj)/$(DEPTH)/Makefile.inc
 
-INCS+=	-I${HAL} -I${HAL}/${OS} -I${obj}/${ATH_HAL} -I${obj}/${DEPTH}
+INCS+=	-I$(HAL) -I$(HAL)/$(OS) -I$(obj)/$(ATH_HAL) -I$(obj)/$(DEPTH)
 
-EXTRA_CFLAGS+= ${INCS} ${COPTS}
+EXTRA_CFLAGS+= $(INCS) $(COPTS)
 
 -include $(TOPDIR)/Rules.make
 
 all:	ah_osdep.c hal.o
-	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) MODVERDIR=$(shell pwd)/${SYMBOLSDIR} modules
+	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) MODVERDIR=$(shell pwd)/$(SYMBOLSDIR) modules
 
 ah_osdep.c:
-	cp ${HAL}/${OS}/ah_osdep.c ah_osdep.c
+	cp $(HAL)/$(OS)/ah_osdep.c ah_osdep.c
 
 install:
-	test -d ${DESTDIR}/${MODULEPATH} || mkdir -p ${DESTDIR}/${MODULEPATH}
+	test -d $(DESTDIR)/$(MODULEPATH) || mkdir -p $(DESTDIR)/$(MODULEPATH)
 	$(STRIP) -S ath_hal.$(KMODSUF)
-	cp ath_hal.${KMODSUF} ${DESTDIR}/${MODULEPATH}
+	cp ath_hal.$(KMODSUF) $(DESTDIR)/$(MODULEPATH)
 
 clean:
 	-rm -f *~ *.o *.ko *.mod.c
@@ -68,5 +68,5 @@ clean:
 # remove the files we copied to this dir
 	-rm -f ah_osdep.c hal.o
 
-ath_hal.o: ${ath_hal-objs}
+ath_hal.o: $(ath_hal-objs)
 	$(LD) $(LDOPTS) -o ath_hal.$(KMODSUF) -r $(ath_hal-objs)

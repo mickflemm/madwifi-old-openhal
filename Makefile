@@ -44,16 +44,16 @@ DEPTH=	.
 include Makefile.inc
 
 # NB: the order is important here
-DIRS=	${ATH_HAL} ${ATH_RATE} ${WLAN} ${ATH}
+DIRS=	$(ATH_HAL) $(ATH_RATE) $(WLAN) $(ATH)
 
 all: configcheck
-	mkdir -p ${SYMBOLSDIR}
-	for i in ${DIRS}; do \
+	mkdir -p $(SYMBOLSDIR)
+	for i in $(DIRS); do \
 		(cd $$i; make) || exit 1; \
 	done
 
 install:
-	for i in ${DIRS}; do \
+	for i in $(DIRS); do \
 		(cd $$i; make install) || exit 1; \
 	done
 	@if [ -z $(DESTDIR) ]; then \
@@ -69,19 +69,19 @@ FILES=	ath_hal COPYRIGHT ath include Makefile Makefile.inc \
 HAL_TAG=ATH_HAL_20030802
 
 release:
-	DATE=`date +'%Y%m%d'`; TAG="MADWIFI_$${DATE}"; DIR="madwifi-$${DATE}"; \
-	cvs tag -F $${TAG} ${FILES}; \
-	rm -rf $${DIR}; mkdir $${DIR}; \
-	cvs export -d $${DIR} -r $${TAG} linux; \
-	(cd $${DIR}; cvs export -r ${HAL_TAG} hal); \
-	tar zcf $${DIR}.tgz --exclude=CVS --exclude=hal/freebsd $${DIR}; \
-	rm -rf $${DIR}
+	DATE=`date +'%Y%m%d'`; TAG="MADWIFI_$$DATE"; DIR="madwifi-$$DATE"; \
+	cvs tag -F $$TAG $(FILES); \
+	rm -rf $$DIR; mkdir $$DIR; \
+	cvs export -d $$DIR -r $$TAG linux; \
+	(cd $$DIR; cvs export -r $(HAL_TAG) hal); \
+	tar zcf $$DIR.tgz --exclude=CVS --exclude=hal/freebsd $$DIR; \
+	rm -rf $$DIR
 
 clean:
-	for i in ${DIRS}; do \
+	for i in $(DIRS); do \
 		(cd $$i; make clean); \
 	done
-	rm -rf ${SYMBOLSDIR}
+	rm -rf $(SYMBOLSDIR)
 
 info:
 	@echo "The following settings will be used for compilation:"

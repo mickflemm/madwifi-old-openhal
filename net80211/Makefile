@@ -93,17 +93,17 @@ export-objs	:= if_media.o rc4.o \
 		   ieee80211_dot1x.o ieee80211_radius.o ieee80211_xauth.o
 list-multi	:= $(MOD_INSTALL)
 
-include $(obj)/${DEPTH}/Makefile.inc
+include $(obj)/$(DEPTH)/Makefile.inc
 
-INCS+=	-I${HAL} -I${HAL}/${OS} -I$(obj)/${ATH_HAL} -I$(obj)/${WLAN} \
-	-I${obj}/${DEPTH}
+INCS+=	-I$(HAL) -I$(HAL)/$(OS) -I$(obj)/$(ATH_HAL) -I$(obj)/$(WLAN) \
+	-I$(obj)/$(DEPTH)
 
-EXTRA_CFLAGS+=$(INCS) ${COPTS}
+EXTRA_CFLAGS+=$(INCS) $(COPTS)
 
 -include $(TOPDIR)/Rules.make
 
 all:
-	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) MODVERDIR=$(shell pwd)/${SYMBOLSDIR}  modules
+	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) MODVERDIR=$(shell pwd)/$(SYMBOLSDIR)  modules
 
 wlan.o:	$(wlan-objs)
 	$(LD) $(LDOPTS) -o wlan.$(KMODSUF) -r $(wlan-objs)
@@ -130,11 +130,11 @@ wep_test.o:	$(wep_test-objs)
 	$(LD) $(LDOPTS) -o wep_test.$(KMODSUF) -r $(wep_test-objs)
 
 install:
-	test -d ${DESTDIR}/${MODULEPATH} || mkdir -p ${DESTDIR}/${MODULEPATH}
-	for i in ${MOD_INSTALL}; do \
+	test -d $(DESTDIR)/$(MODULEPATH) || mkdir -p $(DESTDIR)/$(MODULEPATH)
+	for i in $(MOD_INSTALL); do \
 		f=`basename $$i .o`; \
-		${TOOLPREFIX}strip -S $$f.$(KMODSUF); \
-		cp $$f.${KMODSUF} ${DESTDIR}/${MODULEPATH}; \
+		$(TOOLPREFIX)strip -S $$f.$(KMODSUF); \
+		cp $$f.$(KMODSUF) $(DESTDIR)/$(MODULEPATH); \
 	done
 
 clean:

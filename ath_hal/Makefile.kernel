@@ -5,7 +5,7 @@
 ##2.4##src=.
 ##2.4##obj=.
 
-EXTRA_CFLAGS+=	-I. -I${HAL}/.. -I${HAL} -I${HAL}/linux
+EXTRA_CFLAGS+=	-I. -I$(HAL)/.. -I$(HAL) -I$(HAL)/linux
 
 ifndef OS
 OS = linux
@@ -24,5 +24,5 @@ HAL=		$(src)/../openhal
 ##2.4##O_TARGET	:= ath_hal.o
 ##2.4##include $(TOPDIR)/Rules.make
 
-$(obj)/ah_osdep.c: ${HAL}/${OS}/ah_osdep.c
-	cp ${HAL}/${OS}/ah_osdep.c $(obj)/ah_osdep.c
+$(obj)/ah_osdep.c: $(HAL)/$(OS)/ah_osdep.c
+	cp $(HAL)/$(OS)/ah_osdep.c $(obj)/ah_osdep.c

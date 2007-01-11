@@ -45,7 +45,7 @@ endif
 
 DEPTH=	..
 
-ifeq ($(strip ${BUS}),AHB)
+ifeq ($(strip $(BUS)),AHB)
 BUSNAME=ahb
 COPTS+= -DATH_AHB
 else
@@ -53,31 +53,31 @@ BUSNAME=pci
 COPTS+= -DATH_PCI
 endif
 
-obj-m		+= ath_${BUSNAME}.o
-ath_${BUSNAME}-objs	:= if_ath.o if_ath_${BUSNAME}.o radar.o
-export-objs	:= if_ath_${BUSNAME}.o radar.o
-list-multi	:= ath_${BUSNAME}.o
+obj-m		+= ath_$(BUSNAME).o
+ath_$(BUSNAME)-objs	:= if_ath.o if_ath_$(BUSNAME).o radar.o
+export-objs	:= if_ath_$(BUSNAME).o radar.o
+list-multi	:= ath_$(BUSNAME).o
 
-include $(obj)/${DEPTH}/Makefile.inc
+include $(obj)/$(DEPTH)/Makefile.inc
 
-INCS+=	-I${HAL} -I${HAL}/${OS} -I${obj}/${ATH_HAL} \
-	-I${obj}/${WLAN} -I${obj}/${DEPTH}
+INCS+=	-I$(HAL) -I$(HAL)/$(OS) -I$(obj)/$(ATH_HAL) \
+	-I$(obj)/$(WLAN) -I$(obj)/$(DEPTH)
 
-EXTRA_CFLAGS+= ${INCS} ${COPTS}
+EXTRA_CFLAGS+= $(INCS) $(COPTS)
 
 -include $(TOPDIR)/Rules.make
 
 all:
-	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) MODVERDIR=$(shell pwd)/${SYMBOLSDIR} modules
+	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) MODVERDIR=$(shell pwd)/$(SYMBOLSDIR) modules
 
 install:
-	test -d ${DESTDIR}/${MODULEPATH} || mkdir -p ${DESTDIR}/${MODULEPATH}
-	cp ath_${BUSNAME}.${KMODSUF} ${DESTDIR}/${MODULEPATH}
+	test -d $(DESTDIR)/$(MODULEPATH) || mkdir -p $(DESTDIR)/$(MODULEPATH)
+	cp ath_$(BUSNAME).$(KMODSUF) $(DESTDIR)/$(MODULEPATH)
 
 clean:
 	-rm -f *~ *.o *.ko *.mod.c
 	-rm -f .version .*.o.flags .*.o.d .*.o.cmd .*.ko.cmd
 	-rm -rf .tmp_versions
 
-ath_${BUSNAME}.o: ${ath_${BUSNAME}-objs}
-	$(LD) $(LDOPTS) -o ath_${BUSNAME}.$(KMODSUF) -r $(ath_${BUSNAME}-objs)
+ath_$(BUSNAME).o: $(ath_$(BUSNAME)-objs)
+	$(LD) $(LDOPTS) -o ath_$(BUSNAME).$(KMODSUF) -r $(ath_$(BUSNAME)-objs)
