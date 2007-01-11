@@ -53,7 +53,7 @@ OS=		linux
 # to override the default setting.
 #
 ifeq ($(TARGET),)
-TARGET=		i386-elf
+TARGET=		openhal
 endif
 
 # BUS defines the bus type to which the wireless devices is attached.
@@ -75,8 +75,6 @@ DESTDIR ?=
 # TOOLPATH is the path which contains the crosscompile toolchain (?)
 
 ifeq ($(strip ${BUS}),AHB)
-# Bus type AHB forces the target platform to be mipsisa32.
-TARGET :=	mipsisa32-be-elf
 
 # Bus type AHB requires KERNELPATH and TOOLPATH to be set manually.
 ifndef KERNELPATH
