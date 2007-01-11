@@ -327,6 +327,7 @@ get_jiffies_64(void)
 #define CLONE_KERNEL	(CLONE_FS | CLONE_FILES | CLONE_SIGHAND)
 #endif
 
+#include <linux/mm.h>
 #ifndef offset_in_page
 #define	offset_in_page(p) ((unsigned long) (p) & ~PAGE_MASK)
 #endif
