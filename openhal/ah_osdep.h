@@ -53,9 +53,6 @@ typedef u_int32_t HAL_BUS_ADDR;
 #define free(_a, _b) kfree(_a)
 #define bcopy(_a, _b, _c)       memcpy(_b, _a, _c)
 #define bzero(_a, _b)           memset(_a, 0, _b)
-#ifndef printf
-#define printf                  AR5K_PRINT
-#endif
 
 #define AR5K_REG_WRITE(_reg, _val)      (writel(cpu_to_le32(_val), hal->ah_sh + (_reg)))
 //      bus_space_write_4(hal->ah_st, hal->ah_sh, (_reg), (_val))
