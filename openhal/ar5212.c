@@ -822,15 +822,16 @@ ar5k_ar5212_reset(struct ath_hal *hal, HAL_OPMODE op_mode, HAL_CHANNEL *channel,
 
 	/*
 	 * Set RF kill flags if supported by the device (read from the EEPROM)
+	 * Disable gpio_intr for now since it results system hang.
 	 */
-	if (AR5K_EEPROM_HDR_RFKILL(hal->ah_capabilities.cap_eeprom.ee_header)) {
+/*	if (AR5K_EEPROM_HDR_RFKILL(hal->ah_capabilities.cap_eeprom.ee_header)) {
 		ar5k_ar5212_set_gpio_input(hal, 0);
 		if ((hal->ah_gpio[0] = ar5k_ar5212_get_gpio(hal, 0)) == 0)
 			ar5k_ar5212_set_gpio_intr(hal, 0, 1);
 		else
 			ar5k_ar5212_set_gpio_intr(hal, 0, 0);
 	}
-
+*/
 	/*
 	 * Set the 32MHz reference clock
 	 */
@@ -2884,6 +2885,9 @@ ar5k_ar5212_get_isr(struct ath_hal *hal, u_int32_t *interrupt_mask)
 
 	if (data & (AR5K_AR5212_PISR_HIUERR))
 		*interrupt_mask |= HAL_INT_FATAL;
+
+	if (data & (AR5K_AR5212_PISR_BNR))
+		*interrupt_mask |= HAL_INT_BNR;
 
 	/*
 	 * Special interrupt handling (not caught by the driver)

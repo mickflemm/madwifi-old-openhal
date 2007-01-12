@@ -58,7 +58,7 @@ EXPORT_SYMBOL(ath_hal_ieee2mhz);
 static int __init
 init_ath_hal(void)
 {
-	printk(KERN_INFO "%s: driver loaded\n", dev_info);
+	printk(KERN_INFO "%s: OpenHAL loaded (AR5210, AR5211, AR5212)\n", dev_info);
 	return (0);
 }
 module_init(init_ath_hal);
