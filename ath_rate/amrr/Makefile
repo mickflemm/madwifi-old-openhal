@@ -44,17 +44,14 @@ ifeq ($(obj),)
 obj=	.
 endif
 
-DEPTH=	../..
+TOP = $(obj)/../..
 
 obj-m		+= ath_rate_amrr.o
 ath_rate_amrr-objs	:= amrr.o
-export-objs	:= amrr.o
-list-multi	:= ath_rate_onoe.o
 
-include $(obj)/$(DEPTH)/Makefile.inc
+include $(TOP)/Makefile.inc
 
-INCS+=	-I$(HAL) -I$(HAL)/$(OS) -I$(obj)/$(ATH) -I$(obj)/$(WLAN) \
-	-I$(obj)/$(DEPTH)
+INCS += -I$(TOP) -I$(ATH) -I$(HAL)
 
 EXTRA_CFLAGS+= $(INCS) $(COPTS)
 
@@ -64,13 +61,13 @@ all:
 	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) modules
 
 install:
-	test -d $(DESTDIR)/$(MODULEPATH) || mkdir -p $(DESTDIR)/$(MODULEPATH)
-	$(TOOLPREFIX)strip -S ath_rate_amrr.$(KMODSUF)
-	cp ath_rate_amrr.$(KMODSUF) $(DESTDIR)/$(MODULEPATH)
+	test -d $(DESTDIR)/$(KMODPATH) || mkdir -p $(DESTDIR)/$(KMODPATH)
+	cp ath_rate_amrr.$(KMODSUF) $(DESTDIR)/$(KMODPATH)
 
 clean:
 	-rm -f *~ *.o *.ko *.mod.c
-	-rm -f .version .*.o.flags .*.o.d .*.o.cmd .*.ko.cmd
+	-rm -f .depend .version .*.o.flags .*.o.d .*.o.cmd .*.ko.cmd
+	-rm -rf .tmp_versions
 
 ath_rate_amrr.o: $(ath_rate_amrr-objs)
 	$(LD) $(LDOPTS) -o ath_rate_amrr.$(KMODSUF) -r $(ath_rate_amrr-objs)

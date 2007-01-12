@@ -1,26 +1,35 @@
 #
-# Makefile for Onoe's rate control algorithm.
+# Makefile for Atsushi Onoe's rate control algorithm.
 #
 # $Id$
 #
 
-##2.4##src=.
+src ?= .
+srctree ?= .
 
-HAL=	$(src)/../hal
-ATH=	$(src)/../ath
-WLAN=	$(src)/../net80211
-COMPAT=	$(WLAN)/compat
+TOP = $(srctree)/$(src)/../..
 
-INCS=	-include $(COMPAT)/compat.h -I$(COMPAT)
-EXTRA_CFLAGS+=	$(INCS) -I$(HAL) -I$(HAL)/linux -I$(ATH) -I$(WLAN) -I$(src)/..
+include $(TOP)/BuildCaps.inc
 
-##2.6##obj-$(CONFIG_ATHEROS_RATE) += ath_rate_onoe.o
-##2.6##ath_rate_onoe-objs	:= onoe.o
+ATH=	$(TOP)/ath
+COMPAT=	$(TOP)/include
+HAL=	$(TOP)/hal
 
-##2.4##obj-$(CONFIG_ATHEROS_RATE) := onoe.o
+INCS = -include $(COMPAT)/compat.h -I$(COMPAT)
+INCS += -I$(TOP) -I$(ATH) -I$(HAL)
+EXTRA_CFLAGS += $(INCS)
 
-##2.4##export-objs	:= onoe.o
-##2.4##list-multi	:= ath_rate_onoe.o
+ifdef LINUX26
+obj-$(CONFIG_ATHEROS) += ath_rate_onoe.o
+ath_rate_onoe-objs	:= onoe.o
+endif
 
-##2.4##O_TARGET	:= ath_rate.o
-##2.4##include $(TOPDIR)/Rules.make
+ifdef LINUX24
+obj-$(CONFIG_ATHEROS) := onoe.o
+
+export-objs	:= onoe.o
+list-multi	:= ath_rate_onoe.o
+
+O_TARGET	:= ath_rate.o
+include $(TOPDIR)/Rules.make
+endif

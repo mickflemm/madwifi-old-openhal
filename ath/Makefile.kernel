@@ -2,12 +2,15 @@
 # Makefile for the Atheros WLAN driver.
 #
 
-##2.4##src=.
+obj ?= .
+src ?= .
+srctree ?= .
 
-HAL=	$(src)/../hal
-ATH_HAL=$(src)/../_ath_hal
-WLAN=	$(src)/../net80211
-COMPAT=	$(WLAN)/compat
+TOP = $(srctree)/$(src)/..
+
+HAL=	$(TOP)/openhal
+WLAN=	$(TOP)/net80211
+COMPAT=	$(TOP)/include
 
 #
 # Select bus-specific code.  Note that this defaults to PCI.
@@ -20,17 +23,22 @@ BUSNAME=pci
 EXTRA_CFLAGS+= -DATH_PCI
 endif
 
-INCS=	-include $(COMPAT)/compat.h -I$(COMPAT)
-EXTRA_CFLAGS+=	$(INCS) -I$(HAL) -I$(HAL)/linux -I$(ATH_HAL) -I$(WLAN) \
-	-I$(src)/..
+INCS = -include $(COMPAT)/compat.h -I$(COMPAT)
+INCS += -I$(TOP) -I$(HAL) -I$(WLAN)
 
-##2.6##obj-$(CONFIG_ATHEROS) += ath_$(BUSNAME).o
-##2.6##ath_$(BUSNAME)-objs	:= if_ath.o if_ath_$(BUSNAME).o radar.o
+EXTRA_CFLAGS += $(INCS)
 
-##2.4##obj-$(CONFIG_ATHEROS) := if_ath.o if_ath_$(BUSNAME).o radar.o
+ifdef LINUX26
+obj-$(CONFIG_ATHEROS)	+= ath_$(BUSNAME).o
+ath_$(BUSNAME)-objs	:= if_ath.o if_ath_$(BUSNAME).o radar.o
+endif
 
-##2.4##O_TARGET := ath_$(BUSNAME).o
-##2.4##include $(TOPDIR)/Rules.make
+ifdef LINUX24
+obj-$(CONFIG_ATHEROS) := if_ath.o if_ath_$(BUSNAME).o radar.o
 
-##2.4##export-objs	:= if_ath_$(BUSNAME).o
-##2.4##list-multi	:= ath_$(BUSNAME).o
+O_TARGET := ath_$(BUSNAME).o
+include $(TOPDIR)/Rules.make
+
+export-objs	:= if_ath_$(BUSNAME).o
+list-multi	:= ath_$(BUSNAME).o
+endif

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2002-2004 Sam Leffler, Errno Consulting
+# Copyright (c) 2002-2005 Sam Leffler, Errno Consulting
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -39,84 +39,111 @@
 #
 # Makefile for the HAL-based Atheros driver.
 #
-DEPTH=	.
 
-include Makefile.inc
+ifeq ($(obj),)
+obj=	.
+endif
 
-# NB: the order is important here
-DIRS=	$(ATH_HAL) $(ATH_RATE) $(WLAN) $(ATH)
+TOP = $(obj)
 
-all: configcheck
-	mkdir -p $(SYMBOLSDIR)
-	for i in $(DIRS); do \
-		(cd $$i; make) || exit 1; \
+ifneq (svnversion.h,$(MAKECMDGOALS))
+include $(TOP)/Makefile.inc
+endif
+
+DIRS_MODULES = $(ATH) $(ATH_RATE) $(HAL) $(WLAN)
+
+obj-y := ath/ openhal/ $(ATH_RATE)/ net80211/
+
+all: modules tools
+
+modules: configcheck svnversion.h
+ifdef LINUX24
+	for i in $(DIRS_MODULES); do \
+		$(MAKE) -C $$i || exit 1; \
 	done
+else
+	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) modules
+endif
 
-install:
-	for i in $(DIRS); do \
-		(cd $$i; make install) || exit 1; \
-	done
-	@if [ -z $(DESTDIR) ]; then \
-	    /sbin/depmod -ae ; \
-	elif [ -f $(SYSTEMMAP) ]; then \
-	    /sbin/depmod -ae -b $(DESTDIR) -F $(SYSTEMMAP) $(KERNELRELEASE) ; \
+.PHONY: svnversion.h
+svnversion.h:
+	@if [ -d .svn ]; then \
+		ver=`svnversion -nc . | sed -e 's/^[^:]*://;s/[A-Za-z]//'`; \
+		echo "#define SVNVERSION \"svn r$$ver\"" > $@; \
+	elif [ -s SNAPSHOT ]; then \
+		ver=`sed -e '/^Revision: */!d;s///;q' SNAPSHOT`; \
+		echo "#define SVNVERSION \"svn r$$ver\"" > $@; \
 	else \
-	    echo "Don't forget to run \"depmod -ae\" on the target system."; \
-	fi
+		touch svnversion.h; \
+	fi; \
 
-FILES=	COPYRIGHT ath include Makefile Makefile.inc \
-	README release.h share net80211 ath_rate
-HAL_TAG=ATH_HAL_20030802
+# conflicts with the 'tools' subdirectory
+.PHONY: tools
+tools:
+	$(MAKE) -C $(TOOLS) all || exit 1
 
-release:
-	DATE=`date +'%Y%m%d'`; TAG="MADWIFI_$$DATE"; DIR="madwifi-$$DATE"; \
-	cvs tag -F $$TAG $(FILES); \
-	rm -rf $$DIR; mkdir $$DIR; \
-	cvs export -d $$DIR -r $$TAG linux; \
-	(cd $$DIR; cvs export -r $(HAL_TAG) hal); \
-	tar zcf $$DIR.tgz --exclude=CVS --exclude=hal/freebsd $$DIR; \
-	rm -rf $$DIR
+install: install-modules install-tools
+
+install-modules:
+	@# check if there are modules left from an old installation
+	@# might cause make to abort the build
+	sh scripts/find-madwifi-modules.sh $(KERNELRELEASE) $(DESTDIR)
+
+	for i in $(DIRS_MODULES); do \
+		$(MAKE) -C $$i install || exit 1; \
+	done
+ifeq ($(DESTDIR),)
+	(export KMODPATH=$(KMODPATH); /sbin/depmod -ae)
+endif
+
+install-tools:
+	$(MAKE) -C $(TOOLS) install || exit 1
+
+uninstall:
+	sh scripts/find-madwifi-modules.sh $(KERNELRELEASE) $(DESTDIR)
+	$(MAKE) -C $(TOOLS) uninstall
 
 clean:
-	for i in $(DIRS); do \
-		(cd $$i; make clean); \
+	for i in $(DIRS_MODULES); do \
+		$(MAKE) -C $$i clean; \
 	done
-	rm -rf $(SYMBOLSDIR)
+	-$(MAKE) -C $(TOOLS) clean
+	rm -rf .tmp_versions
+	rm -f *.symvers svnversion.h
 
 info:
 	@echo "The following settings will be used for compilation:"
-	@echo "OS           : $(OS)"
+	@echo "ARCH         : $(ARCH)"
 	@echo "BUS          : $(BUS)"
-	@if [ ! -z "$(TOOLPATH)" ]; then \
+	@if [ -n "$(TOOLPATH)" ]; then \
 	    @echo "TOOLPATH     : $(TOOLPATH)"; \
 	fi	
 	@echo "KERNELRELEASE: $(KERNELRELEASE)"
 	@echo "KERNELPATH   : $(KERNELPATH)"
 	@echo "KERNELCONF   : $(KERNELCONF)"
-	@echo "MODULEPATH   : $(MODULEPATH)"
+	@echo "KMODPATH     : $(KMODPATH)"
 	@echo "KMODSUF      : $(KMODSUF)"
-	@if [ ! -z "$(DESTDIR)" ]; then \
-	    echo "DESTDIR      : $(DESTDIR)"; \
-	    echo "SYSTEMMAP    : $(SYSTEMMAP)"; \
-	fi
 
-dotconfig:
-	@#
-	@# check if kernel configuration file is available
-	@#	
-	@if [ ! -f $(KERNELCONF) ]; then \
-	    echo "You need to configure your kernel."; \
+sanitycheck:
+	@echo -n "Checking requirements... "
+	
+	@# check if specified rate control is available
+	@if [ ! -d $(ATH_RATE) ]; then \
+	    echo "FAILED"; \
+	    echo "Selected rate control $(ATH_RATE) not available."; \
 	    exit 1; \
 	fi
-
-# new targets should be inserted ABOVE this line in order to avoid
-# problems with the included kernel configuration file below.
-include $(KERNELCONF)
-
-configcheck: dotconfig
-	@echo -n "Checking if all requirements are met... "
 	
-	@# check version of kernel and wireless.h
+	@echo "ok."
+
+.PHONY: release
+release:
+	sh scripts/make-release.bash
+
+configcheck: sanitycheck
+	@echo -n "Checking kernel configuration... "
+	
+	@# check version of kernel
 	@echo $(KERNELRELEASE) | grep -q -i '^[2-9]\.[4-9]\.' || { \
 	    echo "FAILED"; \
 	    echo "Only kernel versions 2.4.x and above are supported."; \
@@ -130,22 +157,28 @@ configcheck: dotconfig
 	    echo "Please enable sysctl support."; \
 	    exit 1; \
 	fi
+	
+ifeq ($(strip $(BUS)),PCI)
+	@# check PCI support
+	@if [ -z "$(CONFIG_PCI)" ]; then \
+	    echo "FAILED"; \
+	    echo "Please enable PCI support."; \
+	    exit 1; \
+	fi
+endif
+	
+	@# check wireless extensions support is enabled
 	@if [ -z "$(CONFIG_NET_RADIO)" ]; then \
 	    echo "FAILED"; \
 	    echo "Please enable wireless extensions."; \
 	    exit 1; \
 	fi
+	
+	@# check crypto support is enabled
 	@if [ -z "$(CONFIG_CRYPTO)" ]; then \
 	    echo "FAILED"; \
 	    echo "Please enable crypto API."; \
 	    exit 1; \
 	fi
 	
-	@# some other sanity checks
-	@if [ ! -d $(ATH_RATE) ]; then \
-	    echo "FAILED"; \
-	    echo "Selected rate control $(ATH_RATE) not available."; \
-	    exit 1; \
-	fi
-		
 	@echo "ok."

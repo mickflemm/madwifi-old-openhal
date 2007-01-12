@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2002-2004 Sam Leffler, Errno Consulting
+# Copyright (c) 2002-2005 Sam Leffler, Errno Consulting
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -39,11 +39,12 @@
 #
 # Makefile for the Atheros WLAN driver.
 #
+
 ifeq ($(obj),)
 obj=	.
 endif
 
-DEPTH=	..
+TOP = $(obj)/..
 
 ifeq ($(strip $(BUS)),AHB)
 BUSNAME=ahb
@@ -53,31 +54,28 @@ BUSNAME=pci
 COPTS+= -DATH_PCI
 endif
 
+include $(TOP)/Makefile.inc
+
 obj-m		+= ath_$(BUSNAME).o
 ath_$(BUSNAME)-objs	:= if_ath.o if_ath_$(BUSNAME).o radar.o
-export-objs	:= if_ath_$(BUSNAME).o radar.o
-list-multi	:= ath_$(BUSNAME).o
 
-include $(obj)/$(DEPTH)/Makefile.inc
-
-INCS+=	-I$(HAL) -I$(HAL)/$(OS) -I$(obj)/$(ATH_HAL) \
-	-I$(obj)/$(WLAN) -I$(obj)/$(DEPTH)
+INCS += -I$(TOP) -I$(HAL) -I$(WLAN)
 
 EXTRA_CFLAGS+= $(INCS) $(COPTS)
 
 -include $(TOPDIR)/Rules.make
 
 all:
-	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) MODVERDIR=$(shell pwd)/$(SYMBOLSDIR) modules
+	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) modules
 
 install:
-	test -d $(DESTDIR)/$(MODULEPATH) || mkdir -p $(DESTDIR)/$(MODULEPATH)
-	cp ath_$(BUSNAME).$(KMODSUF) $(DESTDIR)/$(MODULEPATH)
+	test -d $(DESTDIR)/$(KMODPATH) || mkdir -p $(DESTDIR)/$(KMODPATH)
+	cp ath_$(BUSNAME).$(KMODSUF) $(DESTDIR)/$(KMODPATH)
 
 clean:
-	-rm -f *~ *.o *.ko *.mod.c
-	-rm -f .version .*.o.flags .*.o.d .*.o.cmd .*.ko.cmd
-	-rm -rf .tmp_versions
+	rm -f *~ *.o *.ko *.mod.c .*.cmd
+	rm -f .depend .version .*.o.flags .*.o.d
+	rm -rf .tmp_versions
 
 ath_$(BUSNAME).o: $(ath_$(BUSNAME)-objs)
 	$(LD) $(LDOPTS) -o ath_$(BUSNAME).$(KMODSUF) -r $(ath_$(BUSNAME)-objs)

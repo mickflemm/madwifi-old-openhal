@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2002-2004 Sam Leffler, Errno Consulting
+# Copyright (c) 2002-2005 Sam Leffler, Errno Consulting
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,15 +36,8 @@
 # $Id$
 #
 
-ifeq ($(obj),)
-obj=	.
-endif
-
 # other locales sometimes cause trouble
 export LC_ALL = POSIX
-
-# OS is the target operating system. Currently only Linux is supported.
-OS=		linux
 
 # BUS defines the bus type to which the wireless devices is attached.
 # Currently, the valid BUS types are PCI and AHB.  If BUS is not
@@ -83,7 +76,7 @@ endif
 # in that file.
 # This trick has been inspired by the lm_sensors project.
 ifndef KERNELRELEASE
-KERNELRELEASE := $(shell $(CC) -I $(KERNELPATH)/include -E $(obj)/$(DEPTH)/kernelversion.c | grep uts_release | cut -f2 -d'"')
+KERNELRELEASE := $(shell $(CC) -I $(KERNELPATH)/include -E $(TOP)/kernelversion.c | grep uts_release | cut -f2 -d'"')
 ifeq (,$(KERNELRELEASE))
 $(error Cannot detect kernel version - please check compiler and KERNELPATH)
 endif
@@ -97,62 +90,66 @@ KERNELCONF ?=	$(KERNELPATH)/.config
 ifeq ($(wildcard $(KERNELCONF)),)
 $(error KERNELCONF: $(KERNELCONF) does not exist.)
 endif
+include $(KERNELCONF)
 
-# SYSTEMMAP is the name of the System.map file for the target
-# kernel. This will be needed when DESTDIR is defined in order
-# to run depmod properly.
-SYSTEMMAP ?= 	$(KERNELPATH)/System.map
-
-# MODULEPATH nominates the directory where the modules will be
+# KMODPATH nominates the directory where the modules will be
 # installed to
-ifeq ($(strip $(BUS)),AHB)
-MODULEPATH := 	$(KERNELPATH)/arch/mips/ar531x/RAMDISK/rootdir/lib/modules/$(KERNELRELEASE)/net
-else
-MODULEPATH ?=	/lib/modules/$(KERNELRELEASE)/net
+KMODPATH :=	/lib/modules/$(KERNELRELEASE)/net
+
+# Recognize 2.4.x kernels to support the old build system
+ifeq ($(filter-out 2.4%,$(KERNELRELEASE)),)
+LINUX24 = y
 endif
 
-# Some settings that depend on actual kernel release
-ifneq ($(findstring 2.6,$(KERNELRELEASE)),)
-export-objs	:=
-list-multi	:=
+ifndef LINUX24
 KMODSUF		:= ko
 else
+export-objs	= $(foreach m, $(obj-m), $($(m:.o=-objs)))
+list-multi	= $(obj-m)
 KMODSUF		:= o
 endif
 
-NM=            nm
-AWK=           awk
+NM=		nm
 
 #
 # Path to the HAL source code.
 #
-ifeq ($(HAL),)
-HAL=	$(obj)/$(DEPTH)/openhal
-endif
-#
-# Path to the HAL build area.
-#
-ATH_HAL=$(DEPTH)/openhal
+HAL=	$(TOP)/openhal
 #
 # Path to the 802.11 include files.
 #
-WLAN=	$(DEPTH)/net80211
+WLAN=	$(TOP)/net80211
 #
 # Path to the Atheros device driver.
 #
-ATH=	$(DEPTH)/ath
+ATH=	$(TOP)/ath
 #
 # Path to the rate control algorithm.
 #
-#ATH_RATE=$(shell find ath_rate/ -maxdepth 1 ! -name CVS ! -name ath_rate/ -type d)
 ifeq ($(ATH_RATE),)
-ATH_RATE=ath_rate/sample
+ATH_RATE=	ath_rate/sample
 endif
+#
+# Path to the userspace utilities. 
+# 
+TOOLS=  $(TOP)/tools 
 
-INCS=	-include $(obj)/$(DEPTH)/include/compat.h -I$(obj)/$(DEPTH)/include
+COPTS+=	-Wall
+INCS=	-include $(TOP)/include/compat.h -I$(TOP)/include
 
-ifeq ($(strip $(BUS)),AHB)
-INCS+= -isystem $(TOOLPATH)/include
-endif
 
-SYMBOLSDIR=$(DEPTH)/symbols
+# The following variables will affect developers only, and are used in the
+# make-release.bash script.
+#
+# RELEASE_TMP is used as a temporary store for the files needed to create the
+# release tarball. Packaging will take place in TMPDIR/madwifi-release.
+# Defaults to /tmp.
+RELEASE_TMP=/tmp
+
+# RELEASE_STORE is the (local) directory where the release tarball should be
+# stored in. Defaults to the parent directory of the working copy used to
+# create the release.
+RELEASE_STORE=..
+
+# expose these settings to make-release.bash
+export RELEASE_TMP RELEASE_STORE

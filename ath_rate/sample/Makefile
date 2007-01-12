@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2004-2005 Sam Leffler, Errno Consulting
-# Copyright (c) 2004-2005 Video54 Technologies, Inc.
+# Copyright (c) 2004 Sam Leffler, Errno Consulting
+# Copyright (c) 2004 Video54 Technologies, Inc.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 #
-# $Id$
-#
 
 #
 # Makefile for the Atheros Rate Control Support.
@@ -44,33 +42,30 @@ ifeq ($(obj),)
 obj=	.
 endif
 
-DEPTH=	../..
+TOP = $(obj)/../..
 
 obj-m		+= ath_rate_sample.o
 ath_rate_sample-objs	:= sample.o
-export-objs	:= sample.o
-list-multi	:= ath_rate_sample.o
 
-include $(obj)/$(DEPTH)/Makefile.inc
+include $(TOP)/Makefile.inc
 
-INCS+=	-I$(HAL) -I$(HAL)/$(OS) -I$(obj)/$(ATH) -I$(obj)/$(WLAN) \
-	-I$(obj)/$(DEPTH)
+INCS += -I$(TOP) -I$(ATH) -I$(HAL)
 
 EXTRA_CFLAGS+= $(INCS) $(COPTS)
 
 -include $(TOPDIR)/Rules.make
 
 all:
-	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) MODVERDIR=$(shell pwd)/$(SYMBOLSDIR) modules
+	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) modules
 
 install:
-	test -d $(DESTDIR)/$(MODULEPATH) || mkdir -p $(DESTDIR)/$(MODULEPATH)
-	$(TOOLPREFIX)strip -S ath_rate_sample.$(KMODSUF)
-	cp ath_rate_sample.$(KMODSUF) $(DESTDIR)/$(MODULEPATH)
+	test -d $(DESTDIR)/$(KMODPATH) || mkdir -p $(DESTDIR)/$(KMODPATH)
+	cp ath_rate_sample.$(KMODSUF) $(DESTDIR)/$(KMODPATH)
 
 clean:
 	-rm -f *~ *.o *.ko *.mod.c
-	-rm -f .version .*.o.flags .*.o.d .*.o.cmd .*.ko.cmd
+	-rm -f .depend .version .*.o.flags .*.o.d .*.o.cmd .*.ko.cmd
+	-rm -rf .tmp_versions
 
 ath_rate_sample.o: $(ath_rate_sample-objs)
 	$(LD) $(LDOPTS) -o ath_rate_sample.$(KMODSUF) -r $(ath_rate_sample-objs)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2002-2004 Sam Leffler, Errno Consulting
+# Copyright (c) 2002-2005 Sam Leffler, Errno Consulting
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ ifeq ($(obj),)
 obj=	.
 endif
 
-DEPTH=	..
+TOP = $(obj)/..
 #
 # There are two authenticator mechanisms: an in-kernel implementation
 # (wlan_auth+wlan_radius) and an external implementation (wlan_xauth) that
@@ -55,12 +55,7 @@ DEPTH=	..
 # 
 MOD_AUTH	:= wlan_xauth.o
 #
-# Crypto test modules.  These are used only to test/validate the
-# software crypto implementations.
-#
-MOD_CRYPTO_TEST	:= tkip_test.o ccmp_test.o wep_test.o
-#
-# Modules to be built+installed (leave out the crypto test modules).
+# Modules to be built+installed
 #
 MOD_INSTALL	:= wlan.o wlan_wep.o wlan_tkip.o wlan_ccmp.o wlan_acl.o \
 		   $(MOD_AUTH)
@@ -68,42 +63,26 @@ MOD_INSTALL	:= wlan.o wlan_wep.o wlan_tkip.o wlan_ccmp.o wlan_acl.o \
 obj-m		+= $(MOD_INSTALL)
 
 wlan-objs	:= if_media.o rc4.o \
-		   ieee80211.o ieee80211_crypto.o ieee80211_input.o \
-		   ieee80211_node.o ieee80211_output.o ieee80211_proto.o \
-		   ieee80211_wireless.o ieee80211_linux.o \
-		   ieee80211_crypto_none.o
+		   ieee80211.o ieee80211_crypto.o \
+		   ieee80211_crypto_none.o ieee80211_input.o ieee80211_node.o \
+		   ieee80211_output.o ieee80211_proto.o \
+		   ieee80211_wireless.o ieee80211_linux.o
 wlan_wep-objs	:= ieee80211_crypto_wep.o
 wlan_tkip-objs	:= ieee80211_crypto_tkip.o
 wlan_ccmp-objs	:= ieee80211_crypto_ccmp.o
 wlan_acl-objs	:= ieee80211_acl.o
-wlan_auth-objs	:= ieee80211_dot1x.o
-wlan_radius-objs:= ieee80211_radius.o
 wlan_xauth-objs	:= ieee80211_xauth.o
 
-tkip_test-objs	:= test_tkip.o
-ccmp_test-objs	:= test_ccmp.o
-wep_test-objs	:= test_wep.o
+include $(TOP)/Makefile.inc
 
-export-objs	:= if_media.o rc4.o \
-		   ieee80211.o ieee80211_crypto.o ieee80211_input.o \
-		   ieee80211_node.o ieee80211_output.o ieee80211_proto.o \
-		   ieee80211_wireless.o ieee80211_linux.o \
-		   ieee80211_crypto_none.o ieee80211_crypto_wep.o \
-		   ieee80211_crypto_tkip.o ieee80211_crypto_ccmp.o \
-		   ieee80211_dot1x.o ieee80211_radius.o ieee80211_xauth.o
-list-multi	:= $(MOD_INSTALL)
-
-include $(obj)/$(DEPTH)/Makefile.inc
-
-INCS+=	-I$(HAL) -I$(HAL)/$(OS) -I$(obj)/$(ATH_HAL) -I$(obj)/$(WLAN) \
-	-I$(obj)/$(DEPTH)
+INCS += -I$(TOP) -I$(HAL)
 
 EXTRA_CFLAGS+=$(INCS) $(COPTS)
 
 -include $(TOPDIR)/Rules.make
 
 all:
-	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) MODVERDIR=$(shell pwd)/$(SYMBOLSDIR)  modules
+	$(MAKE) -C $(KERNELPATH) SUBDIRS=$(shell pwd) modules
 
 wlan.o:	$(wlan-objs)
 	$(LD) $(LDOPTS) -o wlan.$(KMODSUF) -r $(wlan-objs)
@@ -115,29 +94,17 @@ wlan_ccmp.o:	$(wlan_ccmp-objs)
 	$(LD) $(LDOPTS) -o wlan_ccmp.$(KMODSUF) -r $(wlan_ccmp-objs)
 wlan_xauth.o:	$(wlan_xauth-objs)
 	$(LD) $(LDOPTS) -o wlan_xauth.$(KMODSUF) -r $(wlan_xauth-objs)
-wlan_auth.o:	$(wlan_auth-objs)
-	$(LD) $(LDOPTS) -o wlan_auth.$(KMODSUF) -r $(wlan_auth-objs)
-wlan_radius.o:	$(wlan_radius-objs)
-	$(LD) $(LDOPTS) -o wlan_radius.$(KMODSUF) -r $(wlan_radius-objs)
 wlan_acl.o:	$(wlan_acl-objs)
 	$(LD) $(LDOPTS) -o wlan_acl.$(KMODSUF) -r $(wlan_acl-objs)
 
-tkip_test.o:	$(tkip_test-objs)
-	$(LD) $(LDOPTS) -o tkip_test.$(KMODSUF) -r $(tkip_test-objs)
-ccmp_test.o:	$(ccmp_test-objs)
-	$(LD) $(LDOPTS) -o ccmp_test.$(KMODSUF) -r $(ccmp_test-objs)
-wep_test.o:	$(wep_test-objs)
-	$(LD) $(LDOPTS) -o wep_test.$(KMODSUF) -r $(wep_test-objs)
-
 install:
-	test -d $(DESTDIR)/$(MODULEPATH) || mkdir -p $(DESTDIR)/$(MODULEPATH)
+	test -d $(DESTDIR)/$(KMODPATH) || mkdir -p $(DESTDIR)/$(KMODPATH)
 	for i in $(MOD_INSTALL); do \
 		f=`basename $$i .o`; \
-		$(TOOLPREFIX)strip -S $$f.$(KMODSUF); \
-		cp $$f.$(KMODSUF) $(DESTDIR)/$(MODULEPATH); \
+		cp $$f.$(KMODSUF) $(DESTDIR)/$(KMODPATH); \
 	done
 
 clean:
 	-rm -f *~ *.o *.ko *.mod.c
-	-rm -f .version .*.o.flags .*.o.d .*.o.cmd .*.ko.cmd
+	-rm -f .depend .version .*.o.flags .*.o.d .*.o.cmd .*.ko.cmd
 	-rm -rf .tmp_versions
