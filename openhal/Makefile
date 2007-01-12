@@ -9,7 +9,7 @@ ath_hal-objs	:= ah_osdep.o ar5xxx.o ar5212.o ar5211.o ar5210.o ieee80211_regdoma
 
 include $(TOP)/Makefile.inc
 
-INCS += -I$(TOP) -I$(ATH_HAL) -I$(HAL)
+INCS += -I$(TOP) -I$(HAL)
 
 EXTRA_CFLAGS+= $(INCS) $(COPTS)
 
