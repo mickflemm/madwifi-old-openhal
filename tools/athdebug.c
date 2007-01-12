@@ -46,8 +46,11 @@
 #include <sys/socket.h>
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <getopt.h>
+#include <err.h>
 
 #define	N(a)	(sizeof(a)/sizeof(a[0]))
 
@@ -108,17 +111,6 @@ getflag(const char *name, int len)
 		if (strncasecmp(flags[i].name, name, len) == 0)
 			return flags[i].bit;
 	return 0;
-}
-
-static const char *
-getflagname(u_int flag)
-{
-	int i;
-
-	for (i = 0; i < N(flags); i++)
-		if (flags[i].bit == flag)
-			return flags[i].name;
-	return "???";
 }
 
 static void
@@ -182,7 +174,7 @@ main(int argc, char *argv[])
 	const char *ifname = "ath0";
 	const char *cp, *tp;
 	const char *sep;
-	int c, op, i;
+	int op, i;
 	u_int32_t debug, ndebug;
 	size_t debuglen;
 	char oid[256];
@@ -234,7 +226,7 @@ main(int argc, char *argv[])
 						bit = strtoul(cp, NULL, 0);
 					else
 						errx(1, "unknown flag %.*s",
-							tp-cp, cp);
+							(int)(tp-cp), cp);
 				}
 				ndebug = bit;
 			}

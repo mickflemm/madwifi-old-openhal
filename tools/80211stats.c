@@ -47,7 +47,10 @@
 #include <linux/wireless.h>
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <signal.h>
+#include <err.h>
 
 #include "net80211/_ieee80211.h"
 #include "net80211/ieee80211.h"

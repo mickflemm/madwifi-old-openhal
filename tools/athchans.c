@@ -47,8 +47,11 @@
 #include <linux/wireless.h>
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <getopt.h>
+#include <err.h>
 
 #include "net80211/_ieee80211.h"
 #include "net80211/ieee80211.h"
@@ -126,13 +129,12 @@ usage(void)
 	exit(-1);
 }
 
-#define	MAXCHAN	(sizeof(struct ieee80211req_chanlist) * NBBY)
+#define	MAXCHAN	((int)(sizeof(struct ieee80211req_chanlist) * NBBY))
 int
 main(int argc, char *argv[])
 {
 	const char *ifname = "ath0";
 	struct ieee80211req_chanlist chanlist;
-	const char *cp;
 	int c;
 
 	progname = argv[0];
