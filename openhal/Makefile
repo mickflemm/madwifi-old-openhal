@@ -20,10 +20,7 @@ all:	ah_osdep.c ah.h ieee80211_regdomain.h
 
 install:
 	test -d $(DESTDIR)/$(KMODPATH) || mkdir -p $(DESTDIR)/$(KMODPATH)
-	for i in $(MOD_INSTALL); do \
-		f=`basename $$i .o`; \
-		cp $$f.$(KMODSUF) $(DESTDIR)/$(KMODPATH); \
-	done
+	cp ath_hal.$(KMODSUF) $(DESTDIR)/$(KMODPATH)
 
 clean:
 	-rm -f *~ *.o *.ko *.mod.c
