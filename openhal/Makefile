@@ -6,8 +6,6 @@ TOP = $(obj)/..
 
 obj-m		+= ath_hal.o
 ath_hal-objs	:= ah_osdep.o ar5xxx.o ar5212.o ar5211.o ar5210.o ieee80211_regdomain.o
-export-objs	:= ah_osdep.o
-list-multi	:= ath_hal.o
 
 include $(TOP)/Makefile.inc
 
