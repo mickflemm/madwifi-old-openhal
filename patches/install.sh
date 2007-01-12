@@ -57,11 +57,9 @@ test -d ${WIRELESS} || die "No wireless directory ${WIRELESS}"
 if test -f ${WIRELESS}/Kconfig; then
 	kbuild=2.6
 	kbuildconf=Kconfig
-	makedef=LINUX26
 else if test -f ${WIRELESS}/Config.in; then
 	kbuild=2.4
 	kbuildconf=Config.in
-	makedef=LINUX24
 else
 	die "Kernel build system is not supported"
 fi
@@ -88,8 +86,7 @@ done
 echo "Copying makefiles"
 FILES=`cd ${SRC} && find . -name Makefile.kernel`
 for f in $FILES; do
-	echo "$makedef = 1" >`dirname ${MADWIFI}/$f`/Makefile
-	cat ${SRC}/$f >>`dirname ${MADWIFI}/$f`/Makefile
+	cp -f ${SRC}/$f `dirname ${MADWIFI}/$f`/Makefile
 done
 
 

@@ -40,7 +40,7 @@ wlan_ccmp-objs	:= ieee80211_crypto_ccmp.o
 wlan_xauth-objs	:= ieee80211_xauth.o
 wlan_acl-objs	:= ieee80211_acl.o
 
-ifdef LINUX24
+ifeq ($(VERSION).$(PATCHLEVEL),2.4)
 export-objs	:= if_media.o rc4.o \
 		   ieee80211.o ieee80211_crypto.o \
 		   ieee80211_crypto_none.o ieee80211_input.o ieee80211_node.o \

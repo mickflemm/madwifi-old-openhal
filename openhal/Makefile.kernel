@@ -15,13 +15,13 @@ INCS += -I$(TOP) -I$(HAL) -I$(WLAN)
 
 EXTRA_CFLAGS += $(INCS)
 
-ifdef LINUX26
+ifneq ($(VERSION).$(PATCHLEVEL),2.4)
 obj-$(CONFIG_ATHEROS) += ath_hal.o
 ath_hal-objs := ah_osdep.o ar5xxx.o ar5212.o ar5211.o ar5210.o \
 	ieee80211_regdomain.o
 endif
 
-ifdef LINUX24
+ifeq ($(VERSION).$(PATCHLEVEL),2.4)
 obj-$(CONFIG_ATHEROS) := ah_osdep.o ar5xxx.o ar5212.o ar5211.o ar5210.o \
 	ieee80211_regdomain.o
 export-objs := ah_osdep.o

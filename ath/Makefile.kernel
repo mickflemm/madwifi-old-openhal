@@ -28,12 +28,12 @@ INCS += -I$(TOP) -I$(HAL) -I$(WLAN)
 
 EXTRA_CFLAGS += $(INCS)
 
-ifdef LINUX26
+ifneq ($(VERSION).$(PATCHLEVEL),2.4)
 obj-$(CONFIG_ATHEROS)	+= ath_$(BUSNAME).o
 ath_$(BUSNAME)-objs	:= if_ath.o if_ath_$(BUSNAME).o radar.o
 endif
 
-ifdef LINUX24
+ifeq ($(VERSION).$(PATCHLEVEL),2.4)
 obj-$(CONFIG_ATHEROS) := if_ath.o if_ath_$(BUSNAME).o radar.o
 
 O_TARGET := ath_$(BUSNAME).o
