@@ -463,7 +463,6 @@ void /*Unimplemented*/
 ar5k_ar5210_set_def_antenna(struct ath_hal *hal, u_int ant)
 {
 	AR5K_TRACE;
-	return 0;
 }
 
 u_int/*Unimplemented*/
@@ -2130,7 +2129,7 @@ ar5k_ar5210_disable_pspoll(struct ath_hal *hal)
 HAL_BOOL /*Unimplemented*/
 ar5k_ar5210_set_txpower_limit(struct ath_hal *hal, u_int32_t power)
 {
-	HAL_CHANNEL *channel = &hal->ah_current_channel;
+//	HAL_CHANNEL *channel = &hal->ah_current_channel;
 
 	AR5K_TRACE;
 	AR5K_PRINTF("changing txpower to %d\n unimplemented ;-(",power);

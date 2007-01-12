@@ -740,7 +740,7 @@ ieee80211_setup_wpa_ie(struct ieee80211com *ic, u_int8_t *ie)
 	ie[1] = frm - ie - 2;
 	KASSERT(ie[1]+2 <= (int)sizeof(struct ieee80211_ie_wpa),
 		("WPA IE too big, %u > %u",
-		ie[1]+2, sizeof(struct ieee80211_ie_wpa)));
+		ie[1]+2, (int)sizeof(struct ieee80211_ie_wpa)));
 	return frm;
 #undef ADDSHORT
 #undef ADDSELECTOR
@@ -824,7 +824,7 @@ ieee80211_setup_rsn_ie(struct ieee80211com *ic, u_int8_t *ie)
 	ie[1] = frm - ie - 2;
 	KASSERT(ie[1]+2 <= (int)sizeof(struct ieee80211_ie_wpa),
 		("RSN IE too big, %u > %u",
-		ie[1]+2, sizeof(struct ieee80211_ie_wpa)));
+		ie[1]+2, (int)sizeof(struct ieee80211_ie_wpa)));
 	return frm;
 #undef ADDSELECTOR
 #undef ADDSHORT

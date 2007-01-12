@@ -134,7 +134,7 @@ endif
 # 
 TOOLS=  $(TOP)/tools 
 
-COPTS+=	-Wall
+COPTS+=	-Werror
 INCS=	-include $(TOP)/include/compat.h -I$(TOP)/include
 
 

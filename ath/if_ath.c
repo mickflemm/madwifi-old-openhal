@@ -1370,15 +1370,15 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 	    _txq->axq_lastdsWithCTS, _txq->axq_gatingds, \
 	    txopLimit, CTS_DURATION)*/
 	struct ath_softc *sc = dev->priv;
-	struct ieee80211com *ic = &sc->sc_ic;
+//	struct ieee80211com *ic = &sc->sc_ic;
 	struct ath_hal *ah = sc->sc_ah;
-	const struct chanAccParams *cap = &ic->ic_wme.wme_chanParams;
+//	const struct chanAccParams *cap = &ic->ic_wme.wme_chanParams;
 	struct ath_txq *txq;
 	struct ath_buf *bf;
 	HAL_PKT_TYPE atype;
 	int pktlen, hdrlen, try0, pri, dot11Rate, txpower; 
 	u_int8_t ctsrate, ctsduration, txrate;
-	u_int8_t cix = 0xff;         /* NB: silence compiler */
+//	u_int8_t cix = 0xff;         /* NB: silence compiler */
 	u_int flags = 0;
 	struct ieee80211_frame *wh; 
 	struct ath_desc *ds;
@@ -1578,8 +1578,8 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 	 */
 	ATH_TXQ_LOCK_BH(txq);
 	if (flags & (HAL_TXDESC_RTSENA | HAL_TXDESC_CTSENA)) {
-		u_int32_t txopLimit = IEEE80211_TXOP_TO_US(
-			cap->cap_wmeParams[pri].wmep_txopLimit);
+//		u_int32_t txopLimit = IEEE80211_TXOP_TO_US(
+//			cap->cap_wmeParams[pri].wmep_txopLimit);
 		/*
 		 * When bursting, potentially extend the CTS duration
 		 * of a previously queued frame to cover this frame
@@ -3411,7 +3411,7 @@ ath_rx_capture(struct net_device *dev, struct ath_desc *ds, struct sk_buff *skb)
 			DPRINTF(sc, ATH_DEBUG_RECV,
 				"%s: prism not enough headroom %d/%d\n",
 				__func__, skb_headroom(skb), 
-				sizeof(wlan_ng_prism2_header));
+				(int)sizeof(wlan_ng_prism2_header));
 			goto bad;
 		}
 		ph = (wlan_ng_prism2_header *)
@@ -3483,7 +3483,7 @@ ath_rx_capture(struct net_device *dev, struct ath_desc *ds, struct sk_buff *skb)
 			DPRINTF(sc, ATH_DEBUG_RECV,
 				"%s: radiotap not enough headroom %d/%d\n",
 				__func__, skb_headroom(skb), 
-				sizeof(struct ath_rx_radiotap_header));
+				(int)sizeof(struct ath_rx_radiotap_header));
 			goto bad;
 		}
 		th = (struct ath_rx_radiotap_header  *) skb_push(skb, sizeof(struct ath_rx_radiotap_header));
@@ -4512,8 +4512,8 @@ ath_tx_start(struct net_device *dev, struct ieee80211_node *ni, struct ath_buf *
 	 */
 	ATH_TXQ_LOCK_BH(txq);
 	if (flags & (HAL_TXDESC_RTSENA | HAL_TXDESC_CTSENA)) {
-		u_int32_t txopLimit = IEEE80211_TXOP_TO_US(
-			cap->cap_wmeParams[pri].wmep_txopLimit);
+//		u_int32_t txopLimit = IEEE80211_TXOP_TO_US(
+//			cap->cap_wmeParams[pri].wmep_txopLimit);
 		/*
 		 * When bursting, potentially extend the CTS duration
 		 * of a previously queued frame to cover this frame
@@ -5453,13 +5453,13 @@ ath_update_txpow(struct ath_softc *sc)
 	if (sc->sc_curtxpow != ic->ic_txpowlimit) {
 		ath_hal_settxpowlimit(ah, ic->ic_txpowlimit);
 		/* read back in case value is clamped */
-		ath_hal_gettxpowlimit(ah, &txpow);
+		(void)ath_hal_gettxpowlimit(ah, &txpow);
 		ic->ic_txpowlimit = sc->sc_curtxpow = txpow;
 	}
 	/* 
 	 * Fetch max tx power level for status requests.
 	 */
-	ath_hal_getmaxtxpow(sc->sc_ah, &txpow);
+	(void)ath_hal_getmaxtxpow(sc->sc_ah, &txpow);
 	ic->ic_bss->ni_txpower = txpow;
 }
 
@@ -6336,13 +6336,13 @@ ATH_SYSCTL_DECL(ath_sysctl_halparam, ctl, write, filp, buffer, lenp, ppos)
 			val = sc->sc_txintrperiod;
 			break;
 		case ATH_TPSCALE:
-			ath_hal_gettpscale(ah, &val);
+			(void)ath_hal_gettpscale(ah, &val);
 			break;
 		case ATH_TPC:
 			val = ath_hal_gettpc(ah);
 			break;
 		case ATH_TXPOWLIMIT:
-			ath_hal_gettxpowlimit(ah, &val);
+			(void)ath_hal_gettxpowlimit(ah, &val);
 			break;
 		case ATH_VEOL:
 			val = sc->sc_hasveol;
