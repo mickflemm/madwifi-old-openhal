@@ -432,7 +432,7 @@ extern	int ieee80211_ioctl_siwnickn(struct ieee80211com *,
 extern	int ieee80211_ioctl_giwnickn(struct ieee80211com *,
 		struct iw_request_info *, struct iw_point *, char *);
 struct iw_freq;
-extern	int ieee80211_ioctl_siwfreq(struct ieee80211com *,
+extern	int ieee80211_ioctl_siwfreqx(struct ieee80211com *,
 		struct iw_request_info *, struct iw_freq *, char *);
 extern	int ieee80211_ioctl_giwfreq(struct ieee80211com *,
 		struct iw_request_info *, struct iw_freq *, char *);

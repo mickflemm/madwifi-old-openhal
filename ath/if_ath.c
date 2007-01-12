@@ -5815,7 +5815,7 @@ ATH_SOCKADDR_BOUNCE(siwap)
 ATH_SOCKADDR_BOUNCE(giwap)
 ATH_POINT_BOUNCE(siwnickn)
 ATH_POINT_BOUNCE(giwnickn)
-ATH_FREQ_BOUNCE(siwfreq)
+ATH_FREQ_BOUNCE(siwfreqx)
 ATH_FREQ_BOUNCE(giwfreq)
 ATH_POINT_BOUNCE(siwessid)
 ATH_POINT_BOUNCE(giwessid)
@@ -5850,7 +5850,7 @@ static const iw_handler ath_handlers[] = {
 	(iw_handler) ath_ioctl_giwname,			/* SIOCGIWNAME */
 	(iw_handler) NULL,				/* SIOCSIWNWID */
 	(iw_handler) NULL,				/* SIOCGIWNWID */
-	(iw_handler) ath_ioctl_siwfreq,			/* SIOCSIWFREQ */
+	(iw_handler) ath_ioctl_siwfreqx,		/* SIOCSIWFREQ */
 	(iw_handler) ath_ioctl_giwfreq,			/* SIOCGIWFREQ */
 	(iw_handler) ath_ioctl_siwmode,			/* SIOCSIWMODE */
 	(iw_handler) ath_ioctl_giwmode,			/* SIOCGIWMODE */
@@ -6117,7 +6117,7 @@ ath_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
 			error = ath_ioctl_ethtool(sc, cmd, ifr->ifr_data);
 			break;
 	default:
-		error = ieee80211_ioctl(ic, ifr, cmd);
+		error = ieee80211_ioctlx(ic, ifr, cmd);
 		if (error == -ENETRESET) {
 			if (IS_RUNNING(dev) && 
 			    ic->ic_roaming != IEEE80211_ROAMING_MANUAL)

@@ -707,9 +707,9 @@ cap2cipher(int flag)
 }
 
 int
-ieee80211_ioctl_siwfreq(struct ieee80211com *ic,
-			struct iw_request_info *info,
-			struct iw_freq *freq, char *extra)
+ieee80211_ioctl_siwfreqx(struct ieee80211com *ic,
+			 struct iw_request_info *info,
+			 struct iw_freq *freq, char *extra)
 {
 	struct ieee80211_channel *c;
 	int i;
@@ -746,7 +746,7 @@ ieee80211_ioctl_siwfreq(struct ieee80211com *ic,
 	else
 		return IS_UP_AUTO(ic) ? -(*ic->ic_init)(ic->ic_dev) : 0;
 }
-EXPORT_SYMBOL(ieee80211_ioctl_siwfreq);
+EXPORT_SYMBOL(ieee80211_ioctl_siwfreqx);
 
 int
 ieee80211_ioctl_giwfreq(struct ieee80211com *ic,
@@ -2342,7 +2342,7 @@ EXPORT_SYMBOL(ieee80211_ioctl_iwsetup);
  * Handle private ioctl requests.
  */
 int
-ieee80211_ioctl(struct ieee80211com *ic, struct ifreq *ifr, int cmd)
+ieee80211_ioctlx(struct ieee80211com *ic, struct ifreq *ifr, int cmd)
 {
 	switch (cmd) {
 	case SIOCG80211STATS:
@@ -2357,5 +2357,5 @@ ieee80211_ioctl(struct ieee80211com *ic, struct ifreq *ifr, int cmd)
 	}
 	return -EOPNOTSUPP;
 }
-EXPORT_SYMBOL(ieee80211_ioctl);
+EXPORT_SYMBOL(ieee80211_ioctlx);
 #endif /* CONFIG_NET_WIRELESS */

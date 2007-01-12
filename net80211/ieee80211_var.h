@@ -277,7 +277,7 @@ void	ieee80211_media_init(struct ieee80211com *,
 struct ieee80211com *ieee80211_find_vap(const u_int8_t mac[IEEE80211_ADDR_LEN]);
 int	ieee80211_media_change(struct net_device *);
 void	ieee80211_media_status(struct net_device *, struct ifmediareq *);
-int	ieee80211_ioctl(struct ieee80211com *, struct ifreq *, int);
+int	ieee80211_ioctlx(struct ieee80211com *, struct ifreq *, int);
 void	ieee80211_watchdog(unsigned long);
 int	ieee80211_rate2media(struct ieee80211com *, int,
 		enum ieee80211_phymode);
