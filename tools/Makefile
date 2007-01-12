@@ -41,14 +41,13 @@ MANDIR ?= /usr/local/man
 # Path to the HAL source code.
 #
 ifeq ($(HAL),)
-HAL=   $(TOP)/hal
+HAL=   $(TOP)/openhal
 endif
 
 INCS=  -include $(TOP)/include/compat.h
 
 
-# FIXME athstats is currently broken
-ALL_INSTALL=	80211stats athdebug 80211debug
+ALL_INSTALL=	athstats 80211stats athdebug 80211debug
 ALL=	$(ALL_INSTALL) athkey athchans athctrl
 
 all:	$(ALL)
@@ -61,8 +60,8 @@ LDFLAGS=
 all:	$(ALL)
 
 athstats: athstats.c
-	$(CC) -o athstats $(ALL_CFLAGS) -I$(TOP)/ath -I$(TOP)/net80211 
-		-I$(TOP)/openhal $(LDFLAGS) athstats.c
+	$(CC) -o athstats $(ALL_CFLAGS) -I$(TOP)/ath -I$(TOP)/net80211 \
+		$(LDFLAGS) athstats.c
 80211stats: 80211stats.c
 	$(CC) -o 80211stats $(ALL_CFLAGS) $(LDFLAGS) 80211stats.c
 athkey: athkey.c

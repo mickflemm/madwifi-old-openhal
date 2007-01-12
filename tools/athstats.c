@@ -53,36 +53,13 @@
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <unistd.h>
 #include <err.h>
 
 #include "ah_desc.h"
 #include "ieee80211_radiotap.h"
 #include "if_athioctl.h"
-
-static const struct {
-	u_int		phyerr;
-	const char*	desc;
-} phyerrdescriptions[] = {
-	{ HAL_PHYERR_UNDERRUN,		"transmit underrun" },
-	{ HAL_PHYERR_TIMING,		"timing error" },
-	{ HAL_PHYERR_PARITY,		"illegal parity" },
-	{ HAL_PHYERR_RATE,		"illegal rate" },
-	{ HAL_PHYERR_LENGTH,		"illegal length" },
-	{ HAL_PHYERR_RADAR,		"radar detect" },
-	{ HAL_PHYERR_SERVICE,		"illegal service" },
-	{ HAL_PHYERR_TOR,		"transmit override receive" },
-	{ HAL_PHYERR_OFDM_TIMING,	"OFDM timing" },
-	{ HAL_PHYERR_OFDM_SIGNAL_PARITY,"OFDM illegal parity" },
-	{ HAL_PHYERR_OFDM_RATE_ILLEGAL,	"OFDM illegal rate" },
-	{ HAL_PHYERR_OFDM_POWER_DROP,	"OFDM power drop" },
-	{ HAL_PHYERR_OFDM_SERVICE,	"OFDM illegal service" },
-	{ HAL_PHYERR_OFDM_RESTART,	"OFDM restart" },
-	{ HAL_PHYERR_CCK_TIMING,	"CCK timing" },
-	{ HAL_PHYERR_CCK_HEADER_CRC,	"CCK header crc" },
-	{ HAL_PHYERR_CCK_RATE_ILLEGAL,	"CCK illegal rate" },
-	{ HAL_PHYERR_CCK_SERVICE,	"CCK illegal service" },
-	{ HAL_PHYERR_CCK_RESTART,	"CCK restart" },
-};
 
 static void
 printstats(FILE *fd, const struct ath_stats *stats)
@@ -92,7 +69,7 @@ printstats(FILE *fd, const struct ath_stats *stats)
 	if (stats->ast_##x) fprintf(fd, "%u\t" fmt "\n", stats->ast_##x)
 #define	STATI(x,fmt) \
 	if (stats->ast_##x) fprintf(fd, "%d\t" fmt "\n", stats->ast_##x)
-	int i, j;
+	int i;
 	
 	STAT(watchdog, "watchdog timeouts");
 	STAT(hardware, "hardware error interrupts");
@@ -145,17 +122,9 @@ printstats(FILE *fd, const struct ath_stats *stats)
 		for (i = 0; i < 32; i++) {
 			if (stats->ast_rx_phy[i] == 0)
 				continue;
-			for (j = 0; j < N(phyerrdescriptions); j++)
-				if (phyerrdescriptions[j].phyerr == i)
-					break;
-			if (j == N(phyerrdescriptions))
-				fprintf(fd,
-					"    %u (unknown phy error code %u)\n",
-					stats->ast_rx_phy[i], i);
-			else
-				fprintf(fd, "    %u %s\n",
-					stats->ast_rx_phy[i],
-					phyerrdescriptions[j].desc);
+			fprintf(fd,
+				"    %u (phy error code %u)\n",
+				stats->ast_rx_phy[i], i);
 		}
 	}
 	
@@ -235,7 +204,7 @@ getifstats(const char *ifname, u_long *iframes, u_long *oframes)
 				*tp++ = '\0';
 				if (strcmp(cp, ifname) != 0)
 					continue;
-				sscanf(tp, "%*llu %lu %*u %*u %*u %*u %*u %*u %*llu %lu",
+				sscanf(tp, "%*u %lu %*u %*u %*u %*u %*u %*u %*u %lu",
 					iframes, oframes);
 				fclose(fd);
 				return 1;
@@ -275,8 +244,8 @@ main(int argc, char *argv[])
 		strncpy(ifr.ifr_name, "ath0", sizeof (ifr.ifr_name));
 	if (argc > 1) {
 		u_long interval = strtoul(argv[1], NULL, 0);
-		u_long off;
-		int line, omask;
+		int line;
+		sigset_t omask, nmask;
 		u_int rate, rssi;
 		struct ath_stats cur, total;
 		u_long icur, ocur;
@@ -313,7 +282,7 @@ main(int argc, char *argv[])
 				err(1, ifr.ifr_name);
 			if (!getifstats(ifr.ifr_name, &icur, &ocur))
 				err(1, ifr.ifr_name);
-			printf("%8u %8u %7u %7u %7u %6u %6u %6u %7u %4u %3uM\n"
+			printf("%8lu %8lu %7u %7u %7u %6u %6u %6u %7u %4u %3uM\n"
 				, (icur - itot) -
 					(cur.ast_rx_mgt - total.ast_rx_mgt)
 				, ocur - otot
@@ -336,7 +305,7 @@ main(int argc, char *argv[])
 				err(1, ifr.ifr_name);
 			if (!getifstats(ifr.ifr_name, &itot, &otot))
 				err(1, ifr.ifr_name);
-			printf("%8u %8u %7u %7u %7u %6u %6u %6u %7u %4u %3uM\n"
+			printf("%8lu %8lu %7u %7u %7u %6u %6u %6u %7u %4u %3uM\n"
 				, itot - total.ast_rx_mgt
 				, otot
 				, total.ast_tx_altrate
@@ -351,10 +320,13 @@ main(int argc, char *argv[])
 			);
 		}
 		fflush(stdout);
-		omask = sigblock(sigmask(SIGALRM));
+		sigemptyset(&nmask);
+		sigaddset(&nmask,SIGALRM);
+		sigprocmask(SIG_BLOCK, &nmask, &omask);
+		sigemptyset(&nmask);
 		if (!signalled)
-			sigpause(0);
-		sigsetmask(omask);
+			sigsuspend(&nmask);
+		sigprocmask(SIG_SETMASK, &omask, NULL);
 		signalled = 0;
 		alarm(interval);
 		line++;
