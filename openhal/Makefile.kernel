@@ -1,0 +1,31 @@
+#
+# Makefile for the Atheros WLAN driver.
+#
+
+obj ?= .
+src ?= .
+srctree ?= .
+
+TOP = $(srctree)/$(src)/..
+
+COMPAT=	$(TOP)/include
+
+INCS = -include $(COMPAT)/compat.h -I$(COMPAT)
+INCS += -I$(TOP) -I$(HAL) -I$(WLAN)
+
+EXTRA_CFLAGS += $(INCS)
+
+ifdef LINUX26
+obj-$(CONFIG_ATHEROS) += ath_hal.o
+ath_hal-objs := ah_osdep.o ar5xxx.o ar5212.o ar5211.o ar5210.o \
+	ieee80211_regdomain.o
+endif
+
+ifdef LINUX24
+obj-$(CONFIG_ATHEROS) := ah_osdep.o ar5xxx.o ar5212.o ar5211.o ar5210.o \
+	ieee80211_regdomain.o
+export-objs := ah_osdep.o
+list-multi := ath_hal.o
+O_TARGET := ath_hal.o
+include $(TOPDIR)/Rules.make
+endif

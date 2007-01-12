@@ -7,11 +7,9 @@ srctree ?= .
 
 TOP = $(srctree)/$(src)/..
 
-include $(TOP)/BuildCaps.inc
-
 COMPAT = $(TOP)/include
 
-HAL = $(TOP)/hal
+HAL = $(TOP)/openhal
 
 INCS = -include $(COMPAT)/compat.h -I$(COMPAT)
 INCS += -I$(TOP) -I$(HAL)
