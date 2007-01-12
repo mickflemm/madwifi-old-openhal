@@ -64,7 +64,7 @@ install:
 	    echo "Don't forget to run \"depmod -ae\" on the target system."; \
 	fi
 
-FILES=	ath_hal COPYRIGHT ath include Makefile Makefile.inc \
+FILES=	COPYRIGHT ath include Makefile Makefile.inc \
 	README release.h share net80211 ath_rate
 HAL_TAG=ATH_HAL_20030802
 
