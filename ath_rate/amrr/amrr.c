@@ -192,7 +192,7 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 {
 	struct ath_node *an = ATH_NODE(ni);
 	struct amrr_node *amn = ATH_NODE_AMRR(an);
-	const HAL_RATE_TABLE *rt = sc->sc_currates;
+	const AR5K_RATE_TABLE *rt = sc->sc_currates;
 	u_int8_t rix;
 
 	KASSERT(rt != NULL, ("no rate table, mode %u", sc->sc_curmode));
@@ -204,7 +204,7 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 
 	ni->ni_txrate = rate;
 	/* XXX management/control frames always go at the lowest speed */
-	an->an_tx_mgtrate = rt->info[0].rateCode;
+	an->an_tx_mgtrate = rt->info[0].rate_code;
 	an->an_tx_mgtratesp = an->an_tx_mgtrate | rt->info[0].shortPreamble;
 	/*
 	 * Before associating a node has no rate set setup
@@ -216,7 +216,7 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 	if (ni->ni_rates.rs_nrates > 0) {
 		amn->amn_tx_rix0 = sc->sc_rixmap[
 					       ni->ni_rates.rs_rates[rate] & IEEE80211_RATE_VAL];
-		amn->amn_tx_rate0 = rt->info[amn->amn_tx_rix0].rateCode;
+		amn->amn_tx_rate0 = rt->info[amn->amn_tx_rix0].rate_code;
 		amn->amn_tx_rate0sp = amn->amn_tx_rate0 |
 			rt->info[amn->amn_tx_rix0].shortPreamble;
 		if (sc->sc_mrretry) {
@@ -227,7 +227,7 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 			if (--rate >= 0) {
 				rix = sc->sc_rixmap[
 						    ni->ni_rates.rs_rates[rate]&IEEE80211_RATE_VAL];
-				amn->amn_tx_rate1 = rt->info[rix].rateCode;
+				amn->amn_tx_rate1 = rt->info[rix].rate_code;
 				amn->amn_tx_rate1sp = amn->amn_tx_rate1 |
 					rt->info[rix].shortPreamble;
 			} else {
@@ -236,7 +236,7 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 			if (--rate >= 0) {
 				rix = sc->sc_rixmap[
 						    ni->ni_rates.rs_rates[rate]&IEEE80211_RATE_VAL];
-				amn->amn_tx_rate2 = rt->info[rix].rateCode;
+				amn->amn_tx_rate2 = rt->info[rix].rate_code;
 				amn->amn_tx_rate2sp = amn->amn_tx_rate2 |
 					rt->info[rix].shortPreamble;
 			} else {
@@ -244,7 +244,7 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 			}
 			if (rate > 0) {
 				/* NB: only do this if we didn't already do it above */
-				amn->amn_tx_rate3 = rt->info[0].rateCode;
+				amn->amn_tx_rate3 = rt->info[0].rate_code;
 				amn->amn_tx_rate3sp =
 					an->an_tx_mgtrate | rt->info[0].shortPreamble;
 			} else {

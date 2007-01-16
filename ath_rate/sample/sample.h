@@ -58,7 +58,7 @@ struct sample_softc {
 struct rate_info {
 	int rate;
 	int rix;
-	int rateCode;
+	int rate_code;
 	int shortPreambleRateCode;
 };
 
@@ -192,7 +192,7 @@ struct ar5212_desc {
 static unsigned calc_usecs_unicast_packet(struct ath_softc *sc,
 				int length, 
 				int rix, int short_retries, int long_retries) {
-	const HAL_RATE_TABLE *rt = sc->sc_currates;
+	const AR5K_RATE_TABLE *rt = sc->sc_currates;
 	int rts, cts;
 	
 	unsigned t_slot = 20;
@@ -202,13 +202,13 @@ static unsigned calc_usecs_unicast_packet(struct ath_softc *sc,
 	int tt = 0;
 	int x = 0;
 	int cw = WIFI_CW_MIN;
-	int cix = rt->info[rix].controlRate;
+	int cix = rt->rates[rix].control_rate;
 	KASSERT(rt != NULL, ("no rate table, mode %u", sc->sc_curmode));
 
-	if (!rt->info[rix].rateKbps) {
+	if (!rt->rates[rix].rate_kbps) {
 		printk(KERN_WARNING "rix %d (%d) bad ratekbps %d mode %u",
-		       rix, rt->info[rix].dot11Rate,
-		       rt->info[rix].rateKbps,
+		       rix, rt->rates[rix].dot11_rate,
+		       rt->rates[rix].rate_kbps,
 		       sc->sc_curmode);
 
 		return 0;
@@ -218,7 +218,7 @@ static unsigned calc_usecs_unicast_packet(struct ath_softc *sc,
 	 * rates, and there is probably a way to get this from the
 	 * hal...
 	 */
-	switch (rt->info[rix].phy) {
+	switch (rt->rates[rix].modulation) {
 	case IEEE80211_T_OFDM:
 		t_slot = 9;
 		t_sifs = 16;
@@ -241,13 +241,13 @@ static unsigned calc_usecs_unicast_packet(struct ath_softc *sc,
 	rts = cts = 0;
 
 	if ((ic->ic_flags & IEEE80211_F_USEPROT) &&
-	    rt->info[rix].phy == IEEE80211_T_OFDM) {
+	    rt->rates[rix].modulation == IEEE80211_T_OFDM) {
 		if (ic->ic_protmode == IEEE80211_PROT_RTSCTS)
 			rts = 1;
 		else if (ic->ic_protmode == IEEE80211_PROT_CTSONLY)
 			cts = 1;
 
-		cix = rt->info[sc->sc_protrix].controlRate;
+		cix = rt->rates[sc->sc_protrix].control_rate;
 	}
 
 	if (length > ic->ic_rtsthreshold) {
@@ -255,34 +255,34 @@ static unsigned calc_usecs_unicast_packet(struct ath_softc *sc,
 	}
 
 	if (rts || cts) {
-		int ctsrate = rt->info[cix].rateCode;
+		int ctsrate = rt->rates[cix].rate_code;
 		int ctsduration = 0;
 
-		if (!rt->info[cix].rateKbps) {
+		if (!rt->rates[cix].rate_kbps) {
 			printk(KERN_WARNING "cix %d (%d) bad ratekbps %d mode %u",
-			       cix, rt->info[cix].dot11Rate,
-			       rt->info[cix].rateKbps,
+			       cix, rt->rates[cix].dot11_rate,
+			       rt->rates[cix].rate_kbps,
 			       sc->sc_curmode);
 			return 0;
 		}
 		
 
-		ctsrate |= rt->info[cix].shortPreamble;
+		ctsrate |= SHPREAMBLE_FLAG(cix);
 		if (rts)		/* SIFS + CTS */
-			ctsduration += rt->info[cix].spAckDuration;
+			ctsduration += rt->rates[cix].sp_ack_duration;
 
 		ctsduration += ath_hal_computetxtime(sc->sc_ah,
-						     rt, length, rix, AH_TRUE);
+						     rt, length, rix, TRUE);
 
 		if (cts)	/* SIFS + ACK */
-			ctsduration += rt->info[cix].spAckDuration;
+			ctsduration += rt->rates[cix].sp_ack_duration;
 
 		tt += (short_retries + 1) * ctsduration;
 	}
 	tt += t_difs;
-	tt += (long_retries+1)*(t_sifs + rt->info[rix].spAckDuration);
+	tt += (long_retries+1)*(t_sifs + rt->rates[rix].sp_ack_duration);
 	tt += (long_retries+1)*ath_hal_computetxtime(sc->sc_ah, rt, length, 
-						rix, AH_TRUE);
+						rix, TRUE);
 	for (x = 0; x <= short_retries + long_retries; x++) {
 		cw = MIN(WIFI_CW_MAX, (cw + 1) * 2);
 		tt += (t_slot * cw/2);

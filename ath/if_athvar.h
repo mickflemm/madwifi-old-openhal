@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2002-2005 Sam Leffler, Errno Consulting
+ * Copyright (c) 2002-2007 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -150,7 +150,7 @@ struct ath_node {
 	u_int8_t	an_tx_mgtrate;	/* h/w rate for management/ctl frames */
 	u_int8_t	an_tx_mgtratesp;/* short preamble h/w rate for " " */
 	u_int32_t	an_avgrssi;	/* average rssi over all rx frames */
-	HAL_NODE_STATS	an_halstats;	/* rssi statistics used by hal */
+	AR5K_NODE_STATS	an_halstats;	/* rssi statistics used by hal */
 	/* variable-length rate control state follows */
 };
 #define	ATH_NODE(ni)	((struct ath_node *)(ni))
@@ -159,7 +159,7 @@ struct ath_node {
 #define ATH_RSSI_LPF_LEN	10
 #define ATH_RSSI_DUMMY_MARKER	0x127
 #define ATH_EP_MUL(x, mul)	((x) * (mul))
-#define ATH_RSSI_IN(x)		(ATH_EP_MUL((x), HAL_RSSI_EP_MULTIPLIER))
+#define ATH_RSSI_IN(x)		(ATH_EP_MUL((x), AR5K_RSSI_EP_MULTIPLIER))
 #define ATH_LPF_RSSI(x, y, len) \
     ((x != ATH_RSSI_DUMMY_MARKER) ? (((x) * ((len) - 1) + (y)) / (len)) : (y))
 #define ATH_RSSI_LPF(x, y) do {						\
@@ -273,11 +273,11 @@ struct ath_softc {
 				sc_hasclrkey:1, /* CLR key supported */
 				sc_rawdev_enabled : 1;  /* enable sc_rawdev */
 						/* rate tables */
-	const HAL_RATE_TABLE	*sc_rates[IEEE80211_MODE_MAX];
-	const HAL_RATE_TABLE	*sc_currates;	/* current rate table */
+	const AR5K_RATE_TABLE	*sc_rates[IEEE80211_MODE_MAX];
+	const AR5K_RATE_TABLE	*sc_currates;	/* current rate table */
 	enum ieee80211_phymode	sc_curmode;	/* current phy mode */
 	u_int16_t		sc_curtxpow;	/* current tx power limit */
-	HAL_CHANNEL		sc_curchan;	/* current h/w channel */
+	AR5K_CHANNEL		sc_curchan;	/* current h/w channel */
 	u_int8_t		sc_rixmap[256];	/* IEEE to h/w rate table ix */
 	struct {
 		u_int8_t	ieeerate;	/* IEEE rate */
@@ -288,7 +288,7 @@ struct ath_softc {
 	} sc_hwmap[32];				/* h/w rate ix mappings */
 	u_int8_t		sc_protrix;	/* protection rate index */
 	u_int			sc_txantenna;	/* tx antenna (fixed or auto) */
-	HAL_INT			sc_imask;	/* interrupt mask copy */
+	AR5K_INT			sc_imask;	/* interrupt mask copy */
 	u_int			sc_keymax;	/* size of key cache */
 	u_int8_t                sc_keymap[ATH_KEYBYTES];/* key use bit map */
 	struct ieee80211_node   *sc_keyixmap[ATH_KEYMAX];/* key ix->node map */
@@ -330,7 +330,7 @@ struct ath_softc {
 	int			sc_tx_timer;	/* transmit timeout */
 	u_int			sc_txqsetup;	/* h/w queues setup */
 	u_int			sc_txintrperiod;/* tx interrupt batching */
-	struct ath_txq		sc_txq[HAL_NUM_TX_QUEUES];
+	struct ath_txq		sc_txq[AR5K_NUM_TX_QUEUES];
 	struct ath_txq		*sc_ac2q[5];	/* WME AC -> h/w q map */ 
 	struct tq_struct	sc_txtq;	/* tx intr tasklet */
 
@@ -420,13 +420,13 @@ void	ath_sysctl_unregister(void);
 #define	ath_hal_updatetxtriglevel(_ah, _inc) \
 	((*(_ah)->ah_updateTxTrigLevel)((_ah), (_inc)))
 #define	ath_hal_setpower(_ah, _mode, _sleepduration) \
-	((*(_ah)->ah_setPowerMode)((_ah), (_mode), AH_TRUE, (_sleepduration)))
+	((*(_ah)->ah_setPowerMode)((_ah), (_mode), TRUE, (_sleepduration)))
 #define	ath_hal_keycachesize(_ah) \
 	((*(_ah)->ah_getKeyCacheSize)((_ah)))
 #define	ath_hal_keyreset(_ah, _ix) \
 	((*(_ah)->ah_resetKeyCacheEntry)((_ah), (_ix)))
 #define	ath_hal_keyset(_ah, _ix, _pk, _mac) \
-	((*(_ah)->ah_setKeyCacheEntry)((_ah), (_ix), (_pk), (_mac), AH_FALSE))
+	((*(_ah)->ah_setKeyCacheEntry)((_ah), (_ix), (_pk), (_mac), FALSE))
 #define	ath_hal_keyisvalid(_ah, _ix) \
 	(((*(_ah)->ah_isKeyCacheEntryValid)((_ah), (_ix))))
 #define	ath_hal_keysetmac(_ah, _ix, _mac) \
@@ -525,54 +525,54 @@ void	ath_sysctl_unregister(void);
 #define	ath_hal_setcapability(_ah, _cap, _param, _v, _status) \
 	((*(_ah)->ah_setCapability)((_ah), (_cap), (_param), (_v), (_status)))
 #define	ath_hal_ciphersupported(_ah, _cipher) \
-	(ath_hal_getcapability(_ah, HAL_CAP_CIPHER, _cipher, NULL) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_CIPHER, _cipher, NULL) == AR5K_OK)
 #define	ath_hal_getregdomain(_ah, _prd) \
-	ath_hal_getcapability(_ah, HAL_CAP_REG_DMN, 0, (_prd))
+	ath_hal_getcapability(_ah, AR5K_CAP_REG_DMN, 0, (_prd))
 #define	ath_hal_getcountrycode(_ah, _pcc) \
-	(*(_pcc) = (_ah)->ah_countryCode)
+	(*(_pcc) = (_ah)->ah_country_code)
 #define	ath_hal_tkipsplit(_ah) \
-	(ath_hal_getcapability(_ah, HAL_CAP_TKIP_SPLIT, 0, NULL) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_TKIP_SPLIT, 0, NULL) == AR5K_OK)
 #define	ath_hal_hwphycounters(_ah) \
-	(ath_hal_getcapability(_ah, HAL_CAP_PHYCOUNTERS, 0, NULL) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_PHYCOUNTERS, 0, NULL) == AR5K_OK)
 #define	ath_hal_hasdiversity(_ah) \
-	(ath_hal_getcapability(_ah, HAL_CAP_DIVERSITY, 0, NULL) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_DIVERSITY, 0, NULL) == AR5K_OK)
 #define	ath_hal_getdiversity(_ah) \
-	(ath_hal_getcapability(_ah, HAL_CAP_DIVERSITY, 1, NULL) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_DIVERSITY, 1, NULL) == AR5K_OK)
 #define	ath_hal_setdiversity(_ah, _v) \
-	ath_hal_setcapability(_ah, HAL_CAP_DIVERSITY, 1, _v, NULL)
+	ath_hal_setcapability(_ah, AR5K_CAP_DIVERSITY, 1, _v, NULL)
 #define	ath_hal_getdiag(_ah, _pv) \
-	(ath_hal_getcapability(_ah, HAL_CAP_DIAG, 0, _pv) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_DIAG, 0, _pv) == AR5K_OK)
 #define	ath_hal_setdiag(_ah, _v) \
-	ath_hal_setcapability(_ah, HAL_CAP_DIAG, 0, _v, NULL)
+	ath_hal_setcapability(_ah, AR5K_CAP_DIAG, 0, _v, NULL)
 #define	ath_hal_getnumtxqueues(_ah, _pv) \
-	(ath_hal_getcapability(_ah, HAL_CAP_NUM_TXQUEUES, 0, _pv) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_NUM_TXQUEUES, 0, _pv) == AR5K_OK)
 #define	ath_hal_hasveol(_ah) \
-	(ath_hal_getcapability(_ah, HAL_CAP_VEOL, 0, NULL) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_VEOL, 0, NULL) == AR5K_OK)
 #define	ath_hal_hastxpowlimit(_ah) \
-	(ath_hal_getcapability(_ah, HAL_CAP_TXPOW, 0, NULL) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_TXPOW, 0, NULL) == AR5K_OK)
 #define	ath_hal_settxpowlimit(_ah, _pow) \
 	((*(_ah)->ah_setTxPowerLimit)((_ah), (_pow)))
 #define	ath_hal_gettxpowlimit(_ah, _ppow) \
-	(ath_hal_getcapability(_ah, HAL_CAP_TXPOW, 1, _ppow) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_TXPOW, 1, _ppow) == AR5K_OK)
 #define	ath_hal_getmaxtxpow(_ah, _ppow) \
-	(ath_hal_getcapability(_ah, HAL_CAP_TXPOW, 2, _ppow) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_TXPOW, 2, _ppow) == AR5K_OK)
 #define	ath_hal_gettpscale(_ah, _scale) \
-	(ath_hal_getcapability(_ah, HAL_CAP_TXPOW, 3, _scale) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_TXPOW, 3, _scale) == AR5K_OK)
 #define	ath_hal_settpscale(_ah, _v) \
-	ath_hal_setcapability(_ah, HAL_CAP_TXPOW, 3, _v, NULL)
+	ath_hal_setcapability(_ah, AR5K_CAP_TXPOW, 3, _v, NULL)
 #define	ath_hal_hastpc(_ah) \
-	(ath_hal_getcapability(_ah, HAL_CAP_TPC, 0, NULL) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_TPC, 0, NULL) == AR5K_OK)
 #define	ath_hal_gettpc(_ah) \
-	(ath_hal_getcapability(_ah, HAL_CAP_TPC, 1, NULL) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_TPC, 1, NULL) == AR5K_OK)
 #define	ath_hal_settpc(_ah, _v) \
-	ath_hal_setcapability(_ah, HAL_CAP_TPC, 1, _v, NULL)
+	ath_hal_setcapability(_ah, AR5K_CAP_TPC, 1, _v, NULL)
 #define	ath_hal_hasbursting(_ah) \
-	(ath_hal_getcapability(_ah, HAL_CAP_BURST, 0, NULL) == HAL_OK)
+	(ath_hal_getcapability(_ah, AR5K_CAP_BURST, 0, NULL) == AR5K_OK)
 #ifdef notyet
 #define ath_hal_hasmcastkeysearch(_ah) \
-        (ath_hal_getcapability(_ah, HAL_CAP_MCAST_KEYSRCH, 0, NULL) == HAL_OK)
+        (ath_hal_getcapability(_ah, AR5K_CAP_MCAST_KEYSRCH, 0, NULL) == AR5K_OK)
 #define ath_hal_getmcastkeysearch(_ah) \
-        (ath_hal_getcapability(_ah, HAL_CAP_MCAST_KEYSRCH, 1, NULL) == HAL_OK)
+        (ath_hal_getcapability(_ah, AR5K_CAP_MCAST_KEYSRCH, 1, NULL) == AR5K_OK)
 #else
 #define ath_hal_getmcastkeysearch(_ah)  0
 #endif

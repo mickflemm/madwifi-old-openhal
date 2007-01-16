@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2006-2007 Nick Kossifidis <mickflemm@gmail.com>
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * Alternatively, this software may be distributed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * $Id$
+ */
+
 #include "ah.h"
 
 /*Definitions for module loading/unloading 
@@ -27,13 +49,13 @@ MODULE_LICENSE("Dual BSD/GPL");
 /*Attach/Dettach to HAL*/
 
 struct ath_hal *
-_ath_hal_attach(u_int16_t devid, HAL_SOFTC sc,
-                HAL_BUS_TAG t, HAL_BUS_HANDLE h, void* s)
+_ath_hal_attach(u_int16_t devid, AR5K_SOFTC sc,
+                AR5K_BUS_TAG t, AR5K_BUS_HANDLE h, void* s)
 {
-        HAL_STATUS status;
+        AR5K_STATUS status;
         struct ath_hal *ah = ath_hal_attach(devid, sc, t, h, &status);
 
-        *(HAL_STATUS *)s = status;
+        *(AR5K_STATUS *)s = status;
         if (ah)
                 AH_MOD_INC_USE_COUNT(THIS_MODULE);
         return ah;
@@ -58,7 +80,7 @@ EXPORT_SYMBOL(ath_hal_ieee2mhz);
 static int __init
 init_ath_hal(void)
 {
-	printk(KERN_INFO "%s: OpenHAL loaded (AR5210, AR5211, AR5212)\n", dev_info);
+	printk(KERN_INFO "%s: OpenHAL loaded (AR5210, AR5211, AR5212, RF5110/1/2)\n", dev_info);
 	return (0);
 }
 module_init(init_ath_hal);

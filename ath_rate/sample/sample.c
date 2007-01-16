@@ -367,7 +367,7 @@ ath_rate_findrate(struct ath_softc *sc, struct ath_node *an,
 	if (shortPreamble) {
 		*txrate = sn->rates[ndx].shortPreambleRateCode;
 	} else {
-		*txrate = sn->rates[ndx].rateCode;
+		*txrate = sn->rates[ndx].rate_code;
 	}
 	sn->packets_sent[size_bin]++;
 }
@@ -378,7 +378,7 @@ ath_rate_setupxtxdesc(struct ath_softc *sc, struct ath_node *an,
 		      struct ath_desc *ds, int shortPreamble, u_int8_t rix)
 {
 	struct sample_node *sn = ATH_NODE_SAMPLE(an);
-	int rateCode = -1;
+	int rate_code = -1;
 	int frame_size = 0;
 	int size_bin = 0;
 	int ndx = 0;
@@ -391,13 +391,13 @@ ath_rate_setupxtxdesc(struct ath_softc *sc, struct ath_node *an,
 	}
 
 	if (shortPreamble) {
-		rateCode = sn->rates[ndx].shortPreambleRateCode;
+		rate_code = sn->rates[ndx].shortPreambleRateCode;
 	} else {
-		rateCode = sn->rates[ndx].rateCode;
+		rate_code = sn->rates[ndx].rate_code;
 	}
 	ath_hal_setupxtxdesc(sc->sc_ah, ds
-			     , rateCode, 3	        /* series 1 */
-			     , sn->rates[0].rateCode, 3	/* series 2 */
+			     , rate_code, 3	        /* series 1 */
+			     , sn->rates[0].rate_code, 3	/* series 2 */
 			     , 0, 0	                /* series 3 */
 			     );
 	
@@ -510,7 +510,7 @@ ath_rate_tx_complete(struct ath_softc *sc,
 	int frame_size = 0;
 	int mrr;
 
-	final_rate = sc->sc_hwmap[ds->ds_txstat.ts_rate &~ HAL_TXSTAT_ALTRATE].ieeerate;
+	final_rate = sc->sc_hwmap[ds->ds_txstat.ts_rate &~ AR5K_TXSTAT_ALTRATE].ieeerate;
 	short_tries = ds->ds_txstat.ts_shortretry + 1;
 	long_tries = ds->ds_txstat.ts_longretry + 1;
 	frame_size = ds->ds_ctl0 & 0x0fff; /* low-order 12 bits of ds_ctl0 */
@@ -545,7 +545,7 @@ ath_rate_tx_complete(struct ath_softc *sc,
 	}
 
 
-	if (!mrr || !(ds->ds_txstat.ts_rate & HAL_TXSTAT_ALTRATE)) {
+	if (!mrr || !(ds->ds_txstat.ts_rate & AR5K_TXSTAT_ALTRATE)) {
 		/* only one rate was used */
 		ndx = rate_to_ndx(sn, final_rate);
 		if (ndx >= 0 && ndx < sn->num_rates) {
@@ -658,7 +658,7 @@ ath_rate_ctl_reset(struct ath_softc *sc, struct ieee80211_node *ni)
 	struct ieee80211com *ic = &sc->sc_ic;
 	struct ath_node *an = ATH_NODE(ni);
 	struct sample_node *sn = ATH_NODE_SAMPLE(an);
-	const HAL_RATE_TABLE *rt = sc->sc_currates;
+	const AR5K_RATE_TABLE *rt = sc->sc_currates;
 	const struct ieee80211_rateset *rs;
 	int r, x, y;
 	int srate;
@@ -679,15 +679,15 @@ ath_rate_ctl_reset(struct ath_softc *sc, struct ieee80211_node *ni)
 				dev_info, __func__, x);
 			continue;
 		}
-		sn->rates[x].rateCode = rt->info[sn->rates[x].rix].rateCode;
+		sn->rates[x].rate_code = rt->rates[sn->rates[x].rix].rate_code;
 		sn->rates[x].shortPreambleRateCode = 
-			rt->info[sn->rates[x].rix].rateCode | 
-			rt->info[sn->rates[x].rix].shortPreamble;
+			rt->rates[sn->rates[x].rix].rate_code | 
+			SHPREAMBLE_FLAG(sn->rates[x].rix);
 	}
 	
 	ni->ni_txrate = 0;
-	an->an_tx_mgtrate = rt->info[0].rateCode;
-	an->an_tx_mgtratesp = an->an_tx_mgtrate | rt->info[0].shortPreamble;
+	an->an_tx_mgtrate = rt->rates[0].rate_code;
+	an->an_tx_mgtratesp = an->an_tx_mgtrate | SHPREAMBLE_FLAG(0);
 	sn->num_rates = ni->ni_rates.rs_nrates;
 
 	if (sn->num_rates <= 0) {

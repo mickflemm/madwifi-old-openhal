@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2006-2007 Nick Kossifidis <mickflemm@gmail.com>
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * Alternatively, this software may be distributed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * $Id$
+ */
+
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -16,12 +38,12 @@
 #include <asm/io.h>
 
 
-typedef void* HAL_SOFTC;
-typedef int HAL_BUS_TAG;
-typedef void* HAL_BUS_HANDLE;
-typedef u_int32_t HAL_BUS_ADDR;
-#define bus_space_tag_t HAL_BUS_TAG
-#define bus_space_handle_t HAL_BUS_HANDLE
+typedef void* AR5K_SOFTC;
+typedef int AR5K_BUS_TAG;
+typedef void* AR5K_BUS_HANDLE;
+typedef u_int32_t AR5K_BUS_ADDR;
+#define bus_space_tag_t AR5K_BUS_TAG
+#define bus_space_handle_t AR5K_BUS_HANDLE
 //#define hz cpufreq_get(0) / 1000
 //#define tick 1000000 / hz
 

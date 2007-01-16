@@ -192,7 +192,7 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 {
 	struct ath_node *an = ATH_NODE(ni);
 	struct onoe_node *on = ATH_NODE_ONOE(an);
-	const HAL_RATE_TABLE *rt = sc->sc_currates;
+	const AR5K_RATE_TABLE *rt = sc->sc_currates;
 	u_int8_t rix;
 
 	KASSERT(rt != NULL, ("no rate table, mode %u", sc->sc_curmode));
@@ -204,8 +204,8 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 
 	ni->ni_txrate = rate;
 	/* XXX management/control frames always go at the lowest speed */
-	an->an_tx_mgtrate = rt->info[0].rateCode;
-	an->an_tx_mgtratesp = an->an_tx_mgtrate | rt->info[0].shortPreamble;
+	an->an_tx_mgtrate = rt->rates[0].rate_code;
+	an->an_tx_mgtratesp = an->an_tx_mgtrate | SHPREAMBLE_FLAG(0);
 	/*
 	 * Before associating a node has no rate set setup
 	 * so we can't calculate any transmit codes to use.
@@ -217,10 +217,10 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 		goto done;
 	on->on_tx_rix0 = sc->sc_rixmap[
 		ni->ni_rates.rs_rates[rate] & IEEE80211_RATE_VAL];
-	on->on_tx_rate0 = rt->info[on->on_tx_rix0].rateCode;
+	on->on_tx_rate0 = rt->rates[on->on_tx_rix0].rate_code;
 	
 	on->on_tx_rate0sp = on->on_tx_rate0 |
-		rt->info[on->on_tx_rix0].shortPreamble;
+		SHPREAMBLE_FLAG(on->on_tx_rix0);
 	if (sc->sc_mrretry) {
 		/*
 		 * Hardware supports multi-rate retry; setup two
@@ -233,26 +233,26 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 		if (--rate >= 0) {
 			rix = sc->sc_rixmap[
 				ni->ni_rates.rs_rates[rate]&IEEE80211_RATE_VAL];
-			on->on_tx_rate1 = rt->info[rix].rateCode;
+			on->on_tx_rate1 = rt->rates[rix].rate_code;
 			on->on_tx_rate1sp = on->on_tx_rate1 |
-				rt->info[rix].shortPreamble;
+				SHPREAMBLE_FLAG(rix);
 		} else {
 			on->on_tx_rate1 = on->on_tx_rate1sp = 0;
 		}
 		if (--rate >= 0) {
 			rix = sc->sc_rixmap[
 				ni->ni_rates.rs_rates[rate]&IEEE80211_RATE_VAL];
-			on->on_tx_rate2 = rt->info[rix].rateCode;
+			on->on_tx_rate2 = rt->rates[rix].rate_code;
 			on->on_tx_rate2sp = on->on_tx_rate2 |
-				rt->info[rix].shortPreamble;
+				SHPREAMBLE_FLAG(rix);
 		} else {
 			on->on_tx_rate2 = on->on_tx_rate2sp = 0;
 		}
 		if (rate > 0) {
 			/* NB: only do this if we didn't already do it above */
-			on->on_tx_rate3 = rt->info[0].rateCode;
+			on->on_tx_rate3 = rt->rates[0].rate_code;
 			on->on_tx_rate3sp =
-				an->an_tx_mgtrate | rt->info[0].shortPreamble;
+				an->an_tx_mgtrate | SHPREAMBLE_FLAG(0);
 		} else {
 			on->on_tx_rate3 = on->on_tx_rate3sp = 0;
 		}
