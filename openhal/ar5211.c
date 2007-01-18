@@ -186,11 +186,11 @@ ar5k_ar5211_fill(struct ath_hal *hal)
 	AR5K_HAL_FUNCTION(hal, ar5211, set_txpower_limit);
 	AR5K_HAL_FUNCTION(hal, ar5211, set_def_antenna);
 	AR5K_HAL_FUNCTION(hal, ar5211, get_def_antenna);
+	AR5K_HAL_FUNCTION(hal, ar5211, set_bssid_mask);
 	/*Totaly unimplemented*/
 	AR5K_HAL_FUNCTION(hal, ar5211, set_capability);
 	AR5K_HAL_FUNCTION(hal, ar5211, proc_mib_event);
 	AR5K_HAL_FUNCTION(hal, ar5211, get_tx_inter_queue);
-
 
 }
 
@@ -1732,6 +1732,14 @@ ar5k_ar5211_set_associd(struct ath_hal *hal, const u_int8_t *bssid,
 	    AR5K_AR5211_BEACON_TIM));
 
 	ar5k_ar5211_enable_pspoll(hal, NULL, 0);
+}
+
+AR5K_BOOL  /*New*/
+ar5k_ar5211_set_bssid_mask(struct ath_hal *hal, const u_int8_t* mask)
+{
+	/*Not supported in 5211*/
+	AR5K_TRACE; 
+	return (FALSE); 
 }
 
 AR5K_BOOL

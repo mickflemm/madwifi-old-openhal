@@ -1953,6 +1953,7 @@ typedef AR5K_BOOL (ar5k_rfgain_t)
 	_t AR5K_BOOL (_a _n##_set_txpower_limit)(struct ath_hal *, u_int);			\
 	_t void (_a _n##_set_def_antenna)(struct ath_hal *, u_int);				\
 	_t u_int  (_a _n ##_get_def_antenna)(struct ath_hal *);					\
+	_t AR5K_BOOL (_a _n ##_set_bssid_mask)(struct ath_hal *, const u_int8_t*);		\
 	/*Totaly unimplemented*/								\
 	_t AR5K_BOOL (_a _n##_set_capability)(struct ath_hal *, AR5K_CAPABILITY_TYPE, u_int32_t,\
 				u_int32_t,AR5K_STATUS *) ;					\
