@@ -95,6 +95,15 @@ typedef void irqreturn_t;
 #define	SET_NETDEV_DEV(ndev, pdev)
 #endif
 
+
+/*
+ * Macro to expand scalars to 64-bit objects
+ */
+#define	ito64(x) (sizeof(x)==8) ? (((unsigned long long int)(x)) & (0xff)) : \
+		 (sizeof(x)==16) ? (((unsigned long long int)(x)) & 0xffff) : \
+		 ((sizeof(x)==32) ? (((unsigned long long int)(x)) & 0xffffffff): (unsigned long long int)(x))
+
+
 /*
  * Deal with the sysctl handler api changing.
  */

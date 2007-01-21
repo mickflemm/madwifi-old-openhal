@@ -1603,15 +1603,15 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 	if (txq->axq_link == NULL) {
 		ath_hal_puttxbuf(ah, txq->axq_qnum, bf->bf_daddr);
 		DPRINTF(sc, ATH_DEBUG_XMIT,
-			"%s: TXDP[%u] = %p (%p) depth %d\n", __func__,
-			txq->axq_qnum, (caddr_t)bf->bf_daddr, bf->bf_desc,
+			"%s: TXDP[%u] = %llx (%p) depth %d\n", __func__,
+			txq->axq_qnum, ito64(bf->bf_daddr), bf->bf_desc,
 			txq->axq_depth);
 	} else {
 		*txq->axq_link = bf->bf_daddr;
 		DPRINTF(sc, ATH_DEBUG_XMIT,
-			"%s: link[%u](%p)=%p (%p) depth %d\n", __func__,
+			"%s: link[%u](%p)=%llx (%p) depth %d\n", __func__,
 			txq->axq_qnum, txq->axq_link,
-			(caddr_t)bf->bf_daddr, bf->bf_desc, txq->axq_depth);
+			ito64(bf->bf_daddr), bf->bf_desc, txq->axq_depth);
 	}
 	txq->axq_link = &bf->bf_desc->ds_link;
 	/*
@@ -2506,8 +2506,8 @@ ath_beacon_setup(struct ath_softc *sc, struct ath_buf *bf)
 	bf->bf_skbaddr = bus_map_single(sc->sc_bdev,
 		skb->data, skb->len, BUS_DMA_TODEVICE);
 	DPRINTF(sc, ATH_DEBUG_BEACON,
-		"%s: skb %p [data %p len %u] skbaddr %p\n",
-		__func__, skb, skb->data, skb->len, (caddr_t) bf->bf_skbaddr);
+		"%s: skb %p [data %p len %u] skbaddr %llx\n",
+		__func__, skb, skb->data, skb->len, ito64(bf->bf_skbaddr));
 	if (BUS_DMA_MAP_ERROR(bf->bf_skbaddr)) {
 		if_printf(&sc->sc_dev, "%s: DMA mapping failed\n", __func__);
 		return;
@@ -2698,8 +2698,8 @@ ath_beacon_tasklet(struct net_device *dev)
 	ath_hal_puttxbuf(ah, sc->sc_bhalq, bf->bf_daddr);
 	ath_hal_txstart(ah, sc->sc_bhalq);
 	DPRINTF(sc, ATH_DEBUG_BEACON_PROC,
-		"%s: TXDP[%u] = %p (%p)\n", __func__,
-		sc->sc_bhalq, (caddr_t)bf->bf_daddr, bf->bf_desc);
+		"%s: TXDP[%u] = %llx (%p)\n", __func__,
+		sc->sc_bhalq, ito64(bf->bf_daddr), bf->bf_desc);
 
 	sc->sc_stats.ast_be_xmit++;
 }
@@ -2984,8 +2984,8 @@ ath_desc_alloc(struct ath_softc *sc)
 		return ENOMEM;
 	}
 	ds = sc->sc_desc;
-	DPRINTF(sc, ATH_DEBUG_ANY, "%s: DMA map: %p (%u) -> %p\n",
-	    __func__, ds, (unsigned int) sc->sc_desc_len, (caddr_t) sc->sc_desc_daddr);
+	DPRINTF(sc, ATH_DEBUG_ANY, "%s: DMA map: %p (%u) -> %llx\n",
+	    __func__, ds, (unsigned int) sc->sc_desc_len, ito64(sc->sc_desc_daddr));
 
 	/* allocate buffers */
 	bsize = sizeof(struct ath_buf) * (ATH_TXBUF + ATH_RXBUF + ATH_BCBUF + 1);
@@ -4537,15 +4537,15 @@ ath_tx_start(struct net_device *dev, struct ieee80211_node *ni, struct ath_buf *
 	if (txq->axq_link == NULL) {
 		ath_hal_puttxbuf(ah, txq->axq_qnum, bf->bf_daddr);
 		DPRINTF(sc, ATH_DEBUG_XMIT,
-			"%s: TXDP[%u] = %p (%p) depth %d\n", __func__,
-			txq->axq_qnum, (caddr_t)bf->bf_daddr, bf->bf_desc,
+			"%s: TXDP[%u] = %llx (%p) depth %d\n", __func__,
+			txq->axq_qnum, ito64(bf->bf_daddr), bf->bf_desc,
 			txq->axq_depth);
 	} else {
 		*txq->axq_link = bf->bf_daddr;
 		DPRINTF(sc, ATH_DEBUG_XMIT,
-			"%s: link[%u](%p)=%p (%p) depth %d\n", __func__,
+			"%s: link[%u](%p)=%llx (%p) depth %d\n", __func__,
 			txq->axq_qnum, txq->axq_link,
-			(caddr_t)bf->bf_daddr, bf->bf_desc, txq->axq_depth);
+			ito64(bf->bf_daddr), bf->bf_desc, txq->axq_depth);
 	}
 	txq->axq_link = &bf->bf_desc->ds_link;
 	/*
@@ -5643,8 +5643,8 @@ ath_printrxbuf(struct ath_buf *bf, int done)
 {
 	struct ath_desc *ds = bf->bf_desc;
 
-	printk("R (%p %p) %08x %08x %08x %08x %08x %08x %c\n",
-	    ds, (struct ath_desc *)bf->bf_daddr,
+	printk("R (%p %llx) %08x %08x %08x %08x %08x %08x %c\n",
+	    ds, ito64(bf->bf_daddr),
 	    ds->ds_link, ds->ds_data,
 	    ds->ds_ctl0, ds->ds_ctl1,
 	    ds->ds_hw[0], ds->ds_hw[1],
@@ -5656,8 +5656,8 @@ ath_printtxbuf(struct ath_buf *bf, int done)
 {
 	struct ath_desc *ds = bf->bf_desc;
 
-	printk("T (%p %p) %08x %08x %08x %08x %08x %08x %08x %08x %c\n",
-	    ds, (struct ath_desc *)bf->bf_daddr,
+	printk("T (%p %llx) %08x %08x %08x %08x %08x %08x %08x %08x %c\n",
+	    ds, ito64(bf->bf_daddr),
 	    ds->ds_link, ds->ds_data,
 	    ds->ds_ctl0, ds->ds_ctl1,
 	    ds->ds_hw[0], ds->ds_hw[1], ds->ds_hw[2], ds->ds_hw[3],
