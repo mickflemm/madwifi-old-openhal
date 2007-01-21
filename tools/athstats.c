@@ -47,7 +47,6 @@
 #include <sys/file.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <linux/wireless.h>
 
 #include <stdio.h>
 #include <signal.h>
@@ -57,6 +56,7 @@
 #include <unistd.h>
 #include <err.h>
 
+#include "wireless_copy.h"
 #include "ah_desc.h"
 #include "ieee80211_radiotap.h"
 #include "if_athioctl.h"

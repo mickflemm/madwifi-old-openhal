@@ -44,7 +44,6 @@
 #include <sys/file.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <linux/wireless.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,6 +52,7 @@
 #include <getopt.h>
 #include <err.h>
 
+#include "wireless_copy.h"
 #include "net80211/_ieee80211.h"
 #include "net80211/ieee80211.h"
 #include "net80211/ieee80211_crypto.h"
