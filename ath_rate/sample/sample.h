@@ -47,10 +47,8 @@ struct sample_softc {
 	int ath_smoothing_rate;     /* ewma percentage (out of 100) */
 	int ath_sample_rate;        /* send a different bit-rate 1/X packets */
 
-#ifdef CONFIG_SYSCTL
 	struct ctl_table_header *sysctl_header;
 	struct ctl_table *sysctls;
-#endif
 
 };
 #define ATH_SOFTC_SAMPLE(sc)    ((struct sample_softc *)sc->sc_rc)

@@ -39,7 +39,6 @@
 #define	EXPORT_SYMTAB
 #endif
 
-#ifdef CONFIG_NET_WIRELESS
 /*
  * Wireless extensions support for 802.11 common code.
  */
@@ -2358,4 +2357,3 @@ ieee80211_ioctlx(struct ieee80211com *ic, struct ifreq *ifr, int cmd)
 	return -EOPNOTSUPP;
 }
 EXPORT_SYMBOL(ieee80211_ioctlx);
-#endif /* CONFIG_NET_WIRELESS */

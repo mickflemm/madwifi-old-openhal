@@ -168,10 +168,8 @@ static void	ath_vlan_register(struct net_device *, struct vlan_group *);
 static void	ath_vlan_kill_vid(struct net_device *, unsigned short );
 #endif
 static struct net_device_stats *ath_getstats(struct net_device *);
-#ifdef CONFIG_NET_WIRELESS
 static struct iw_statistics *ath_iw_getstats(struct net_device *);
 static struct iw_handler_def ath_iw_handler_def;
-#endif
 static void	ath_setup_stationkey(struct ieee80211_node *);
 static void	ath_newassoc(struct ieee80211com *,
 			struct ieee80211_node *, int);
@@ -190,10 +188,8 @@ static void	ath_setcurmode(struct ath_softc *, enum ieee80211_phymode);
 
 static int      ath_rawdev_attach(struct ath_softc *);
 static void     ath_rawdev_detach(struct ath_softc *);
-#ifdef CONFIG_SYSCTL
 static void	ath_dynamic_sysctl_register(struct ath_softc *);
 static void	ath_dynamic_sysctl_unregister(struct ath_softc *);
-#endif /* CONFIG_SYSCTL */
 static void	ath_announce(struct ath_softc *);
 
 static const char *hal_status_desc[] = {
@@ -569,14 +565,12 @@ ath_attach(u_int16_t devid, struct net_device *dev)
 	dev->set_mac_address = ath_set_mac_address;
  	dev->change_mtu = &ath_change_mtu;
 	dev->tx_queue_len = ATH_TXBUF;			/* TODO? 1 for mgmt frame */
-#ifdef CONFIG_NET_WIRELESS
 /*get_wireless_stats moved from net_device to iw_handler_def*/
 # if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,10)
 	dev->get_wireless_stats = ath_iw_getstats;
 # endif
 	ieee80211_ioctl_iwsetup(&ath_iw_handler_def);
 	dev->wireless_handlers = &ath_iw_handler_def;
-#endif /* CONFIG_NET_WIRELESS */
 #if IEEE80211_VLAN_TAG_USED
 	dev->features |= NETIF_F_HW_VLAN_TX | NETIF_F_HW_VLAN_RX;
 	dev->vlan_rx_register = ath_vlan_register;
@@ -715,11 +709,9 @@ ath_attach(u_int16_t devid, struct net_device *dev)
 	 * Attach dynamic MIB vars and announce support
 	 * now that we have a device name with unit number.
 	 */
-#ifdef CONFIG_SYSCTL
 	ath_dynamic_sysctl_register(sc);
 	ath_rate_dynamic_sysctl_register(sc);
 	ieee80211_sysctl_register(ic);
-#endif /* CONFIG_SYSCTL */
 	ieee80211_announce(ic);
 	ath_announce(sc);
 	return 0;
@@ -781,9 +773,7 @@ ath_detach(struct net_device *dev)
 	 * returns because we'll get called back to reclaim node
 	 * state and potentially want to use them.
 	 */
-#ifdef CONFIG_SYSCTL
 	ath_dynamic_sysctl_unregister(sc);
-#endif /* CONFIG_SYSCTL */
 	ath_rawdev_detach(sc);
 	unregister_netdev(dev);
 
@@ -5693,7 +5683,6 @@ ath_getstats(struct net_device *dev)
 	return stats;
 }
 
-#ifdef CONFIG_NET_WIRELESS
 /*
  * Return wireless extensions statistics.
  */
@@ -5915,7 +5904,6 @@ static struct iw_handler_def ath_iw_handler_def = {
 	.num_private		= N(ath_priv_handlers),
 #undef N
 };
-#endif /* CONFIG_NET_WIRELESS */
 
 static int
 ath_set_mac_address(struct net_device *dev, void *addr)
@@ -6120,7 +6108,6 @@ ath_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
 #undef IS_RUNNING
 }
 
-#ifdef CONFIG_SYSCTL
 /*
  * Sysctls are split into ``static'' and ``dynamic'' tables.
  * The former are defined at module load time and are used
@@ -6694,4 +6681,3 @@ ath_sysctl_unregister(void)
 	if (ath_sysctl_header)
 		unregister_sysctl_table(ath_sysctl_header);
 }
-#endif /* CONFIG_SYSCTL */

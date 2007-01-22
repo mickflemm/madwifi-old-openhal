@@ -501,13 +501,11 @@ static	int maxint = 0x7fffffff;		/* 32-bit big */
 
 #define	CTL_AUTO	-2	/* cannot be CTL_ANY or CTL_NONE */
 
-#ifdef CONFIG_SYSCTL
 void
 ath_rate_dynamic_sysctl_register(struct ath_softc *sc)
 {
 }
 EXPORT_SYMBOL(ath_rate_dynamic_sysctl_register);
-#endif /* CONFIG_SYSCTL */
 
 /*
  * Static (i.e. global) sysctls.
@@ -581,9 +579,7 @@ init_ath_rate_onoe(void)
 {
 	printk(KERN_INFO "%s: %s\n", dev_info, version);
 
-#ifdef CONFIG_SYSCTL
 	ath_sysctl_header = register_sysctl_table(ath_root_table, 1);
-#endif
 	return (0);
 }
 module_init(init_ath_rate_onoe);
@@ -591,10 +587,8 @@ module_init(init_ath_rate_onoe);
 static void __exit
 exit_ath_rate_onoe(void)
 {
-#ifdef CONFIG_SYSCTL
 	if (ath_sysctl_header != NULL)
 		unregister_sysctl_table(ath_sysctl_header);
-#endif
 
 	printk(KERN_INFO "%s: unloaded\n", dev_info);
 }

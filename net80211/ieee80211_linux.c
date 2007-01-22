@@ -279,7 +279,6 @@ ieee80211_notify_michael_failure(struct ieee80211com *ic,
 }
 EXPORT_SYMBOL(ieee80211_notify_michael_failure);
 
-#ifdef CONFIG_SYSCTL
 #include <linux/ctype.h>
 
 static int
@@ -519,7 +518,6 @@ ieee80211_sysctl_unregister(struct ieee80211com *ic)
 	}
 }
 EXPORT_SYMBOL(ieee80211_sysctl_unregister);
-#endif /* CONFIG_SYSCTL */
 
 /*
  * Format an Ethernet MAC for printing.

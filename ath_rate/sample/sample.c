@@ -815,7 +815,6 @@ ath_rate_detach(struct ath_ratectrl *arc)
 {
 	struct sample_softc *osc = (struct sample_softc *) arc;
 
-#if CONFIG_SYSCTL
 	if (osc->sysctl_header) {
 		unregister_sysctl_table(osc->sysctl_header);
 		osc->sysctl_header = NULL;
@@ -825,13 +824,9 @@ ath_rate_detach(struct ath_ratectrl *arc)
 		osc->sysctls = NULL;
 	}
 
-#endif /* CONFIG_SYSCTL */
-
 	kfree(osc);
 }
 EXPORT_SYMBOL(ath_rate_detach);
-
-#ifdef CONFIG_SYSCTL
 
 int
 read_rate_stats(struct ieee80211_node *ni, int size, char *buf, int space)
@@ -1019,7 +1014,6 @@ ath_rate_dynamic_sysctl_register(struct ath_softc *sc)
 
 }
 EXPORT_SYMBOL(ath_rate_dynamic_sysctl_register);
-#endif /* CONFIG_SYSCTL */
 
 /*
  * Static (i.e. global) sysctls.
@@ -1094,9 +1088,7 @@ init_ath_rate_sample(void)
 {
 	printk(KERN_INFO "%s: %s\n", dev_info, version);
 
-#ifdef CONFIG_SYSCTL
 	ath_sysctl_header = register_sysctl_table(ath_root_table, 1);
-#endif
 	return (0);
 }
 module_init(init_ath_rate_sample);
@@ -1104,10 +1096,8 @@ module_init(init_ath_rate_sample);
 static void __exit
 exit_ath_rate_sample(void)
 {
-#ifdef CONFIG_SYSCTL
 	if (ath_sysctl_header != NULL)
 		unregister_sysctl_table(ath_sysctl_header);
-#endif
 
 	printk(KERN_INFO "%s: unloaded\n", dev_info);
 }

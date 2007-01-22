@@ -89,11 +89,9 @@ struct ieee80211com {
 	u_int32_t		ic_debug;	/* debug msg flags */
 	u_int			ic_vap;		/* virtual AP index */
 	ieee80211_beacon_lock_t	ic_beaconlock;	/* beacon update lock */
-#ifdef CONFIG_SYSCTL
 	char			ic_procname[12];/* e.g. wlan%d */
 	struct ctl_table_header	*ic_sysctl_header;
 	struct ctl_table	*ic_sysctls;
-#endif
 	struct vlan_group	*ic_vlgrp;	/* vlan group state */
 
 	int			(*ic_init)(struct net_device *);

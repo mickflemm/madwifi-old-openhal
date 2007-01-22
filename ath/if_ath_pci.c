@@ -356,9 +356,7 @@ init_ath_pci(void)
 		pci_unregister_driver(&ath_pci_drv_id);
 		return (-ENODEV);
 	}
-#ifdef CONFIG_SYSCTL
 	ath_sysctl_register();
-#endif
 	return (0);
 }
 module_init(init_ath_pci);
@@ -366,9 +364,7 @@ module_init(init_ath_pci);
 static void __exit
 exit_ath_pci(void)
 {
-#ifdef CONFIG_SYSCTL
 	ath_sysctl_unregister();
-#endif
 	pci_unregister_driver(&ath_pci_drv_id);
 
 	printk(KERN_INFO "%s: driver unloaded\n", dev_info);

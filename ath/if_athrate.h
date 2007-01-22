@@ -84,14 +84,12 @@ struct ath_ratectrl {
 struct ath_ratectrl *ath_rate_attach(struct ath_softc *);
 void	ath_rate_detach(struct ath_ratectrl *);
 
-#ifdef CONFIG_SYSCTL
 /*
  * Allow rate control module to register dynamic sysctls, after
  * dev->name is filled in; Modules are expected to unregister dynamic
  * sysctls in ath_rate_detach().
  */
 void    ath_rate_dynamic_sysctl_register(struct ath_softc *);
-#endif /* CONFIG_SYSCTL */
 
 /*
  * State storage handling.

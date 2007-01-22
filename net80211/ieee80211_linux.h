@@ -355,7 +355,6 @@ get_jiffies_64(void)
 #error "Please fix asm/byteorder.h"
 #endif
 
-#ifdef CONFIG_SYSCTL
 /*
  * Deal with the sysctl handler api changing.
  */
@@ -375,7 +374,6 @@ get_jiffies_64(void)
 
 extern	void ieee80211_sysctl_register(struct ieee80211com *);
 extern	void ieee80211_sysctl_unregister(struct ieee80211com *);
-#endif /* CONFIG_SYSCTL */
 
 #if defined(CONFIG_VLAN_8021Q) || defined(CONFIG_VLAN_8021Q_MODULE)
 #define IEEE80211_VLAN_TAG_USED 1
@@ -394,7 +392,6 @@ extern	void ieee80211_vlan_kill_vid(struct ieee80211com *, unsigned short);
 #define	free_netdev(dev)	kfree(dev)
 #endif
 
-#ifdef CONFIG_NET_WIRELESS
 struct iw_statistics;
 extern	void ieee80211_iw_getstats(struct ieee80211com*, struct iw_statistics*);
 struct iw_request_info;
@@ -487,6 +484,5 @@ extern	int ieee80211_ioctl_chanlist(struct ieee80211com *,
 		struct iw_request_info *, void *, char *);
 
 extern	void ieee80211_ioctl_iwsetup(struct iw_handler_def *);
-#endif
 
 #endif /* _NET80211_IEEE80211_LINUX_H_ */

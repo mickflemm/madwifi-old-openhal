@@ -47,9 +47,7 @@
 #include "if_athioctl.h"
 #include "if_athrate.h"
 
-#ifdef CONFIG_NET_WIRELESS
 #include <linux/wireless.h>
-#endif
 
 #ifndef ARPHRD_IEEE80211_RADIOTAP
 #define ARPHRD_IEEE80211_RADIOTAP 803 /* IEEE 802.11 + radiotap header */
@@ -360,13 +358,9 @@ struct ath_softc {
 
 	struct timer_list	sc_cal_ch;	/* calibration timer */
 	struct timer_list	sc_scan_ch;	/* AP scan timer */
-#ifdef CONFIG_NET_WIRELESS
 	struct iw_statistics	sc_iwstats;	/* wireless statistics block */
-#endif
-#ifdef CONFIG_SYSCTL
 	struct ctl_table_header	*sc_sysctl_header;
 	struct ctl_table	*sc_sysctls;
-#endif
 };
 
 #define	ATH_LOCK_INIT(_sc) \
@@ -402,10 +396,8 @@ irqreturn_t ath_intr(int, void *);
 #else 
 irqreturn_t ath_intr(int, void *, struct pt_regs *regs); 
 #endif 
-#ifdef CONFIG_SYSCTL
 void	ath_sysctl_register(void);
 void	ath_sysctl_unregister(void);
-#endif /* CONFIG_SYSCTL */
 
 /*
  * HAL definitions to comply with local coding convention.
