@@ -232,7 +232,7 @@ ieee80211_iw_getstats(struct ieee80211com *ic, struct iw_statistics *is)
 	switch (ic->ic_opmode) {
 	case IEEE80211_M_STA:
 		/* use stats from associated ap */
-		if (ic->ic_bss)
+		if (ic->ic_bss && ic->ic_state == IEEE80211_S_RUN)
 			set_quality(&is->qual,
 				(*ic->ic_node_getrssi)(ic->ic_bss));
 		else
@@ -618,9 +618,10 @@ ieee80211_ioctl_siwap(struct ieee80211com *ic,
 {
 	static const u_int8_t zero_bssid[IEEE80211_ADDR_LEN];
 
-	/* NB: should only be set when in STA mode */
+	/* NB: should not be set when in HOSTAP mode */
 	if (ic->ic_opmode != IEEE80211_M_STA &&
-	    ic->ic_opmode != IEEE80211_M_AHDEMO)
+	    ic->ic_opmode != IEEE80211_M_AHDEMO &&
+	    ic->ic_opmode != IEEE80211_M_IBSS)
 		return -EINVAL;
 	IEEE80211_ADDR_COPY(ic->ic_des_bssid, &ap_addr->sa_data);
 	/* looks like a zero address disables */
@@ -707,8 +708,8 @@ cap2cipher(int flag)
 
 int
 ieee80211_ioctl_siwfreqx(struct ieee80211com *ic,
-			 struct iw_request_info *info,
-			 struct iw_freq *freq, char *extra)
+			struct iw_request_info *info,
+			struct iw_freq *freq, char *extra)
 {
 	struct ieee80211_channel *c;
 	int i;
@@ -1608,6 +1609,9 @@ ieee80211_ioctl_setparam(struct ieee80211com *ic, struct iw_request_info *info,
 		if (ic->ic_curmode == IEEE80211_MODE_11G)
 			retv = ENETRESET;
 		break;
+	case IEEE80211_PARAM_WDSONLY:
+		ic->ic_wdsonly = value;
+		break;
 	case IEEE80211_PARAM_RESET:
 		ic->ic_init(ic->ic_dev);
 		break;
@@ -1745,6 +1749,9 @@ ieee80211_ioctl_getparam(struct ieee80211com *ic, struct iw_request_info *info,
 	case IEEE80211_PARAM_PUREG:
 		param[0] = (ic->ic_flags & IEEE80211_F_PUREG) != 0;
 		break;
+	case IEEE80211_PARAM_WDSONLY:
+		param[0] = ic->ic_wdsonly;
+		break;
 	default:
 		return -EOPNOTSUPP;
 	}
@@ -1830,6 +1837,7 @@ ieee80211_ioctl_setkey(struct ieee80211com *ic, struct iw_request_info *info,
 			return -EINVAL;
 		wk = &ic->ic_nw_keys[kid];
 		ni = NULL;
+		ik->ik_flags |= IEEE80211_KEY_GROUP;
 	}
 	error = 0;
 	ieee80211_key_update_begin(ic);
@@ -1924,14 +1932,21 @@ ieee80211_ioctl_delkey(struct ieee80211com *ic, struct iw_request_info *info,
 	if (dk->idk_keyix == (u_int8_t) IEEE80211_KEYIX_NONE) {
 		struct ieee80211_node *ni =
 			ieee80211_find_node(&ic->ic_sta, dk->idk_macaddr);
-		if (ni == NULL)
-			return -EINVAL;		/* XXX */
+		if (ni == NULL) {
+			IEEE80211_DPRINTF(ic, IEEE80211_MSG_MLME,
+				"%s: node not found\n", __func__);
+			return -ENOENT;
+		}
 		/* XXX error return */
 		ieee80211_crypto_delkey(ic, &ni->ni_ucastkey);
 		ieee80211_free_node(ni);
 	} else {
-		if (kid >= IEEE80211_WEP_NKID)
+		if (kid >= IEEE80211_WEP_NKID) {
+			IEEE80211_DPRINTF(ic, IEEE80211_MSG_MLME,
+				"%s: key id %d >= %d\n", __func__,
+				kid, IEEE80211_WEP_NKID);
 			return -EINVAL;
+		}
 		/* XXX error return */
 		ieee80211_crypto_delkey(ic, &ic->ic_nw_keys[kid]);
 	}
@@ -1964,8 +1979,10 @@ ieee80211_ioctl_setmlme(struct ieee80211com *ic, struct iw_request_info *info,
 
 	switch (mlme->im_op) {
 	case IEEE80211_MLME_ASSOC:
+		IEEE80211_DPRINTF(ic, IEEE80211_MSG_MLME,
+			"%s: assoc\n", __func__);
                 if (ic->ic_opmode != IEEE80211_M_STA)
-                        return EINVAL;
+                        return -EINVAL;
                 /* XXX must be in S_SCAN state? */
 
 		if (mlme->im_ssid_len != 0) {
@@ -1982,15 +1999,23 @@ ieee80211_ioctl_setmlme(struct ieee80211com *ic, struct iw_request_info *info,
 			 */
 			ni = ieee80211_find_node(&ic->ic_scan, mlme->im_macaddr);
 		}
-		if (ni == NULL)
-			return EINVAL;
+		if (ni == NULL) {
+			IEEE80211_DPRINTF(ic, IEEE80211_MSG_MLME,
+				"%s: node not found\n", __func__);
+			return -ENOENT;
+		}
 		if (!ieee80211_sta_join(ic, ni)) {
+			IEEE80211_DPRINTF(ic, IEEE80211_MSG_MLME,
+				"%s: join failed\n", __func__);
 			ieee80211_free_node(ni);
-			return EINVAL;
+			return -EINVAL;
 		}
 		break;
 	case IEEE80211_MLME_DISASSOC:
 	case IEEE80211_MLME_DEAUTH:
+		IEEE80211_DPRINTF(ic, IEEE80211_MSG_MLME,
+			"%s: %s\n", __func__,
+			(mlme->im_op == IEEE80211_MLME_DISASSOC ? "disassoc" : "deauth"));
 		switch (ic->ic_opmode) {
 		case IEEE80211_M_STA:
 			/* XXX not quite right */
@@ -2001,8 +2026,11 @@ ieee80211_ioctl_setmlme(struct ieee80211com *ic, struct iw_request_info *info,
 			/* NB: the broadcast address means do 'em all */
 			if (!IEEE80211_ADDR_EQ(mlme->im_macaddr, ic->ic_dev->broadcast)) {
 				if ((ni = ieee80211_find_node(&ic->ic_sta,
-						mlme->im_macaddr)) == NULL)
-					return EINVAL;
+						mlme->im_macaddr)) == NULL) {
+					IEEE80211_DPRINTF(ic, IEEE80211_MSG_MLME,
+						"%s: node not found\n", __func__);
+					return -ENOENT;
+				}
 				domlme(mlme, ni);
 				ieee80211_free_node(ni);
 			} else {
@@ -2011,30 +2039,42 @@ ieee80211_ioctl_setmlme(struct ieee80211com *ic, struct iw_request_info *info,
 			}
 			break;
 		default:
-			return EINVAL;
+			return -EINVAL;
 		}
 		break;
 	case IEEE80211_MLME_AUTHORIZE:
 	case IEEE80211_MLME_UNAUTHORIZE:
+		IEEE80211_DPRINTF(ic, IEEE80211_MSG_MLME,
+			"%s: %sauthorize\n", __func__,
+			(mlme->im_op == IEEE80211_MLME_UNAUTHORIZE ? "un" : ""));
 		if (ic->ic_opmode != IEEE80211_M_HOSTAP)
 			return -EINVAL;
 		ni = ieee80211_find_node(&ic->ic_sta, mlme->im_macaddr);
-		if (ni == NULL)
-			return -EINVAL;
+		if (ni == NULL) {
+			IEEE80211_DPRINTF(ic, IEEE80211_MSG_MLME,
+				"%s: node not found\n", __func__);
+			return -ENOENT;
+		}
 		if (mlme->im_op == IEEE80211_MLME_AUTHORIZE)
-			ieee80211_node_authorize(ic, ni);
+			ieee80211_node_authorize(ni);
 		else
-			ieee80211_node_unauthorize(ic, ni);
+			ieee80211_node_unauthorize(ni);
 		ieee80211_free_node(ni);
 		break;
 	case IEEE80211_MLME_CLEAR_STATS:
+		IEEE80211_DPRINTF(ic, IEEE80211_MSG_MLME,
+			"%s: clear stats\n", __func__);
 		if (ic->ic_opmode != IEEE80211_M_HOSTAP)
-		    return -EINVAL;
+			return -EINVAL;
 		ni = ieee80211_find_node(&ic->ic_sta, mlme->im_macaddr);
-		if (ni == NULL)
-		    return -EINVAL;
+		if (ni == NULL) {
+			IEEE80211_DPRINTF(ic, IEEE80211_MSG_MLME,
+				"%s: node not found\n", __func__);
+			return -ENOENT;
+		}
 		/* clear statistics */
 		memset(&ni->ni_stats, 0, sizeof(struct ieee80211_nodestats));
+		ieee80211_free_node(ni);
 		break;
 	default:
 		return -EINVAL;
@@ -2199,6 +2239,10 @@ static const struct iw_priv_args ieee80211_priv_args[] = {
 	  IW_PRIV_TYPE_ADDR | IW_PRIV_SIZE_FIXED | 1, 0,"delmac" },
 	{ IEEE80211_IOCTL_CHANLIST,
 	  IW_PRIV_TYPE_CHANLIST | IW_PRIV_SIZE_FIXED, 0,"chanlist" },
+	{ IEEE80211_IOCTL_WDSADD,
+	  IW_PRIV_TYPE_ADDR | IW_PRIV_SIZE_FIXED | 1, 0,"wdsadd" },
+	{ IEEE80211_IOCTL_WDSDEL,
+	  IW_PRIV_TYPE_ADDR | IW_PRIV_SIZE_FIXED | 1, 0,"wdsdel" },
 #if WIRELESS_EXT >= 12
 	{ IEEE80211_IOCTL_SETPARAM,
 	  IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 2, 0, "setparam" },
@@ -2322,6 +2366,10 @@ static const struct iw_priv_args ieee80211_priv_args[] = {
 	  IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1, 0, "pureg" },
 	{ IEEE80211_PARAM_PUREG,
 	  0, IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1, "get_pureg" },
+	{ IEEE80211_PARAM_WDSONLY,
+	  IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1, 0, "wdsonly" },
+	{ IEEE80211_PARAM_WDSONLY,
+	  0, IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1, "get_wdsonly" },
 	{ IEEE80211_PARAM_RESET,
 	  IW_PRIV_TYPE_INT | IW_PRIV_SIZE_FIXED | 1, 0, "reset" },
 #endif /* WIRELESS_EXT >= 12 */

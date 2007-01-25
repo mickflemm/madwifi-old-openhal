@@ -100,7 +100,7 @@ struct ieee80211_node {
 #define	IEEE80211_NODE_ERP	0x0004		/* ERP enabled */
 /* NB: this must have the same value as IEEE80211_FC1_PWR_MGT */
 #define	IEEE80211_NODE_PWR_MGT	0x0010		/* power save mode enabled */
-#define IEEE80211_NODE_AREF     0x0020          /* authentication ref held */
+#define	IEEE80211_NODE_AREF	0x0020		/* authentication ref held */
 	u_int16_t		ni_associd;	/* assoc response */
 	u_int16_t		ni_txpower;	/* current transmit power */
 	u_int16_t		ni_vlan;	/* vlan tag */
@@ -147,6 +147,9 @@ struct ieee80211_node {
 	int			ni_txrate;	/* index to ni_rates[] */
 	struct sk_buff_head	ni_savedq;	/* ps-poll queue */
 	struct ieee80211_nodestats ni_stats;	/* per-node statistics */
+	struct net_device	*ni_wdsdev; /* WDS device */
+	int			ni_wdsonly; /* only WDS traffic is allowed */
+	struct net_device_stats ni_wdsstats; /* wds traffic statistics */
 };
 MALLOC_DECLARE(M_80211_NODE);
 
@@ -182,10 +185,8 @@ ieee80211_node_is_authorized(const struct ieee80211_node *ni)
 	return (ni->ni_flags & IEEE80211_NODE_AUTH);
 }
 
-void ieee80211_node_authorize(struct ieee80211com *,
-		struct ieee80211_node *);
-void ieee80211_node_unauthorize(struct ieee80211com *,
-		struct ieee80211_node *);
+void ieee80211_node_authorize(struct ieee80211_node *);
+void ieee80211_node_unauthorize(struct ieee80211_node *);
 
 void ieee80211_begin_scan(struct ieee80211com *, int);
 int ieee80211_next_scan(struct ieee80211com *);
@@ -194,8 +195,7 @@ void ieee80211_create_ibss(struct ieee80211com*,
 void ieee80211_reset_bss(struct ieee80211com *);
 void ieee80211_cancel_scan(struct ieee80211com *);
 void ieee80211_end_scan(struct ieee80211com *);
-int ieee80211_ibss_merge(struct ieee80211com *,
-		struct ieee80211_node *);
+int ieee80211_ibss_merge(struct ieee80211_node *);
 int ieee80211_sta_join(struct ieee80211com *,
 		struct ieee80211_node *);
 void ieee80211_sta_leave(struct ieee80211com *,

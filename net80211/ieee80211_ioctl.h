@@ -467,6 +467,8 @@ struct ieee80211req_scan_result {
 #define	IEEE80211_IOCTL_ADDMAC		(SIOCIWFIRSTPRIV+10)
 #define	IEEE80211_IOCTL_DELMAC		(SIOCIWFIRSTPRIV+12)
 #define	IEEE80211_IOCTL_CHANLIST	(SIOCIWFIRSTPRIV+14)
+#define IEEE80211_IOCTL_WDSADD		(SIOCIWFIRSTPRIV+16)
+#define IEEE80211_IOCTL_WDSDEL		(SIOCIWFIRSTPRIV+18)
 
 enum {
 	IEEE80211_PARAM_TURBO		= 1,	/* turbo mode */
@@ -495,6 +497,7 @@ enum {
 	IEEE80211_PARAM_INACT_INIT	= 25,	/* station init inact timeout */
 	IEEE80211_PARAM_IBSS		= 26,	/* pseudo ad-hoc mode or standard IBSS mode */
 	IEEE80211_PARAM_PUREG		= 27,	/* pure or mixed G */
+	IEEE80211_PARAM_WDSONLY		= 28,	/* only wds traffic allowed */
 	IEEE80211_PARAM_RESET		= 99    /* reset the device */
 };
 

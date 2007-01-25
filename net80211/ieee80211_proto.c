@@ -828,11 +828,12 @@ ieee80211_wme_updateparams_locked(struct ieee80211com *ic)
 void
 ieee80211_wme_updateparams(struct ieee80211com *ic)
 {
+	unsigned long flags;
 
 	if (ic->ic_caps & IEEE80211_C_WME) {
-		IEEE80211_BEACON_LOCK(ic);
+		IEEE80211_BEACON_LOCK(ic, flags);
 		ieee80211_wme_updateparams_locked(ic);
-		IEEE80211_BEACON_UNLOCK(ic);
+		IEEE80211_BEACON_UNLOCK(ic, flags);
 	}
 }
 
@@ -1089,7 +1090,7 @@ ieee80211_newstate(struct ieee80211com *ic, enum ieee80211_state nstate, int arg
 		 * at this point so traffic can flow.
 		 */
 		if (ni->ni_authmode != IEEE80211_AUTH_8021X)
-			ieee80211_node_authorize(ic, ni);
+			ieee80211_node_authorize(ni);
 		/*
 		 * Enable inactivity processing.
 		 * XXX

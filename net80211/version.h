@@ -35,4 +35,4 @@
  *
  * $Id$
  */
-#define	WLAN_VERSION	"0.8.5.0-BSD"
+#define	WLAN_VERSION	"0.8.6.0"

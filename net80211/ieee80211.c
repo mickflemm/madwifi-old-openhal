@@ -221,7 +221,9 @@ ieee80211_ifdetach(struct ieee80211com *ic)
 	ieee80211_crypto_detach(ic);
 	ieee80211_node_detach(ic);
 	ifmedia_removeall(&ic->ic_media);
+
 	ieee80211_sysctl_unregister(ic);
+
 	IEEE80211_BEACON_LOCK_DESTROY(ic);
 	_MOD_DEC_USE(THIS_MODULE);
 }

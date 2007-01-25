@@ -284,17 +284,20 @@ EXPORT_SYMBOL(ieee80211_notify_michael_failure);
 static int
 proc_read_node(char *page, int space, struct ieee80211com *ic, void *arg)
 {
-	char buf[1024];
-	char *p = buf;
+	char *buf;
+	char *p;
 	struct ieee80211_node *ni;
-	struct ieee80211_node_table *nt = &ic->ic_sta;
+	struct ieee80211_node_table *nt = (struct ieee80211_node_table *)arg;
 	struct ieee80211_rateset *rs;
 	int i;
 	u_int16_t temp;
 
+	buf = kmalloc(space,GFP_KERNEL);
+	if(buf==NULL) return 0;
+	p = buf;
 	IEEE80211_NODE_LOCK(nt);
 	TAILQ_FOREACH(ni, &nt->nt_node, ni_list) {
-		/* Assume each node needs 300 bytes */ 
+		/* Assume each node needs 300 bytes */
 		if (p - buf > space - 300)
 			break;
 		
@@ -329,21 +332,25 @@ proc_read_node(char *page, int space, struct ieee80211com *ic, void *arg)
 			p += sprintf(p, " dsssofdm");
 		p += sprintf(p, "\n");
 
-		p += sprintf(p, "  freq: %d MHz (channel %d)\n",
-			ni->ni_chan->ic_freq,
-			ieee80211_mhz2ieee(ni->ni_chan->ic_freq, 0));
+		if(ni->ni_chan == IEEE80211_CHAN_ANYC) {
+			p += sprintf(p, "  freq: ? MHz (channel ?)\n  opmode: ?\n");
+		} else {
 
-		p += sprintf(p, "  opmode:");
-		if (IEEE80211_IS_CHAN_A(ni->ni_chan))
-			p += sprintf(p, " a");
-		if (IEEE80211_IS_CHAN_B(ni->ni_chan))
-			p += sprintf(p, " b");
-		if (IEEE80211_IS_CHAN_PUREG(ni->ni_chan))
-			p += sprintf(p, " pureg");
-		if (IEEE80211_IS_CHAN_G(ni->ni_chan))
-			p += sprintf(p, " g");
-		p += sprintf(p, "\n");
+			p += sprintf(p, "  freq: %d MHz (channel %d)\n",
+					ni->ni_chan->ic_freq,
+					ieee80211_mhz2ieee(ni->ni_chan->ic_freq, 0));
 
+			p += sprintf(p, "  opmode:");
+			if (IEEE80211_IS_CHAN_A(ni->ni_chan))
+				p += sprintf(p, " a");
+			if (IEEE80211_IS_CHAN_B(ni->ni_chan))
+				p += sprintf(p, " b");
+			if (IEEE80211_IS_CHAN_PUREG(ni->ni_chan))
+				p += sprintf(p, " pureg");
+			if (IEEE80211_IS_CHAN_G(ni->ni_chan))
+				p += sprintf(p, " g");
+			p += sprintf(p, "\n");
+		}
 		rs = &ni->ni_rates;
 		if (ni->ni_txrate >= 0 && ni->ni_txrate < rs->rs_nrates) {
 
@@ -382,7 +389,9 @@ proc_read_node(char *page, int space, struct ieee80211com *ic, void *arg)
 				ni->ni_fails, temp);
 	}
 	IEEE80211_NODE_UNLOCK(nt);
-	return copy_to_user(page, buf, p - buf) ? 0 : (p - buf);
+	i = copy_to_user(page, buf, p - buf);
+	kfree(buf);
+       	return i ? 0 : (p - buf);
 }
 
 static int
@@ -413,6 +422,29 @@ IEEE80211_SYSCTL_DECL(ieee80211_sysctl_stations, ctl, write, filp, buffer,
 	return 0;
 }
 
+static int
+IEEE80211_SYSCTL_DECL(ieee80211_sysctl_scan, ctl, write, filp, buffer,
+		lenp, ppos)
+{
+	struct ieee80211com *ic = ctl->extra1;
+	int len = *lenp;
+
+#if	LINUX_VERSION_CODE < KERNEL_VERSION(2,6,8)
+	if (len && filp->f_pos == 0) {
+#else
+	if (len && ppos != NULL && *ppos == 0) {
+#endif
+		*lenp = proc_read_node(buffer, len, ic, &ic->ic_scan);
+#if	LINUX_VERSION_CODE < KERNEL_VERSION(2,6,8)
+		filp->f_pos += *lenp;
+#else
+		*ppos += *lenp;
+#endif
+	} else {
+		*lenp = 0;
+	}
+	return 0;
+}
 
 static int
 IEEE80211_SYSCTL_DECL(ieee80211_sysctl_debug, ctl, write, filp, buffer,
@@ -449,6 +481,11 @@ static const ctl_table ieee80211_sysctl_template[] = {
 	  .procname	= "associated_sta",
 	  .mode		= 0444,
 	  .proc_handler	= ieee80211_sysctl_stations
+	},
+	{ .ctl_name	= CTL_AUTO,
+	  .procname	= "scan_table",
+	  .mode		= 0444,
+	  .proc_handler	= ieee80211_sysctl_scan
 	},
 	{ 0 }
 };

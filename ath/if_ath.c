@@ -127,7 +127,7 @@ static void	ath_updateslot(struct net_device *);
 static int	ath_beaconq_setup(struct ath_hal *);
 static int	ath_beacon_alloc(struct ath_softc *, struct ieee80211_node *);
 static void	ath_beacon_setup(struct ath_softc *, struct ath_buf *);
-static void	ath_beacon_tasklet(struct net_device *);
+static void	ath_beacon_send(struct net_device *);
 static void	ath_beacon_free(struct ath_softc *);
 static void	ath_beacon_config(struct ath_softc *);
 static void	ath_descdma_cleanup(struct ath_softc *sc, ath_bufhead *);
@@ -171,8 +171,7 @@ static struct net_device_stats *ath_getstats(struct net_device *);
 static struct iw_statistics *ath_iw_getstats(struct net_device *);
 static struct iw_handler_def ath_iw_handler_def;
 static void	ath_setup_stationkey(struct ieee80211_node *);
-static void	ath_newassoc(struct ieee80211com *,
-			struct ieee80211_node *, int);
+static void	ath_newassoc(struct ieee80211_node *, int);
 static int	ath_getchannels(struct net_device *, u_int cc,
 			AR5K_BOOL outdoor, AR5K_BOOL xchanmode);
 static void	ath_led_event(struct ath_softc *, int);
@@ -633,8 +632,7 @@ ath_attach(u_int16_t devid, struct net_device *dev)
 	 * all parts.  We're a bit pedantic here as all parts
 	 * support a global cap.
 	 */
-	sc->sc_hastpc = ath_hal_hastpc(ah);
-	if (sc->sc_hastpc || ath_hal_hastxpowlimit(ah))
+	if (ath_hal_hastpc(ah) || ath_hal_hastxpowlimit(ah))
 		ic->ic_caps |= IEEE80211_C_TXPMGT;
 
 	/*
@@ -658,10 +656,6 @@ ath_attach(u_int16_t devid, struct net_device *dev)
 	/*
 	 * Query the hal about antenna support.
 	 */
-	if (ath_hal_hasdiversity(ah)) {
-		sc->sc_hasdiversity = 1;
-		sc->sc_diversity = ath_hal_getdiversity(ah);
-	}
 	sc->sc_defant = ath_hal_getdefantenna(ah);
 
 	/*
@@ -891,7 +885,7 @@ ath_intr(int irq, void *dev_id, struct pt_regs *regs)
 				* this is too slow to meet timing constraints
 				* under load.
 				*/
-				ath_beacon_tasklet(dev);
+				ath_beacon_send(dev);
 			}
 			if (status & AR5K_INT_RXEOL) {
 				/*
@@ -989,15 +983,32 @@ ath_bmiss_tasklet(TQUEUE_ARG data)
 
 	DPRINTF(sc, ATH_DEBUG_ANY, "%s\n", __func__);
 	KASSERT(ic->ic_opmode == IEEE80211_M_STA,
-		("unexpect operating mode %u", ic->ic_opmode));
+		("unexpected operating mode %u", ic->ic_opmode));
 	if (ic->ic_state == IEEE80211_S_RUN) {
-		/*
-		 * Rather than go directly to scan state, try to
-		 * reassociate first.  If that fails then the state
-		 * machine will drop us into scanning after timing
-		 * out waiting for a probe response.
-		 */
-		ieee80211_new_state(ic, IEEE80211_S_ASSOC, -1);
+		if (sc->sc_bmisscount >= 1) {
+			/*
+			 * we have already missed beacons before and did not receive
+			 * a probe response or beacon in the mean time
+			 */
+			DPRINTF(sc, ATH_DEBUG_BEACON,
+				"%s: beacons missed again - reassoc\n", __func__);
+			/*
+			 * Rather than go directly to scan state, try to
+			 * reassociate first.  If that fails then the state
+			 * machine will drop us into scanning after timing
+			 * out waiting for a probe response.
+			 */
+			ieee80211_new_state(ic, IEEE80211_S_ASSOC, -1);
+		} 
+		else {
+			/* first time: increment bmisscount and send probe request */
+			DPRINTF(sc, ATH_DEBUG_BEACON,
+				"%s: beacons missed - send probe request\n",
+				__func__);
+			sc->sc_bmisscount++;
+			IEEE80211_SEND_MGMT(ic, ic->ic_bss,
+			IEEE80211_FC0_SUBTYPE_PROBE_REQ, 0);
+		}
 	}
 }
 
@@ -1071,6 +1082,12 @@ ath_init(struct net_device *dev)
 	 * but it's best done after a reset.
 	 */
 	ath_update_txpow(sc);
+
+	/*
+	 * Likewise this is set during reset so update
+	 * state cached in the driver.
+	 */
+	sc->sc_diversity = ath_hal_getdiversity(ah);
 
 	/*
 	 * Setup the hardware after reset: the key cache
@@ -1198,7 +1215,21 @@ ath_stop(struct net_device *dev)
 		 * (and system).  This varies by chip and is mostly an
 		 * issue with newer parts that go to sleep more quickly.
 		 */
-		ath_hal_setpower(sc->sc_ah, AR5K_PM_FULL_SLEEP, 0);
+		if (sc->sc_ah->ah_mac_version >= 7 && sc->sc_ah->ah_mac_revision >= 8) {
+			/*
+			 * XXX
+			 * don't put newer MAC revisions > 7.8 to sleep because
+			 * of the above mentioned problems
+			 */
+			DPRINTF(sc, ATH_DEBUG_RESET,
+				"%s: mac version > 7.8, not putting device to sleep\n",
+				__func__);
+		}
+		else {
+			DPRINTF(sc, ATH_DEBUG_RESET,
+				"%s: putting device to full sleep\n", __func__);
+			ath_hal_setpower(sc->sc_ah, AR5K_PM_FULL_SLEEP, 0);
+		}
 	}
 	ATH_UNLOCK(sc);
 	return error;
@@ -1221,7 +1252,7 @@ ath_reset(struct net_device *dev)
 	AR5K_STATUS status;
 	int opmode;
 	
-	if_printf(dev, "resetting\n");
+	DPRINTF(sc, ATH_DEBUG_RESET, "%s: resetting\n", dev->name);
 	
 	/*
 	 * Convert to a HAL channel description with the flags
@@ -1241,6 +1272,7 @@ ath_reset(struct net_device *dev)
 		if_printf(dev, "%s: unable to reset hardware: '%s' (%u)\n",
 			__func__, hal_status_desc[status], status);
 	ath_update_txpow(sc);		/* update tx power state */
+	sc->sc_diversity = ath_hal_getdiversity(ah);	/*get diversity status*/
 	if (ath_startrecv(sc) != 0)	/* restart recv */
 		if_printf(dev, "%s: unable to start recv logic\n", __func__);
 	/*
@@ -1554,7 +1586,7 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 	 * pass it on to the hardware.
 	 */
 	ATH_TXQ_LOCK_BH(txq);
-	if (flags & (AR5K_TXDESC_RTSENA | AR5K_TXDESC_CTSENA)) {
+//	if (flags & (AR5K_TXDESC_RTSENA | AR5K_TXDESC_CTSENA)) {
 //		u_int32_t txopLimit = IEEE80211_TXOP_TO_US(
 //			cap->cap_wmeParams[pri].wmep_txopLimit);
 		/*
@@ -1586,7 +1618,7 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 //			} else
 //				sc->sc_stats.ast_tx_ctsext++;
 //		}
-	}
+//	}
 	ATH_TXQ_INSERT_TAIL(txq, bf, bf_list);
 	DPRINTF(sc, ATH_DEBUG_TX_PROC, "%s: txq depth = %d\n",
 		__func__, txq->axq_depth);
@@ -2284,6 +2316,12 @@ ath_calcrxfilter(struct ath_softc *sc, enum ieee80211_state state)
 	    state == IEEE80211_S_SCAN)
 		rfilt |= AR5K_RX_FILTER_BEACON;
 
+	if (sc->sc_rawdev_enabled && (sc->sc_rawdev.flags & IFF_UP)) {
+		/* if the rawdev is up, accept all normal packets */
+		rfilt |= (AR5K_RX_FILTER_CONTROL | AR5K_RX_FILTER_BEACON | AR5K_RX_FILTER_PROM |
+			AR5K_RX_FILTER_PROBEREQ);
+	}
+
 	rfilt |= sc->sc_rxfilter;
 
 	return rfilt;
@@ -2339,6 +2377,8 @@ ath_mode_init(struct net_device *dev)
 
 /*
  * Set the slot time based on the current setting.
+ * This is called by ath_updateslot below and when a non-ERP node
+ * joins the network
  */
 static void
 ath_setslottime(struct ath_softc *sc)
@@ -2346,10 +2386,16 @@ ath_setslottime(struct ath_softc *sc)
 	struct ieee80211com *ic = &sc->sc_ic;
 	struct ath_hal *ah = sc->sc_ah;
 
-	if (ic->ic_flags & IEEE80211_F_SHSLOT)
-		ath_hal_setslottime(ah, AR5K_SLOT_TIME_9);
-	else
-		ath_hal_setslottime(ah, AR5K_SLOT_TIME_20);
+	/* If the user has asked to lock the slot-time, ignore the
+	 * slot time adjustment. This is useful in longer-range networks
+	 * that require a slot time larger than the standard ones. -TvE
+	 */
+	if (!sc->sc_lockslottime) {
+		if (ic->ic_flags & IEEE80211_F_SHSLOT)
+			ath_hal_setslottime(ah, AR5K_SLOT_TIME_9);
+		else
+			ath_hal_setslottime(ah, AR5K_SLOT_TIME_20);
+	}
 	sc->sc_updateslot = OK;
 }
 
@@ -2559,9 +2605,13 @@ ath_beacon_setup(struct ath_softc *sc, struct ath_buf *bf)
  * Transmit a beacon frame at SWBA.  Dynamic updates to the
  * frame contents are done as needed and the slot time is
  * also adjusted based on current state.
+ *
+ * this is usually called from interrupt context (ath_intr())
+ * but also from ath_beacon_config() in IBSS mode which in turn
+ * can be called from a tasklet and user context
  */
 static void
-ath_beacon_tasklet(struct net_device *dev)
+ath_beacon_send(struct net_device *dev)
 {
 	struct ath_softc *sc = dev->priv;
 	struct ath_buf *bf = STAILQ_FIRST(&sc->sc_bbuf);
@@ -2595,12 +2645,12 @@ ath_beacon_tasklet(struct net_device *dev)
 			DPRINTF(sc, ATH_DEBUG_BEACON_PROC,
 			"%s: stuck beacon time (%u missed)\n",
 			__func__, sc->sc_bmisscount);
-                        ATH_SCHEDULE_TQUEUE(&sc->sc_bstuckq, &needmark);
+			ATH_SCHEDULE_TQUEUE(&sc->sc_bstuckq, &needmark);
                 }
 		return;
 	}
 	if (sc->sc_bmisscount != 0) {
-		DPRINTF(sc, ATH_DEBUG_BEACON,
+		DPRINTF(sc, ATH_DEBUG_BEACON_PROC,
 			"%s: resume beacon xmit after %u misses\n",
 			__func__, sc->sc_bmisscount);
 		sc->sc_bmisscount = 0;
@@ -2864,6 +2914,7 @@ ath_beacon_config(struct ath_softc *sc)
 		ath_hal_intrset(ah, 0);
 		ath_hal_beacontimers(ah, &bs);
 		sc->sc_imask |= AR5K_INT_BMISS;
+		sc->sc_bmisscount = 0;
 		ath_hal_intrset(ah, sc->sc_imask);
 	} else { /* IBSS or HOSTAP */
 		ath_hal_intrset(ah, 0);
@@ -2922,7 +2973,7 @@ ath_beacon_config(struct ath_softc *sc)
 		 * ibss mode load it once here.
 		 */
 		if (ic->ic_opmode == IEEE80211_M_IBSS && sc->sc_hasveol)
-			ath_beacon_tasklet(&sc->sc_dev);
+			ath_beacon_send(&sc->sc_dev);
 	}
 #undef TSF_TO_TU
 }
@@ -3560,8 +3611,23 @@ ath_recv_mgmt(struct ieee80211com *ic, struct sk_buff *skb,
 				    "ibss merge, rstamp %u tsf %llx "
 				    "tstamp %llx\n", rstamp, tsf,
 				    ni->ni_tstamp.tsf);
-				ieee80211_ibss_merge(ic, ni);
+				ieee80211_ibss_merge(ni);
 			}
+		}
+		if (ic->ic_opmode == IEEE80211_M_STA &&
+			ic->ic_state == IEEE80211_S_RUN &&
+			sc->sc_bmisscount > 0) {
+				struct ieee80211_frame *wh;
+				wh = (struct ieee80211_frame *) skb->data;
+				if (IEEE80211_ADDR_EQ(wh->i_addr2, ic->ic_bss->ni_bssid)) {
+					DPRINTF(sc, ATH_DEBUG_BEACON,
+						"[%s] received %s after beacon miss - clear\n",
+						ether_sprintf(wh->i_addr2),
+						(subtype == IEEE80211_FC0_SUBTYPE_BEACON) ?
+						"beacon" : "probe response");
+						sc->sc_bmisscount = 0;
+					ic->ic_mgt_timer = 0;
+				}
 		}
 		break;
 	}
@@ -4281,7 +4347,7 @@ ath_tx_start(struct net_device *dev, struct ieee80211_node *ni, struct ath_buf *
 				rix = ic->ic_fixed_rate;
 				try0 = ATH_TXMAXTRY; //XXX: should be configurabe
 				if (short_preamble)
-					txrate = SHPREAMBLE_FLAG(rix);
+					txrate = rt->rates[rix].rate_code | SHPREAMBLE_FLAG(rix);
 				else
 					txrate = rt->rates[rix].rate_code;
 			}
@@ -5042,6 +5108,7 @@ ath_chan_set(struct ath_softc *sc, struct ieee80211_channel *chan)
 		}
 		sc->sc_curchan = hchan;
 		ath_update_txpow(sc);		/* update tx power state */
+		sc->sc_diversity = ath_hal_getdiversity(ah);
 
 		/*
 		 * Re-enable rx framework.
@@ -5100,7 +5167,8 @@ ath_calibrate(unsigned long arg)
 		 * to load new gain values.
 		 */
 		sc->sc_stats.ast_per_rfgain++;
-		if_printf(dev, "calibration, need reset\n");
+		DPRINTF(sc, ATH_DEBUG_RESET,
+			"%s: calibration, resetting\n", dev->name);
 		ath_reset(dev);
 	}
 	if (!ath_hal_calibrate(ah, &sc->sc_curchan)) {
@@ -5299,8 +5367,9 @@ ath_setup_stationkey(struct ieee80211_node *ni)
  * param tells us if this is the first time or not.
  */
 static void
-ath_newassoc(struct ieee80211com *ic, struct ieee80211_node *ni, int isnew)
+ath_newassoc(struct ieee80211_node *ni, int isnew)
 {
+	struct ieee80211com *ic = ni->ni_ic;
 	struct ath_softc *sc = ic->ic_dev->priv;
 
 	ath_rate_newassoc(sc, ATH_NODE(ni), isnew);
@@ -6146,6 +6215,7 @@ enum {
 	ATH_RAWDEV_TYPE = 19,
 	ATH_RXFILTER   = 20,
 	ATH_RADARSIM   = 21,
+	ATH_LOCKSLOTTIME= 22,
 };
 
 static int
@@ -6167,6 +6237,9 @@ ATH_SYSCTL_DECL(ath_sysctl_halparam, ctl, write, filp, buffer, lenp, ppos)
 			case ATH_SLOTTIME:
 				if (!ath_hal_setslottime(ah, val))
 					ret = -EINVAL;
+				break;
+			case ATH_LOCKSLOTTIME:
+				sc->sc_lockslottime = val != 0;
 				break;
 			case ATH_ACKTIMEOUT:
 				if (!ath_hal_setacktimeout(ah, val))
@@ -6201,8 +6274,6 @@ ATH_SYSCTL_DECL(ath_sysctl_halparam, ctl, write, filp, buffer, lenp, ppos)
 				break;
 			case ATH_DIVERSITY:
 				/* XXX validate? */
-				if (!sc->sc_hasdiversity)
-					return -EINVAL;
 				sc->sc_diversity = val;
 				ath_hal_setdiversity(ah, val);
 				break;
@@ -6216,8 +6287,6 @@ ATH_SYSCTL_DECL(ath_sysctl_halparam, ctl, write, filp, buffer, lenp, ppos)
                                 break;
                         case ATH_TPC:
                                 /* XXX validate? */
-                                if (!sc->sc_hastpc)
-                                        return -EINVAL;
                                 ath_hal_settpc(ah, val);
                                 break;
                         case ATH_TXPOWLIMIT:
@@ -6275,6 +6344,9 @@ ATH_SYSCTL_DECL(ath_sysctl_halparam, ctl, write, filp, buffer, lenp, ppos)
 		switch (ctl->ctl_name) {
 		case ATH_SLOTTIME:
 			val = ath_hal_getslottime(ah);
+			break;
+		case ATH_LOCKSLOTTIME:
+			val = sc->sc_lockslottime;
 			break;
 		case ATH_ACKTIMEOUT:
 			val = ath_hal_getacktimeout(ah);
@@ -6360,109 +6432,114 @@ static	int maxint = 0x7fffffff;		/* 32-bit big */
 static const ctl_table ath_sysctl_template[] = {
 	{ .ctl_name	= ATH_SLOTTIME,
 	  .procname	= "slottime",
-	  .mode		= 0644,
+	  .mode         = 0644,
+	  .proc_handler = ath_sysctl_halparam
+	},
+	{ .ctl_name     = ATH_LOCKSLOTTIME,
+	  .procname     = "lockslottime",
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_ACKTIMEOUT,
 	  .procname	= "acktimeout",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_CTSTIMEOUT,
 	  .procname	= "ctstimeout",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_SOFTLED,
 	  .procname	= "softled",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_LEDPIN,
 	  .procname	= "ledpin",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_COUNTRYCODE,
 	  .procname	= "countrycode",
-	  .mode		= 0444,
+	  .mode	= 0444,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_REGDOMAIN,
 	  .procname	= "regdomain",
-	  .mode		= 0444,
+	  .mode	= 0444,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 #ifdef AR_DEBUG
 	{ .ctl_name	= ATH_DEBUG,
 	  .procname	= "debug",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 #endif
 	{ .ctl_name	= ATH_TXANTENNA,
 	  .procname	= "txantenna",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_RXANTENNA,
 	  .procname	= "rxantenna",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_DIVERSITY,
 	  .procname	= "diversity",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_TXINTRPERIOD,
 	  .procname	= "txintrperiod",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_TPSCALE,
 	  .procname	= "tpscale",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_TPC,
 	  .procname	= "tpc",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_TXPOWLIMIT,
 	  .procname	= "txpowlimit",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_VEOL,
 	  .procname	= "veol",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_BINTVAL,
 	  .procname	= "bintval",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_RAWDEV,
 	  .procname	= "rawdev",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_RAWDEV_TYPE,
 	  .procname	= "rawdev_type",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_RXFILTER,
 	  .procname	= "rxfilter",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ .ctl_name	= ATH_RADARSIM,
 	  .procname	= "radarsim",
-	  .mode		= 0644,
+	  .mode	= 0644,
 	  .proc_handler	= ath_sysctl_halparam
 	},
 	{ 0 }
@@ -6515,6 +6592,7 @@ ath_dynamic_sysctl_register(struct ath_softc *sc)
 #endif
 	sc->sc_txantenna = 0;		/* default to auto-selection */
 	sc->sc_txintrperiod = ATH_TXINTR_PERIOD;
+	sc->sc_lockslottime = 0;
 }
 
 static void

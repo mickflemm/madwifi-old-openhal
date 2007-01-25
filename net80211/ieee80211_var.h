@@ -72,6 +72,7 @@
 
 #define	IEEE80211_PS_SLEEP	0x1	/* STA is in power saving mode */
 #define	IEEE80211_PS_MAX_QUEUE	50	/* maximum saved packets */
+#define IEEE80211_WDS_MAXNODES	10	/* max wds nodes per dev in protocol stack */
 
 #define	IEEE80211_MS_TO_TU(x)	(((x) * 1000) / 1024)
 #define	IEEE80211_TU_TO_MS(x)	(((x) * 1024) / 1000)
@@ -89,9 +90,11 @@ struct ieee80211com {
 	u_int32_t		ic_debug;	/* debug msg flags */
 	u_int			ic_vap;		/* virtual AP index */
 	ieee80211_beacon_lock_t	ic_beaconlock;	/* beacon update lock */
+
 	char			ic_procname[12];/* e.g. wlan%d */
 	struct ctl_table_header	*ic_sysctl_header;
 	struct ctl_table	*ic_sysctls;
+
 	struct vlan_group	*ic_vlgrp;	/* vlan group state */
 
 	int			(*ic_init)(struct net_device *);
@@ -103,11 +106,9 @@ struct ieee80211com {
 				    struct ieee80211_node *, int, int);
 	int			(*ic_newstate)(struct ieee80211com *,
 				    enum ieee80211_state, int);
-	void			(*ic_newassoc)(struct ieee80211com *,
-				    struct ieee80211_node *, int);
+	void                    (*ic_newassoc)(struct ieee80211_node *, int);
 	void			(*ic_updateslot)(struct net_device *);
-	void			(*ic_set_tim)(struct ieee80211com *,
-				    struct ieee80211_node *, int);
+	void                    (*ic_set_tim)(struct ieee80211_node *, int);
 	u_int8_t		ic_myaddr[IEEE80211_ADDR_LEN];
 	struct ieee80211_rateset ic_sup_rates[IEEE80211_MODE_MAX];
 	struct ieee80211_channel ic_channels[IEEE80211_CHAN_MAX+1];
@@ -205,6 +206,12 @@ struct ieee80211com {
 
 	struct timer_list	ic_radar_reanimate;	/* reanimation timer after stopping all channels after redar detection */
 	u_int32_t ic_channelList[IEEE80211_CHAN_MAX];
+	/* wds peers mac addresses */
+	u_int8_t		ic_wdspeers[IEEE80211_WDS_MAXNODES][IEEE80211_ADDR_LEN];
+	/* wds devices */
+	struct net_device	*ic_wdsdev[IEEE80211_WDS_MAXNODES];
+	/* only wds traffic is allowed */
+	int			ic_wdsonly;
 };
 
 #define	IEEE80211_ADDR_EQ(a1,a2)	(memcmp(a1,a2,IEEE80211_ADDR_LEN) == 0)
@@ -352,6 +359,7 @@ ieee80211_anyhdrspace(struct ieee80211com *ic, const void *data)
 #define	IEEE80211_MSG_WPA	0x00001000	/* WPA/RSN protocol */
 #define	IEEE80211_MSG_ACL	0x00000800	/* ACL handling */
 #define	IEEE80211_MSG_WME	0x00000400	/* WME protocol */
+#define	IEEE80211_MSG_MLME	0x00000200	/* MLME handling */
 
 #define	IEEE80211_MSG_ANY	0xffffffff	/* anything */
 
