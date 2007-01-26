@@ -2,4 +2,4 @@
 #define SUPERCHANNEL    0
 
 /* Uncomment this for debuging (warning that results TOO much output) */
-//#define AR5K_DEBUG
+//#define AR5K_DEBUG	1

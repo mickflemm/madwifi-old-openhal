@@ -1527,9 +1527,9 @@ ar5k_ar5211_dump_state(struct ath_hal *hal)
 {
 #ifdef AR5K_DEBUG
 #define AR5K_PRINT_REGISTER(_x)						\
-	printf("(%s: %08x) ", #_x, AR5K_REG_READ(AR5K_AR5211_##_x));
+	AR5K_PRINTF("(%s: %08x) ", #_x, AR5K_REG_READ(AR5K_AR5211_##_x));
 
-	printf("MAC registers:\n");
+	AR5K_PRINT("MAC registers:\n");
 	AR5K_PRINT_REGISTER(CR);
 	AR5K_PRINT_REGISTER(CFG);
 	AR5K_PRINT_REGISTER(IER);
@@ -1592,9 +1592,9 @@ ar5k_ar5211_dump_state(struct ath_hal *hal)
 	AR5K_PRINT_REGISTER(FCS_FAIL);
 	AR5K_PRINT_REGISTER(BEACON_CNT);
 	AR5K_PRINT_REGISTER(KEYTABLE_0);
-	printf("\n");
+	AR5K_PRINT("\n");
 
-	printf("PHY registers:\n");
+	AR5K_PRINT("PHY registers:\n");
 	AR5K_PRINT_REGISTER(PHY_TURBO);
 	AR5K_PRINT_REGISTER(PHY_AGC);
 	AR5K_PRINT_REGISTER(PHY_CHIP_ID);
@@ -1607,7 +1607,7 @@ ar5k_ar5211_dump_state(struct ath_hal *hal)
 	AR5K_PRINT_REGISTER(PHY_RADAR);
 	AR5K_PRINT_REGISTER(PHY_ANT_SWITCH_TABLE_0);
 	AR5K_PRINT_REGISTER(PHY_ANT_SWITCH_TABLE_1);
-	printf("\n");
+	AR5K_PRINT("\n");
 #endif
 }
 

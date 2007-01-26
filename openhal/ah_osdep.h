@@ -44,8 +44,6 @@ typedef void* AR5K_BUS_HANDLE;
 typedef u_int32_t AR5K_BUS_ADDR;
 #define bus_space_tag_t AR5K_BUS_TAG
 #define bus_space_handle_t AR5K_BUS_HANDLE
-//#define hz cpufreq_get(0) / 1000
-//#define tick 1000000 / hz
 
  /*
  * Linux uses __BIG_ENDIAN and __LITTLE_ENDIAN while BSD uses _foo
