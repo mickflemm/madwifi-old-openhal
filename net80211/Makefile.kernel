@@ -26,7 +26,7 @@ EXTRA_CFLAGS += $(INCS)
 #
 MOD_AUTH	:= wlan_xauth.o
 
-obj-$(CONFIG_NET80211) += wlan.o wlan_wep.o wlan_tkip.o wlan_ccmp.o wlan_acl.o \
+obj-$(CONFIG_ATHEROS) += wlan.o wlan_wep.o wlan_tkip.o wlan_ccmp.o wlan_acl.o \
 		   $(MOD_AUTH)
 
 wlan-objs	:= if_media.o rc4.o \
