@@ -105,7 +105,7 @@ ieee80211_mgmt_output(struct ieee80211com *ic, struct ieee80211_node *ni,
 		skb_push(skb, sizeof(struct ieee80211_frame));
 	wh->i_fc[0] = IEEE80211_FC0_VERSION_0 | IEEE80211_FC0_TYPE_MGT | type;
 	wh->i_fc[1] = IEEE80211_FC1_DIR_NODS;
-	*(u_int16_t *)wh->i_dur = 0;
+	wh->i_dur = 0;
 	*(u_int16_t *)wh->i_seq =
 	    htole16(ni->ni_txseqs[0] << IEEE80211_SEQ_SEQ_SHIFT);
 	ni->ni_txseqs[0]++;
@@ -179,7 +179,7 @@ ieee80211_send_nulldata(struct ieee80211_node *ni)
 		skb_push(skb, sizeof(struct ieee80211_frame));
 	wh->i_fc[0] = IEEE80211_FC0_VERSION_0 | IEEE80211_FC0_TYPE_DATA |
 		IEEE80211_FC0_SUBTYPE_NODATA;
-	*(u_int16_t *)wh->i_dur = 0;
+	wh->i_dur = 0;
 	*(u_int16_t *)wh->i_seq =
 	    htole16(ni->ni_txseqs[0] << IEEE80211_SEQ_SEQ_SHIFT);
 	ni->ni_txseqs[0]++;
@@ -520,13 +520,13 @@ ieee80211_encap(struct ieee80211com *ic, struct sk_buff *skb,
 	if(wdsdev) {
 		wh4 = (struct ieee80211_frame_addr4*)skb_push(skb, hdrsize);
 		wh4->i_fc[0] = IEEE80211_FC0_VERSION_0 | IEEE80211_FC0_TYPE_DATA;
-		*(u_int16_t *)wh4->i_dur = 0;
+		wh4->i_dur = 0;
 		i_seq = &wh4->i_seq[0];
 		i_fc = &wh4->i_fc[0];
 	} else {
 		wh = (struct ieee80211_frame *)skb_push(skb, hdrsize);
 		wh->i_fc[0] = IEEE80211_FC0_VERSION_0 | IEEE80211_FC0_TYPE_DATA;
-		*(u_int16_t *)wh->i_dur = 0;
+		wh->i_dur = 0;
 		i_seq = &wh->i_seq[0];
 		i_fc = &wh->i_fc[0];
 	}
@@ -1461,7 +1461,7 @@ ieee80211_beacon_alloc(struct ieee80211com *ic, struct ieee80211_node *ni,
 	wh->i_fc[0] = IEEE80211_FC0_VERSION_0 | IEEE80211_FC0_TYPE_MGT |
 	    IEEE80211_FC0_SUBTYPE_BEACON;
 	wh->i_fc[1] = IEEE80211_FC1_DIR_NODS;
-	*(u_int16_t *)wh->i_dur = 0;
+	wh->i_dur = 0;
 	IEEE80211_ADDR_COPY(wh->i_addr1, dev->broadcast);
 	IEEE80211_ADDR_COPY(wh->i_addr2, ic->ic_myaddr);
 	IEEE80211_ADDR_COPY(wh->i_addr3, ni->ni_bssid);

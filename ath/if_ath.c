@@ -4434,7 +4434,7 @@ ath_tx_start(struct net_device *dev, struct ieee80211_node *ni, struct ath_buf *
 			dur = rt->rates[rix].sp_ack_duration;
 		else
 			dur = rt->rates[rix].lp_ack_duration;
-		*(u_int16_t *)wh->i_dur = htole16(dur);
+		wh->i_dur = htole16(dur);
 	}
 
 	/*

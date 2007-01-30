@@ -59,7 +59,7 @@ struct ieee80211_plcp_hdr {
  */
 struct ieee80211_frame {
 	u_int8_t	i_fc[2];
-	u_int8_t	i_dur[2];
+	__le16		i_dur;
 	u_int8_t	i_addr1[IEEE80211_ADDR_LEN];
 	u_int8_t	i_addr2[IEEE80211_ADDR_LEN];
 	u_int8_t	i_addr3[IEEE80211_ADDR_LEN];
@@ -70,7 +70,7 @@ struct ieee80211_frame {
 
 struct ieee80211_qosframe {
 	u_int8_t	i_fc[2];
-	u_int8_t	i_dur[2];
+	__le16		i_dur;
 	u_int8_t	i_addr1[IEEE80211_ADDR_LEN];
 	u_int8_t	i_addr2[IEEE80211_ADDR_LEN];
 	u_int8_t	i_addr3[IEEE80211_ADDR_LEN];
@@ -86,7 +86,7 @@ struct ieee80211_qoscntl {
 
 struct ieee80211_frame_addr4 {
 	u_int8_t	i_fc[2];
-	u_int8_t	i_dur[2];
+	__le16		i_dur;
 	u_int8_t	i_addr1[IEEE80211_ADDR_LEN];
 	u_int8_t	i_addr2[IEEE80211_ADDR_LEN];
 	u_int8_t	i_addr3[IEEE80211_ADDR_LEN];
@@ -97,7 +97,7 @@ struct ieee80211_frame_addr4 {
 
 struct ieee80211_qosframe_addr4 {
 	u_int8_t	i_fc[2];
-	u_int8_t	i_dur[2];
+	__le16		i_dur;
 	u_int8_t	i_addr1[IEEE80211_ADDR_LEN];
 	u_int8_t	i_addr2[IEEE80211_ADDR_LEN];
 	u_int8_t	i_addr3[IEEE80211_ADDR_LEN];
@@ -291,7 +291,7 @@ struct ieee80211_mnf {
  */
 struct ieee80211_frame_min {
 	u_int8_t	i_fc[2];
-	u_int8_t	i_dur[2];
+	__le16		i_dur;
 	u_int8_t	i_addr1[IEEE80211_ADDR_LEN];
 	u_int8_t	i_addr2[IEEE80211_ADDR_LEN];
 	/* FCS */
@@ -299,7 +299,7 @@ struct ieee80211_frame_min {
 
 struct ieee80211_frame_rts {
 	u_int8_t	i_fc[2];
-	u_int8_t	i_dur[2];
+	__le16		i_dur;
 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
 	u_int8_t	i_ta[IEEE80211_ADDR_LEN];
 	/* FCS */
@@ -307,14 +307,14 @@ struct ieee80211_frame_rts {
 
 struct ieee80211_frame_cts {
 	u_int8_t	i_fc[2];
-	u_int8_t	i_dur[2];
+	__le16		i_dur;
 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
 	/* FCS */
 } __packed;
 
 struct ieee80211_frame_ack {
 	u_int8_t	i_fc[2];
-	u_int8_t	i_dur[2];
+	__le16		i_dur;
 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
 	/* FCS */
 } __packed;
@@ -329,7 +329,7 @@ struct ieee80211_frame_pspoll {
 
 struct ieee80211_frame_cfend {		/* NB: also CF-End+CF-Ack */
 	u_int8_t	i_fc[2];
-	u_int8_t	i_dur[2];	/* should be zero */
+	__le16		i_dur;		/* should be zero */
 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
 	u_int8_t	i_bssid[IEEE80211_ADDR_LEN];
 	/* FCS */
