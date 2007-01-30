@@ -3,7 +3,7 @@
  * make this easier to include into user space programs.
  * Jouni Malinen, 2005-03-12.
  *
- * $Id: wireless_copy.h 1426 2006-02-01 20:07:11Z mrenzmann $
+ * $Id: wireless_copy.h 2025 2007-01-30 03:02:56Z proski $
  */
 
 
@@ -89,8 +89,10 @@
 #include <sys/types.h>
 #include <net/if.h>
 typedef __uint32_t __u32;
+typedef __uint32_t __le32;
 typedef __int32_t __s32;
 typedef __uint16_t __u16;
+typedef __uint16_t __le16;
 typedef __int16_t __s16;
 typedef __uint8_t __u8;
 #ifndef __user
