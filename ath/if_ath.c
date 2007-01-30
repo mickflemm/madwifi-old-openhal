@@ -3828,7 +3828,7 @@ rx_accept:
 			 len, skb_tailroom(skb)));
 
 		skb_put(skb, len);
-		skb->protocol = ETH_P_CONTROL;		/* XXX */
+		skb->protocol = __constant_htons(ETH_P_CONTROL);
 
 		if (sc->sc_rawdev_enabled && 
 		    (sc->sc_rawdev.flags & IFF_UP)) {
