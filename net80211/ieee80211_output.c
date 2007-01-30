@@ -1406,8 +1406,8 @@ ieee80211_beacon_alloc(struct ieee80211com *ic, struct ieee80211_node *ni,
 		capinfo |= IEEE80211_CAPINFO_SHORT_PREAMBLE;
 	if (ic->ic_flags & IEEE80211_F_SHSLOT)
 		capinfo |= IEEE80211_CAPINFO_SHORT_SLOTTIME;
-	bo->bo_caps = (u_int16_t *)frm;
-	*(u_int16_t *)frm = htole16(capinfo);
+	bo->bo_caps = (__le16 *)frm;
+	*(__le16 *)frm = htole16(capinfo);
 	frm += 2;
 	*frm++ = IEEE80211_ELEMID_SSID;
 	if ((ic->ic_flags & IEEE80211_F_HIDESSID) == 0) {

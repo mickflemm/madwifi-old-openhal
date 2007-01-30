@@ -252,7 +252,7 @@ extern	const char *ieee80211_wme_acnames[];
  * can update the frame later w/ minimal overhead.
  */
 struct ieee80211_beacon_offsets {
-	u_int16_t	*bo_caps;	/* capabilities */
+	__le16		*bo_caps;	/* capabilities */
 	u_int8_t	*bo_tim;	/* start of atim/dtim */
 	u_int8_t	*bo_wme;	/* start of WME parameters */
 	u_int8_t	*bo_trailer;	/* start of fixed-size trailer */
