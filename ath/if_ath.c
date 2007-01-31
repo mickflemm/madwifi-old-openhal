@@ -355,7 +355,7 @@ ath_attach(u_int16_t devid, struct net_device *dev)
 	 * built with an ah.h that does not correspond to the hal
 	 * module loaded in the kernel.
 	 */
-	ah = _ath_hal_attach(devid, sc, 0, (void *) dev->mem_start, &status);
+	ah = _ath_hal_attach(devid, sc, 0, sc->sc_iobase, &status);
 	if (ah == NULL) {
 		printk(KERN_ERR "%s: unable to attach hardware: '%s' (HAL status %u)\n",
 			__func__, hal_status_desc[status], status);

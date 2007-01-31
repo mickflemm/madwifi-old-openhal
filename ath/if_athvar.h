@@ -241,6 +241,7 @@ struct ath_txq {
 
 struct ath_softc {
 	struct net_device	sc_dev;		/* NB: must be first */
+	void __iomem		*sc_iobase;	/* address of the device */
 	struct net_device	sc_rawdev;	/* live monitor device */
 	struct semaphore	sc_lock;	/* dev-level lock */
 	struct net_device_stats	sc_devstats;	/* device statistics */

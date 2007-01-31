@@ -115,7 +115,7 @@ static int
 ath_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 {
 	unsigned long phymem;
-	unsigned long mem;
+	void __iomem *mem;
 	struct ath_pci_softc *sc;
 	struct net_device *dev;
 	const char *athname;
@@ -172,7 +172,7 @@ ath_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto bad;
 	}
 
-	mem = (unsigned long) ioremap(phymem, pci_resource_len(pdev, 0));
+	mem = ioremap(phymem, pci_resource_len(pdev, 0));
 	if (!mem) {
 		printk(KERN_ERR "ath_pci: cannot remap PCI memory region\n") ;
 		goto bad1;
@@ -198,9 +198,8 @@ ath_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	strncat(dev->name, "%d", sizeof("%d"));
 
 	dev->irq = pdev->irq;
-	dev->mem_start = mem;
-	dev->mem_end = mem + pci_resource_len(pdev, 0);
 	dev->priv = sc;
+	sc->aps_sc.sc_iobase = mem;
 
 	SET_MODULE_OWNER(dev);
 	SET_NETDEV_DEV(dev, &pdev->dev);
@@ -230,7 +229,7 @@ bad4:
 bad3:
 	kfree(sc);
 bad2:
-	iounmap((void *) mem);
+	iounmap(mem);
 bad1:
 	release_mem_region(phymem, pci_resource_len(pdev, 0));
 bad:
@@ -242,11 +241,12 @@ static void
 ath_pci_remove(struct pci_dev *pdev)
 {
 	struct net_device *dev = pci_get_drvdata(pdev);
+	struct ath_pci_softc *sc = dev->priv;
 
 	ath_detach(dev);
 	if (dev->irq)
 		free_irq(dev->irq, dev);
-	iounmap((void *) dev->mem_start);
+	iounmap(sc->aps_sc.sc_iobase);
 	release_mem_region(pci_resource_start(pdev, 0),
 			   pci_resource_len(pdev, 0));
 	pci_disable_device(pdev);
