@@ -64,4 +64,12 @@
 #define pm_message_t u32
 #endif
 
+#ifndef PCI_D0
+#define PCI_D0		0
+#endif
+
+#ifndef PCI_D3hot
+#define PCI_D3hot	3
+#endif
+
 #endif   /* _DEV_ATH_PCI_H_ */

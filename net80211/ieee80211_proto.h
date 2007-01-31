@@ -60,7 +60,7 @@ enum ieee80211_state {
 struct ieee80211_cb {
 	struct ieee80211_node	*ni;
 	struct ieee80211_key	*key;
-	u_int8_t		flags;
+	u_int32_t		flags;
 	int			age;
 };
 

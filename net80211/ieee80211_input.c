@@ -282,9 +282,9 @@ ieee80211_input(struct ieee80211com *ic, struct sk_buff *skb,
 			} else
 				tid = 0;
 			if(isaddr4) {
-				rxseq = le16toh(*(u_int16_t *)wh4->i_seq);
+				rxseq = le16toh(*(__le16 *)wh4->i_seq);
 			} else {
-				rxseq = le16toh(*(u_int16_t *)wh->i_seq);
+				rxseq = le16toh(*(__le16 *)wh->i_seq);
 			}
 			if ((wh->i_fc[1] & IEEE80211_FC1_RETRY) &&
 			    SEQ_LEQ(rxseq, ni->ni_rxseqs[tid])) {
@@ -472,7 +472,7 @@ ieee80211_input(struct ieee80211com *ic, struct sk_buff *skb,
 				IEEE80211_DISCARD_MAC(ic, IEEE80211_MSG_INPUT,
 				    eh->ether_shost, "data",
 				    "unauthorized port: ether type 0x%x len %u",
-				    eh->ether_type, skb->len);
+				    ntohs(eh->ether_type), skb->len);
 				ic->ic_stats.is_rx_unauth++;
 				IEEE80211_NODE_STAT(ni, rx_unauth);
 				goto err;
@@ -491,7 +491,7 @@ ieee80211_input(struct ieee80211com *ic, struct sk_buff *skb,
 				IEEE80211_DISCARD_MAC(ic, IEEE80211_MSG_INPUT,
 				    eh->ether_shost, "data",
 				    "unencrypted: ether type 0x%x len %u",
-				    eh->ether_type, skb->len);
+				    ntohs(eh->ether_type), skb->len);
 				ic->ic_stats.is_rx_unencrypted++;
 				IEEE80211_NODE_STAT(ni, rx_unencrypted);
 				goto out;
@@ -690,9 +690,9 @@ ieee80211_defrag(struct ieee80211com *ic, struct ieee80211_node *ni,
 	KASSERT(!IEEE80211_IS_MULTICAST(wh->i_addr1), ("multicast fragm?"));
 
 	if((wh->i_fc[1] & IEEE80211_FC1_DIR_MASK)==IEEE80211_FC1_DIR_DSTODS) {
-		rxseq = le16toh(*(u_int16_t *)wh4->i_seq);
+		rxseq = le16toh(*(__le16 *)wh4->i_seq);
 	} else {
-		rxseq = le16toh(*(u_int16_t *)wh->i_seq);
+		rxseq = le16toh(*(__le16 *)wh->i_seq);
 	}
 	fragno = rxseq & IEEE80211_SEQ_FRAG_MASK;
 
@@ -731,9 +731,9 @@ ieee80211_defrag(struct ieee80211com *ic, struct ieee80211_node *ni,
 		lwh = (struct ieee80211_frame *) skbfrag->data;
 		if((lwh->i_fc[1] & IEEE80211_FC1_DIR_MASK)==IEEE80211_FC1_DIR_DSTODS) {
 			lwh4 = (struct ieee80211_frame_addr4 *)lwh;
-			last_rxseq = le16toh(*(u_int16_t *)lwh4->i_seq);
+			last_rxseq = le16toh(*(__le16 *)lwh4->i_seq);
 		} else {
-			last_rxseq = le16toh(*(u_int16_t *)lwh->i_seq);
+			last_rxseq = le16toh(*(__le16 *)lwh->i_seq);
 		}
 		/* NB: check seq # and frag together */
 		if (rxseq != last_rxseq+1 ||
@@ -815,7 +815,7 @@ ieee80211_decap(struct ieee80211com *ic, struct sk_buff *skb, int hdrlen)
 	struct ieee80211_qosframe_addr4 wh;	/* Max size address frames */
 	struct ether_header *eh;
 	struct llc *llc;
-	u_short ether_type = 0;
+	__be16 ether_type = 0;
 	
 	// TODO: use linux llc.h ..., same for ieee80211_encap()
 	
@@ -1841,8 +1841,8 @@ ieee80211_recv_mgmt(struct ieee80211com *ic, struct sk_buff *skb,
 		 */
 		IEEE80211_VERIFY_LENGTH(efrm - frm, 12);
 		tstamp  = frm;				frm += 8;
-		bintval = le16toh(*(u_int16_t *)frm);	frm += 2;
-		capinfo = le16toh(*(u_int16_t *)frm);	frm += 2;
+		bintval = le16toh(*(__le16 *)frm);	frm += 2;
+		capinfo = le16toh(*(__le16 *)frm);	frm += 2;
 		ssid = rates = xrates = country = wpa = wme = tim = NULL;
 		bchan = ieee80211_chan2ieee(ic, ic->ic_bss->ni_chan);
 		chan = bchan;
@@ -2216,9 +2216,9 @@ ieee80211_recv_mgmt(struct ieee80211com *ic, struct sk_buff *skb,
 		 *	[tlv*] challenge
 		 */
 		IEEE80211_VERIFY_LENGTH(efrm - frm, 6);
-		algo   = le16toh(*(u_int16_t *)frm);
-		seq    = le16toh(*(u_int16_t *)(frm + 2));
-		status = le16toh(*(u_int16_t *)(frm + 4));
+		algo   = le16toh(*(__le16 *)frm);
+		seq    = le16toh(*(__le16 *)(frm + 2));
+		status = le16toh(*(__le16 *)(frm + 4));
 		IEEE80211_DPRINTF(ic, IEEE80211_MSG_AUTH,
 		    "[%s] recv auth frame with algorithm %d seq %d\n",
 		    ether_sprintf(wh->i_addr2), algo, seq);
@@ -2302,8 +2302,8 @@ ieee80211_recv_mgmt(struct ieee80211com *ic, struct sk_buff *skb,
 			ic->ic_stats.is_rx_assoc_bss++;
 			return;
 		}
-		capinfo = le16toh(*(u_int16_t *)frm);	frm += 2;
-		bintval = le16toh(*(u_int16_t *)frm);	frm += 2;
+		capinfo = le16toh(*(__le16 *)frm);	frm += 2;
+		bintval = le16toh(*(__le16 *)frm);	frm += 2;
 		if (reassoc)
 			frm += 6;	/* ignore current AP info */
 		ssid = rates = xrates = wpa = wme = NULL;
@@ -2511,9 +2511,9 @@ ieee80211_recv_mgmt(struct ieee80211com *ic, struct sk_buff *skb,
 		 */
 		IEEE80211_VERIFY_LENGTH(efrm - frm, 6);
 		ni = ic->ic_bss;
-		capinfo = le16toh(*(u_int16_t *)frm);
+		capinfo = le16toh(*(__le16 *)frm);
 		frm += 2;
-		status = le16toh(*(u_int16_t *)frm);
+		status = le16toh(*(__le16 *)frm);
 		frm += 2;
 		if (status != 0) {
 			IEEE80211_DPRINTF(ic, IEEE80211_MSG_ASSOC,
@@ -2525,7 +2525,7 @@ ieee80211_recv_mgmt(struct ieee80211com *ic, struct sk_buff *skb,
 			ic->ic_stats.is_rx_auth_fail++;	/* XXX */
 			return;
 		}
-		associd = le16toh(*(u_int16_t *)frm);
+		associd = le16toh(*(__le16 *)frm);
 		frm += 2;
 
 		rates = xrates = wpa = wme = NULL;
@@ -2627,7 +2627,7 @@ ieee80211_recv_mgmt(struct ieee80211com *ic, struct sk_buff *skb,
 		 *	[2] reason
 		 */
 		IEEE80211_VERIFY_LENGTH(efrm - frm, 2);
-		reason = le16toh(*(u_int16_t *)frm);
+		reason = le16toh(*(__le16 *)frm);
 		ic->ic_stats.is_rx_deauth++;
 		IEEE80211_NODE_STAT(ni, rx_deauth);
 
@@ -2667,7 +2667,7 @@ ieee80211_recv_mgmt(struct ieee80211com *ic, struct sk_buff *skb,
 		 *	[2] reason
 		 */
 		IEEE80211_VERIFY_LENGTH(efrm - frm, 2);
-		reason = le16toh(*(u_int16_t *)frm);
+		reason = le16toh(*(__le16 *)frm);
 		ic->ic_stats.is_rx_disassoc++;
 	    	IEEE80211_NODE_STAT(ni, rx_disassoc);
 

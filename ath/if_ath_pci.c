@@ -263,7 +263,7 @@ ath_pci_suspend(struct pci_dev *pdev, pm_message_t state)
 	PCI_SAVE_STATE(pdev,
 		((struct ath_pci_softc *)dev->priv)->aps_pmstate);
 	pci_disable_device(pdev);
-	pci_set_power_state(pdev, 3);
+	pci_set_power_state(pdev, PCI_D3hot);
 
 	return (0);
 }
@@ -274,6 +274,10 @@ ath_pci_resume(struct pci_dev *pdev)
 	struct net_device *dev = pci_get_drvdata(pdev);
 	u32 val;
 	int err;
+
+	err = pci_set_power_state(pdev, PCI_D0);
+	if (err)
+		return err;
 
 	err = pci_enable_device(pdev);
 	if (err)

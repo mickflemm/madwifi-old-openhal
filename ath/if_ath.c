@@ -1827,12 +1827,12 @@ ath_start(struct sk_buff *skb, struct net_device *dev)
 				IEEE80211_FC0_SUBTYPE_PROBE_RESP) {
 				/* fill time stamp */
 				u_int64_t tsf;
-				u_int32_t *tstamp;
+				__le32 *tstamp;
 
 				tsf = ath_hal_gettsf64(ah);
 				/* XXX: adjust 100us delay to xmit */
 				tsf += 100;
-				tstamp = (u_int32_t *)&wh[1];
+				tstamp = (__le32 *)&wh[1];
 				tstamp[0] = htole32(tsf & 0xffffffff);
 				tstamp[1] = htole32(tsf >> 32);
 			}
@@ -4172,8 +4172,8 @@ ath_tx_start(struct net_device *dev, struct ieee80211_node *ni, struct ath_buf *
 	// TODO: not so correct (WDS)
 	llc = (struct llc *) (skb->data + sizeof(struct ieee80211_frame));
 	DPRINTF(sc, ATH_DEBUG_XMIT, "%s: ether_type: 0x%x\n",
-		__func__, __constant_htons(llc->llc_snap.ether_type));
-	if (__constant_htons(llc->llc_snap.ether_type) == ETHERTYPE_PAE)
+		__func__, ntohs(llc->llc_snap.ether_type));
+	if (llc->llc_snap.ether_type == __constant_htons(ETHERTYPE_PAE))
 		eapol = 1;
 	else
 		eapol = 0;
@@ -5389,7 +5389,8 @@ ath_getchannels(struct net_device *dev, u_int cc,
 	struct ieee80211com *ic = &sc->sc_ic;
 	struct ath_hal *ah = sc->sc_ah;
 	AR5K_CHANNEL *chans;
-	int i, ix, nchan;
+	int i, ix;
+	u_int nchan;
 
 	chans = kmalloc(IEEE80211_CHAN_MAX * sizeof(AR5K_CHANNEL), GFP_KERNEL);
 	if (chans == NULL) {

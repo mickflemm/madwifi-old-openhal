@@ -340,7 +340,7 @@ wep_encrypt(struct ieee80211_key *key, struct sk_buff *skb, int hdrlen)
 		skb->data + hdrlen + wep.ic_header,
 		skb->len - (hdrlen + wep.ic_header));
 	/* tack on ICV */
-	*(u_int32_t *)crcbuf = htole32(~crc);
+	*(__le32 *)crcbuf = htole32(~crc);
 	icv = skb_put(skb, IEEE80211_WEP_CRCLEN);
 	arc4_encrypt(&ctx->wc_rc4, icv, crcbuf, IEEE80211_WEP_CRCLEN);
 
@@ -377,7 +377,7 @@ wep_decrypt(struct ieee80211_key *key, struct sk_buff *skb, int hdrlen)
 	icv = skb->data + (skb->len - IEEE80211_WEP_CRCLEN);
 	arc4_decrypt(&ctx->wc_rc4, crcbuf, icv, IEEE80211_WEP_CRCLEN);
 
-	return (crc == ~le32toh(*(u_int32_t *)crcbuf));
+	return (crc == ~le32toh(*(__le32 *)crcbuf));
 }
 
 /*

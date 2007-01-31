@@ -53,7 +53,7 @@
 struct	ether_header {
 	u_char	ether_dhost[ETHER_ADDR_LEN];
 	u_char	ether_shost[ETHER_ADDR_LEN];
-	u_short	ether_type;
+	__be16	ether_type;
 };
 
 #ifndef ETHERTYPE_PAE
