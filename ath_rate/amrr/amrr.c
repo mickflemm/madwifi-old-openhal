@@ -204,8 +204,8 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 
 	ni->ni_txrate = rate;
 	/* XXX management/control frames always go at the lowest speed */
-	an->an_tx_mgtrate = rt->info[0].rate_code;
-	an->an_tx_mgtratesp = an->an_tx_mgtrate | rt->info[0].shortPreamble;
+	an->an_tx_mgtrate = rt->rates[0].rate_code;
+	an->an_tx_mgtratesp = an->an_tx_mgtrate | SHPREAMBLE_FLAG(0);
 	/*
 	 * Before associating a node has no rate set setup
 	 * so we can't calculate any transmit codes to use.
@@ -216,9 +216,9 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 	if (ni->ni_rates.rs_nrates > 0) {
 		amn->amn_tx_rix0 = sc->sc_rixmap[
 					       ni->ni_rates.rs_rates[rate] & IEEE80211_RATE_VAL];
-		amn->amn_tx_rate0 = rt->info[amn->amn_tx_rix0].rate_code;
+		amn->amn_tx_rate0 = rt->rates[amn->amn_tx_rix0].rate_code;
 		amn->amn_tx_rate0sp = amn->amn_tx_rate0 |
-			rt->info[amn->amn_tx_rix0].shortPreamble;
+			SHPREAMBLE_FLAG(amn->amn_tx_rix0);
 		if (sc->sc_mrretry) {
 			amn->amn_tx_try0 = 1;
 			amn->amn_tx_try1 = 1;
@@ -227,26 +227,26 @@ ath_rate_update(struct ath_softc *sc, struct ieee80211_node *ni, int rate)
 			if (--rate >= 0) {
 				rix = sc->sc_rixmap[
 						    ni->ni_rates.rs_rates[rate]&IEEE80211_RATE_VAL];
-				amn->amn_tx_rate1 = rt->info[rix].rate_code;
+				amn->amn_tx_rate1 = rt->rates[rix].rate_code;
 				amn->amn_tx_rate1sp = amn->amn_tx_rate1 |
-					rt->info[rix].shortPreamble;
+					SHPREAMBLE_FLAG(rix);
 			} else {
 				amn->amn_tx_rate1 = amn->amn_tx_rate1sp = 0;
 			}
 			if (--rate >= 0) {
 				rix = sc->sc_rixmap[
 						    ni->ni_rates.rs_rates[rate]&IEEE80211_RATE_VAL];
-				amn->amn_tx_rate2 = rt->info[rix].rate_code;
+				amn->amn_tx_rate2 = rt->rates[rix].rate_code;
 				amn->amn_tx_rate2sp = amn->amn_tx_rate2 |
-					rt->info[rix].shortPreamble;
+					SHPREAMBLE_FLAG(rix);
 			} else {
 				amn->amn_tx_rate2 = amn->amn_tx_rate2sp = 0;
 			}
 			if (rate > 0) {
 				/* NB: only do this if we didn't already do it above */
-				amn->amn_tx_rate3 = rt->info[0].rate_code;
+				amn->amn_tx_rate3 = rt->rates[0].rate_code;
 				amn->amn_tx_rate3sp =
-					an->an_tx_mgtrate | rt->info[0].shortPreamble;
+					an->an_tx_mgtrate | SHPREAMBLE_FLAG(0);
 			} else {
 				amn->amn_tx_rate3 = amn->amn_tx_rate3sp = 0;
 			}
