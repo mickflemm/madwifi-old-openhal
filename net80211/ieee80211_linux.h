@@ -50,17 +50,17 @@ typedef spinlock_t ieee80211_beacon_lock_t;
  * Node locking definitions.
  * TODO: should i use irqsave?
  */
-typedef rwlock_t ieee80211_node_lock_t;
-#define	IEEE80211_NODE_LOCK_INIT(_nt, _name) rwlock_init(&(_nt)->nt_nodelock)
+typedef spinlock_t ieee80211_node_lock_t;
+#define	IEEE80211_NODE_LOCK_INIT(_nt, _name) spin_lock_init(&(_nt)->nt_nodelock)
 #define	IEEE80211_NODE_LOCK_DESTROY(_nt) /* not necessary */
-#define	IEEE80211_NODE_LOCK(_nt)	write_lock(&(_nt)->nt_nodelock)
-#define	IEEE80211_NODE_UNLOCK(_nt)	write_unlock(&(_nt)->nt_nodelock)
-#define	IEEE80211_NODE_LOCK_BH(_nt)	write_lock_bh(&(_nt)->nt_nodelock)
-#define	IEEE80211_NODE_UNLOCK_BH(_nt)	write_unlock_bh(&(_nt)->nt_nodelock)
+#define	IEEE80211_NODE_LOCK(_nt)	spin_lock(&(_nt)->nt_nodelock)
+#define	IEEE80211_NODE_UNLOCK(_nt)	spin_unlock(&(_nt)->nt_nodelock)
+#define	IEEE80211_NODE_LOCK_BH(_nt)	spin_lock_bh(&(_nt)->nt_nodelock)
+#define	IEEE80211_NODE_UNLOCK_BH(_nt)	spin_unlock_bh(&(_nt)->nt_nodelock)
 /* NB: beware, *_is_locked() are boguly defined for UP+!PREEMPT */
-#if (defined(CONFIG_SMP) || defined(CONFIG_PREEMPT)) && defined(rwlock_is_locked)
+#if (defined(CONFIG_SMP) || defined(CONFIG_PREEMPT)) && defined(spinlock_is_locked)
 #define IEEE80211_NODE_LOCK_ASSERT(_nt) \
-        KASSERT(rwlock_is_locked(&(_nt)->nt_nodelock), \
+        KASSERT(spinlock_is_locked(&(_nt)->nt_nodelock), \
                 ("802.11 node not locked!"))
 #else
 #define IEEE80211_NODE_LOCK_ASSERT(_nt)
@@ -69,14 +69,14 @@ typedef rwlock_t ieee80211_node_lock_t;
 /*
  * Node table scangen locking definitions.
  */
-typedef rwlock_t ieee80211_scan_lock_t;
+typedef spinlock_t ieee80211_scan_lock_t;
 #define	IEEE80211_SCAN_LOCK_INIT(_nt, _name) \
-	rwlock_init(&(_nt)->nt_scanlock)
+	spin_lock_init(&(_nt)->nt_scanlock)
 #define	IEEE80211_SCAN_LOCK_DESTROY(_nt)	/* not necessary */
-#define	IEEE80211_SCAN_LOCK(_nt)		write_lock(&(_nt)->nt_scanlock)
-#define	IEEE80211_SCAN_UNLOCK(_nt)		write_unlock(&(_nt)->nt_scanlock)
-#define	IEEE80211_SCAN_LOCK_BH(_nt)		write_lock_bh(&(_nt)->nt_scanlock)
-#define	IEEE80211_SCAN_UNLOCK_BH(_nt)		write_unlock_bh(&(_nt)->nt_scanlock)
+#define	IEEE80211_SCAN_LOCK(_nt)		spin_lock(&(_nt)->nt_scanlock)
+#define	IEEE80211_SCAN_UNLOCK(_nt)		spin_unlock(&(_nt)->nt_scanlock)
+#define	IEEE80211_SCAN_LOCK_BH(_nt)		spin_lock_bh(&(_nt)->nt_scanlock)
+#define	IEEE80211_SCAN_UNLOCK_BH(_nt)		spin_unlock_bh(&(_nt)->nt_scanlock)
 #define	IEEE80211_SCAN_LOCK_ASSERT(_nt)
 
 /*
