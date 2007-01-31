@@ -2205,7 +2205,7 @@ ieee80211_ioctl_getstastats(struct ieee80211com *ic, struct iwreq *iwr)
 	if (ni == NULL)
 		return -EINVAL;		/* XXX */
 	/* NB: copy out only the statistics */
-	error = copy_to_user((u_int8_t *) iwr->u.data.pointer + off, &ni->ni_stats,
+	error = copy_to_user(iwr->u.data.pointer + off, &ni->ni_stats,
 			iwr->u.data.length - off);
 	ieee80211_free_node(ni);
 	return (error ? -EFAULT : 0);

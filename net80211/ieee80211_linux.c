@@ -282,7 +282,7 @@ EXPORT_SYMBOL(ieee80211_notify_michael_failure);
 #include <linux/ctype.h>
 
 static int
-proc_read_node(char *page, int space, struct ieee80211com *ic, void *arg)
+proc_read_node(char __user *page, int space, struct ieee80211com *ic, void *arg)
 {
 	char *buf;
 	char *p;

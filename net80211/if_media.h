@@ -58,7 +58,7 @@ struct ifmediareq {
 	int	ifm_status;		/* media status */
 	int	ifm_active;		/* active options */
 	int	ifm_count;		/* # entries in ifm_ulist array */
-	int	*ifm_ulist;		/* media words */
+	int	__user *ifm_ulist;	/* media words */
 };
 #define	SIOCSIFMEDIA	_IOWR('i', 55, struct ifreq)	/* set net media */
 #define	SIOCGIFMEDIA	_IOWR('i', 56, struct ifmediareq) /* get net media */

@@ -330,8 +330,8 @@ ifmedia_ioctl(dev, ifr, ifm, cmd)
 		 */
 		sticky = error;
 		if ((error == 0 || error == E2BIG) && ifmr->ifm_count != 0) {
-			error = copy_to_user((caddr_t)ifmr->ifm_ulist,
-				(caddr_t)kptr, ifmr->ifm_count * sizeof(int));
+			error = copy_to_user(ifmr->ifm_ulist,
+					kptr, ifmr->ifm_count * sizeof(int));
 		}
 
 		if (error == 0)

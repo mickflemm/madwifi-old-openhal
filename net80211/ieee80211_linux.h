@@ -369,7 +369,7 @@ get_jiffies_64(void)
 	proc_dointvec(ctl, write, filp, buffer, lenp)
 #else
 #define	IEEE80211_SYSCTL_DECL(f, ctl, write, filp, buffer, lenp, ppos) \
-	f(ctl_table *ctl, int write, struct file *filp, void *buffer,\
+	f(ctl_table *ctl, int write, struct file *filp, void __user *buffer,\
 		size_t *lenp, loff_t *ppos)
 #define	IEEE80211_SYSCTL_PROC_DOINTVEC(ctl, write, filp, buffer, lenp, ppos) \
 	proc_dointvec(ctl, write, filp, buffer, lenp, ppos)
