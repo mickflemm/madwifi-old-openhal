@@ -58,7 +58,7 @@ bsearch(const void *key, const void *base0, size_t nmemb, size_t size,
 			lim--;
 		} /* else move left */
 	}
-	return (0);
+	return NULL;
 }
 #endif
 
@@ -114,7 +114,7 @@ ieee80211_countrycode2name(u_int16_t code)
 		if(ieee80211_r_ctry[i].cn_code == code)
 			return(ieee80211_r_ctry[i].cn_name);
 
-	return(0);
+	return NULL;
 }
 
 const char *
