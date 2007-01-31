@@ -40,7 +40,7 @@
 
 typedef void* AR5K_SOFTC;
 typedef int AR5K_BUS_TAG;
-typedef void* AR5K_BUS_HANDLE;
+typedef __iomem void* AR5K_BUS_HANDLE;
 typedef u_int32_t AR5K_BUS_ADDR;
 #define bus_space_tag_t AR5K_BUS_TAG
 #define bus_space_handle_t AR5K_BUS_HANDLE
@@ -74,8 +74,8 @@ typedef u_int32_t AR5K_BUS_ADDR;
 #define bcopy(_a, _b, _c)       memcpy(_b, _a, _c)
 #define bzero(_a, _b)           memset(_a, 0, _b)
 
-#define AR5K_REG_WRITE(_reg, _val)      (writel(cpu_to_le32(_val), hal->ah_sh + (_reg)))
+#define AR5K_REG_WRITE(_reg, _val)      (writel(_val, hal->ah_sh + (_reg)))
 //      bus_space_write_4(hal->ah_st, hal->ah_sh, (_reg), (_val))
 
-#define AR5K_REG_READ(_reg)             (le32_to_cpu(readl(hal->ah_sh + (_reg))))
+#define AR5K_REG_READ(_reg)             (readl(hal->ah_sh + (_reg)))
 //      bus_space_read_4(hal->ah_st, hal->ah_sh, (_reg))
