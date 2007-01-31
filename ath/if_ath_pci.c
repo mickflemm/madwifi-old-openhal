@@ -321,7 +321,7 @@ static char *dev_info = "ath_pci";
 #include <linux/ethtool.h>
 
 int
-ath_ioctl_ethtool(struct ath_softc *sc, int cmd, void *addr)
+ath_ioctl_ethtool(struct ath_softc *sc, int cmd, void __user *addr)
 {
 	struct ethtool_drvinfo info;
 

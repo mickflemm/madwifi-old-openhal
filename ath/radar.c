@@ -11,6 +11,7 @@
 #include "if_media.h"
 
 #include <net80211/ieee80211_var.h>
+#include "radar.h"
 
 
 /*

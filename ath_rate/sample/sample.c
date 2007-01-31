@@ -161,6 +161,7 @@ ath_rate_node_cleanup(struct ath_softc *sc, struct ath_node *an)
 }
 EXPORT_SYMBOL(ath_rate_node_cleanup);
 
+#if 0
 void
 ath_rate_node_copy(struct ath_softc *sc,
 		   struct ath_node *dst, const struct ath_node *src)
@@ -170,6 +171,7 @@ ath_rate_node_copy(struct ath_softc *sc,
 	memcpy(odst, osrc, sizeof(struct sample_node));
 }
 EXPORT_SYMBOL(ath_rate_node_copy);
+#endif
 
 /*
  * returns the ndx with the lowest average_tx_time,
@@ -828,7 +830,7 @@ ath_rate_detach(struct ath_ratectrl *arc)
 }
 EXPORT_SYMBOL(ath_rate_detach);
 
-int
+static int
 read_rate_stats(struct ieee80211_node *ni, int size, char *buf, int space)
 {
 	struct ath_node *an = ATH_NODE(ni);

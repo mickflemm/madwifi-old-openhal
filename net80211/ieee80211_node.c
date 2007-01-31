@@ -1021,7 +1021,7 @@ ieee80211_dup_bss(struct ieee80211_node_table *nt, const u_int8_t *macaddr)
 	return ni;
 }
 
-struct ieee80211_node *
+static struct ieee80211_node *
 ieee80211_add_wds_node(struct ieee80211_node_table *nt
 		, const u_int8_t *macaddr, struct net_device *dev)
 {
@@ -1039,7 +1039,7 @@ ieee80211_add_wds_node(struct ieee80211_node_table *nt
 EXPORT_SYMBOL(ieee80211_add_wds_node);
 
 
-int
+static int
 ieee80211_del_wds_node(struct ieee80211_node_table *nt
 		, const u_int8_t *macaddr)
 {

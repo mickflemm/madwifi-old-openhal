@@ -170,7 +170,7 @@ ieee80211_notify_node_join(struct ieee80211com *ic, struct ieee80211_node *ni, i
 	}
 }
 
-void
+static void
 ieee80211_notify_traffic_statistic(struct ieee80211com *ic,
 	struct ieee80211_node *ni)
 {

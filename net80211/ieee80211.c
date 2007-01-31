@@ -67,7 +67,7 @@ SLIST_HEAD(ieee80211_list, ieee80211com);
 static struct ieee80211_list ieee80211_list =
 	SLIST_HEAD_INITIALIZER(ieee80211_list);
 static u_int8_t ieee80211_vapmap[32];		// enough for 256
-DECLARE_MUTEX(ieee80211_vap_mtx);
+static DECLARE_MUTEX(ieee80211_vap_mtx);
 
 static void
 ieee80211_add_vap(struct ieee80211com *ic)

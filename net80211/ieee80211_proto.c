@@ -66,6 +66,7 @@ const char *ieee80211_mgt_subtype_name[] = {
 	"deauth",	"reserved#13",	"reserved#14",	"reserved#15"
 };
 EXPORT_SYMBOL(ieee80211_mgt_subtype_name);
+#if 0
 const char *ieee80211_ctl_subtype_name[] = {
 	"reserved#0",	"reserved#1",	"reserved#2",	"reserved#3",
 	"reserved#3",	"reserved#5",	"reserved#6",	"reserved#7",
@@ -73,6 +74,7 @@ const char *ieee80211_ctl_subtype_name[] = {
 	"cts",		"ack",		"cf_end",	"cf_end_ack"
 };
 EXPORT_SYMBOL(ieee80211_ctl_subtype_name);
+#endif
 const char *ieee80211_state_name[IEEE80211_S_MAX] = {
 	"INIT",		/* IEEE80211_S_INIT */
 	"SCAN",		/* IEEE80211_S_SCAN */
@@ -313,11 +315,11 @@ ieee80211_dump_pkt(const u_int8_t *buf, int len, int rate, int rssi)
 		break;
 	}
 	if (wh->i_fc[1] & IEEE80211_FC1_WEP) {
-		int i;
+		int off;
 		printf(" WEP [IV");
-		for (i = 0; i < IEEE80211_WEP_IVLEN; i++)
-			printf(" %.02x", buf[sizeof(*wh)+i]);
-		printf(" KID %u]", buf[sizeof(*wh)+i] >> 6);
+		for (off = 0; off < IEEE80211_WEP_IVLEN; off++)
+			printf(" %.02x", buf[sizeof(*wh)+off]);
+		printf(" KID %u]", buf[sizeof(*wh)+off] >> 6);
 	}
 	if (rate >= 0)
 		printf(" %dM", rate / 2);

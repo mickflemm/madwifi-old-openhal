@@ -86,7 +86,6 @@ __FBSDID("$FreeBSD: src/sys/dev/ath/if_ath.c,v 1.76 2005/01/24 20:31:24 sam Exp 
 #ifdef ATH_AHB		/* AHB BUS */
 #include "if_ath_ahb.h"
 #endif			/* AHB BUS */
-extern	void bus_read_cachesize(struct ath_softc *sc, u_int8_t *csz);
 
 /* unaligned little endian access */
 #define LE_READ_2(p)							\
@@ -6089,8 +6088,6 @@ bad:
 		kfree(outdata);
 	return error;
 }
-
-extern	int ath_ioctl_ethtool(struct ath_softc *sc, int cmd, void *addr);
 
 static int
 ath_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)

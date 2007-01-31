@@ -395,6 +395,8 @@ irqreturn_t ath_intr(int, void *);
 #else 
 irqreturn_t ath_intr(int, void *, struct pt_regs *regs); 
 #endif 
+void bus_read_cachesize(struct ath_softc *, u_int8_t *);
+int ath_ioctl_ethtool(struct ath_softc *, int, void __user *);
 void	ath_sysctl_register(void);
 void	ath_sysctl_unregister(void);
 
