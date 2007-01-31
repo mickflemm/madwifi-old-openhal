@@ -125,7 +125,7 @@ struct ieee80211_node {
 	/* beacon, probe response */
 	union {
 		u_int8_t	data[8];
-		u_int64_t	tsf;
+		__le64		tsf;
 	} ni_tstamp;				/* from last rcv'd beacon */
 	u_int16_t		ni_intval;	/* beacon interval */
 	u_int16_t		ni_capinfo;	/* capabilities */
