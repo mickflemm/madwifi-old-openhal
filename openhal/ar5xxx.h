@@ -2053,7 +2053,7 @@ struct ath_hal {
 	/*
 	 * Function pointers
 	 */
-	AR5K_HAL_FUNCTIONS(, ah, *);
+	AR5K_HAL_FUNCTIONS(, ah, *)
 
 };
 
