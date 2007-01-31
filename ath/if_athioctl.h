@@ -116,8 +116,8 @@ struct ath_diag {
 #define	ATH_DIAG_OUT	0x0000		/* copy out results (always) */
 #define	ATH_DIAG_ID	0x0fff
 	u_int16_t ad_in_size;		/* pack to fit, yech */
-	caddr_t	ad_in_data;
-	caddr_t	ad_out_data;
+	void __user *ad_in_data;
+	void __user *ad_out_data;
 	u_int	ad_out_size;
 
 };
