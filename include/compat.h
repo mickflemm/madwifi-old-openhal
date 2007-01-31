@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2002-2004 Sam Leffler, Errno Consulting
+ * Copyright (c) 2002-2005 Sam Leffler, Errno Consulting
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,27 @@
  */
 #ifndef _ATH_COMPAT_H_
 #define _ATH_COMPAT_H_
+
+/* Compatibility with older Linux kernels */
+#ifdef __KERNEL__
+#include <linux/types.h>
+#ifndef __bitwise
+#define __le16 u_int16_t
+#define __le32 u_int32_t
+#define __le64 u_int64_t
+#define __be16 u_int16_t
+#define __be32 u_int32_t
+#define __be64 u_int64_t
+#define __force
+#endif
+#endif
+
+#ifndef container_of
+#define container_of(ptr, type, member) ({			\
+        const typeof( ((type *)0)->member ) *__mptr = (ptr);	\
+        (type *)( (char *)__mptr - offsetof(type,member) );})
+#endif
+
 /*
  * BSD/Linux compatibility shims.  These are used mainly to
  * minimize differences when importing necesary BSD code.
@@ -60,6 +81,7 @@
 #define	__packed	__attribute__((__packed__))
 #define	__printflike(_a,_b) \
 	__attribute__ ((__format__ (__printf__, _a, _b)))
+#define	__offsetof(t,m)	offsetof(t,m)
 
 #ifndef ALIGNED_POINTER
 /*
@@ -73,8 +95,6 @@
 #endif
 
 #ifdef __KERNEL__
-#include <asm/page.h>
-
 #define	KASSERT(exp, msg) do {			\
 	if (unlikely(!(exp))) {			\
 		printk msg;			\
