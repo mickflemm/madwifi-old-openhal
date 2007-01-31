@@ -583,11 +583,11 @@ ieee80211_ioctl_siwfrag(struct ieee80211com *ic,
 	u16 val;
 
 	if (rts->disabled)
-		val = __constant_cpu_to_le16(2346);
+		val = 2346;
 	else if (rts->value < 256 || rts->value > 2346)
 		return -EINVAL;
 	else
-		val = __cpu_to_le16(rts->value & ~0x1); /* even numbers only */
+		val = rts->value & ~0x1; /* even numbers only */
 	if (val != ic->ic_fragthreshold) {
 		ic->ic_fragthreshold = val;
 		if (IS_UP(ic->ic_dev))
