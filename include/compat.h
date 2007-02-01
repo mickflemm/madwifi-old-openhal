@@ -50,6 +50,9 @@
 #define __be64 u_int64_t
 #define __force
 #endif
+#else
+#include <sys/types.h>
+#include <linux/types.h>
 #endif
 
 #ifndef container_of
