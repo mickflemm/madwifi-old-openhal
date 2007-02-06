@@ -39,7 +39,9 @@
 #define _ATH_COMPAT_H_
 
 /* Compatibility with older Linux kernels */
-#ifdef __KERNEL__
+#ifndef __KERNEL__
+#include <sys/types.h>
+#endif
 #include <linux/types.h>
 #ifndef __bitwise
 #define __le16 u_int16_t
@@ -49,10 +51,6 @@
 #define __be32 u_int32_t
 #define __be64 u_int64_t
 #define __force
-#endif
-#else
-#include <sys/types.h>
-#include <linux/types.h>
 #endif
 
 #ifndef container_of
