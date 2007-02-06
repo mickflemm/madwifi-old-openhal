@@ -39,10 +39,9 @@
 #define _ATH_COMPAT_H_
 
 /* Compatibility with older Linux kernels */
-#ifndef __KERNEL__
-#include <sys/types.h>
-#endif
+#ifdef __KERNEL__
 #include <linux/types.h>
+#endif
 #ifndef __bitwise
 #define __le16 u_int16_t
 #define __le32 u_int32_t
