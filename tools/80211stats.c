@@ -51,6 +51,8 @@
 #include <signal.h>
 #include <err.h>
 
+#include <include/compat.h>
+
 #include "wireless_copy.h"
 #include "net80211/_ieee80211.h"
 #include "net80211/ieee80211.h"

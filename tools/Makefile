@@ -44,15 +44,13 @@ ifeq ($(HAL),)
 HAL=   $(TOP)/openhal
 endif
 
-INCS=  -include $(TOP)/include/compat.h
-
 
 ALL_INSTALL=	athstats 80211stats athdebug 80211debug
 ALL=	$(ALL_INSTALL) athkey athchans athctrl
 
 all:	$(ALL)
 
-INCS+=	-I. -I$(HAL) -I$(TOP)
+INCS=	-I. -I$(HAL) -I$(TOP)
 CFLAGS=	-g -O2 -Wall
 ALL_CFLAGS= $(CFLAGS) $(INCS)
 LDFLAGS=
