@@ -58,6 +58,7 @@ __FBSDID("$FreeBSD: src/sys/dev/ath/if_ath.c,v 1.76 2005/01/24 20:31:24 sam Exp 
 #include <linux/sysctl.h>
 #include <linux/proc_fs.h>
 #include <linux/if_arp.h>
+#include <net/iw_handler.h>
 
 #include <asm/uaccess.h>
 
@@ -564,7 +565,7 @@ ath_attach(u_int16_t devid, struct net_device *dev)
  	dev->change_mtu = &ath_change_mtu;
 	dev->tx_queue_len = ATH_TXBUF;			/* TODO? 1 for mgmt frame */
 /*get_wireless_stats moved from net_device to iw_handler_def*/
-# if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,10)
+# if IW_HANDLER_VERSION < 7
 	dev->get_wireless_stats = ath_iw_getstats;
 # endif
 	ieee80211_ioctl_iwsetup(&ath_iw_handler_def);
@@ -5779,7 +5780,6 @@ ath_iw_getstats(struct net_device *dev)
 	return &sc->sc_iwstats;
 }
 
-#include <net/iw_handler.h>
 /*
  * Bounce functions to get to the 802.11 code. These are
  * necessary for now because wireless extensions operations
@@ -5964,7 +5964,7 @@ static const iw_handler ath_priv_handlers[] = {
 static struct iw_handler_def ath_iw_handler_def = {
 #define	N(a)	(sizeof (a) / sizeof (a[0]))
 /*get_wireless_stats moved from net_device to iw_handler_def*/
-# if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,10)
+# if IW_HANDLER_VERSION >= 7
 	.get_wireless_stats	= ath_iw_getstats,
 # endif
 	.standard		= (iw_handler *) ath_handlers,
