@@ -386,7 +386,6 @@ int	ath_attach(u_int16_t, struct net_device *);
 int	ath_detach(struct net_device *);
 void	ath_resume(struct net_device *);
 void	ath_suspend(struct net_device *);
-void	ath_shutdown(struct net_device *);
 /*
  *Port r1752 - Starting linux kernel v2.6.19 and later 
  *interrupt handlers are not passed.

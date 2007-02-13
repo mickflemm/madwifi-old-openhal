@@ -801,18 +801,6 @@ ath_resume(struct net_device *dev)
 	}
 }
 
-void
-ath_shutdown(struct net_device *dev)
-{
-#ifdef AR_DEBUG
-	struct ath_softc *sc = dev->priv;
-#endif
-
-	DPRINTF(sc, ATH_DEBUG_ANY, "%s: flags %x\n", __func__, dev->flags);
-
-	ath_stop(dev);
-}
-
 /*
  * Interrupt handler.  Most of the actual processing is deferred.
  */
