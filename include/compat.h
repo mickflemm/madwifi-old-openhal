@@ -78,7 +78,10 @@
 #define	isset(a,i)	((a)[(i)/NBBY] & (1<<((i)%NBBY)))
 #define	isclr(a,i)	(((a)[(i)/NBBY] & (1<<((i)%NBBY))) == 0)
 
+#ifndef __packed
 #define	__packed	__attribute__((__packed__))
+#endif
+
 #define	__printflike(_a,_b) \
 	__attribute__ ((__format__ (__printf__, _a, _b)))
 #define	__offsetof(t,m)	offsetof(t,m)
