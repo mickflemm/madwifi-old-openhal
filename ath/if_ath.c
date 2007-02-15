@@ -88,6 +88,8 @@ __FBSDID("$FreeBSD: src/sys/dev/ath/if_ath.c,v 1.76 2005/01/24 20:31:24 sam Exp 
 #include "if_ath_ahb.h"
 #endif			/* AHB BUS */
 
+#include "ath_hw.h"
+
 /* unaligned little endian access */
 #define LE_READ_2(p)							\
 	((u_int16_t)							\
@@ -804,8 +806,6 @@ ath_resume(struct net_device *dev)
 /*
  * Interrupt handler.  Most of the actual processing is deferred.
  */
-#define pending_interrupt \
-(AR5K_REG_READ(0x4008) == 1)?TRUE:FALSE
 
 /*
  *Port r1752 - Starting linux kernel v2.6.19 and later 
@@ -820,7 +820,7 @@ ath_intr(int irq, void *dev_id, struct pt_regs *regs)
 {
 	struct net_device *dev = dev_id;
 	struct ath_softc *sc = dev->priv;
-	struct ath_hal *hal = sc->sc_ah;
+	struct ath_hal *ah = sc->sc_ah;
 	AR5K_INT status;
 	int needmark;
 
@@ -832,13 +832,13 @@ ath_intr(int irq, void *dev_id, struct pt_regs *regs)
 		DPRINTF(sc, ATH_DEBUG_ANY, "%s: invalid; ignored\n", __func__);
 		return IRQ_NONE;
 	}
-	if (!pending_interrupt)		/* shared irq, not for us */
+	if (!ath_hw_irq_pending(ah))		/* shared irq, not for us */
 		return IRQ_NONE;
 	if ((dev->flags & (IFF_RUNNING|IFF_UP)) != (IFF_RUNNING|IFF_UP)) {
 		DPRINTF(sc, ATH_DEBUG_ANY, "%s: if_flags 0x%x\n",
 			__func__, dev->flags);
-		ath_hal_getisr(hal, &status);	/* clear ISR */
-		ath_hal_intrset(hal, 0);		/* disable further intr's */
+		ath_hal_getisr(ah, &status);	/* clear ISR */
+		ath_hal_intrset(ah, 0);		/* disable further intr's */
 		return IRQ_HANDLED;
 	}
 	needmark = 0;
@@ -850,7 +850,7 @@ ath_intr(int irq, void *dev_id, struct pt_regs *regs)
 		* bits we haven't explicitly enabled so we mask the
 		* value to insure we only process bits we requested.
 		*/
-		ath_hal_getisr(hal, &status);		/* NB: clears ISR too */
+		ath_hal_getisr(ah, &status);		/* NB: clears ISR too */
 		DPRINTF(sc, ATH_DEBUG_INTR, "%s: status 0x%x\n", __func__, status);
 		status &= sc->sc_imask;			/* discard unasked for bits */
 		if (status & AR5K_INT_FATAL) {
@@ -861,11 +861,11 @@ ath_intr(int irq, void *dev_id, struct pt_regs *regs)
 			* by the hal.
 			*/
 			sc->sc_stats.ast_hardware++;
-			ath_hal_intrset(hal, 0);		/* disable intr's until reset */
+			ath_hal_intrset(ah, 0);		/* disable intr's until reset */
 			ATH_SCHEDULE_TQUEUE(&sc->sc_fataltq, &needmark);
 		} else if (status & AR5K_INT_RXORN) {
 			sc->sc_stats.ast_rxorn++;
-			ath_hal_intrset(hal, 0);		/* disable intr's until reset */
+			ath_hal_intrset(ah, 0);		/* disable intr's until reset */
 			ATH_SCHEDULE_TQUEUE(&sc->sc_rxorntq, &needmark);
 		} else {
 			if (status & AR5K_INT_SWBA) {
@@ -889,7 +889,7 @@ ath_intr(int irq, void *dev_id, struct pt_regs *regs)
 			if (status & AR5K_INT_TXURN) {
 				sc->sc_stats.ast_txurn++;
 				/* bump tx trigger level */
-				ath_hal_updatetxtriglevel(hal, TRUE);
+				ath_hal_updatetxtriglevel(ah, TRUE);
 			}
 			if (status & AR5K_INT_RX)
 				ATH_SCHEDULE_TQUEUE(&sc->sc_rxtq, &needmark);
@@ -905,23 +905,22 @@ ath_intr(int irq, void *dev_id, struct pt_regs *regs)
 				* Disable interrupts until we service the MIB
 				* interrupt; otherwise it will continue to fire.
 				*/
-				ath_hal_intrset(hal, 0);
+				ath_hal_intrset(ah, 0);
 				/*
 				* Let the hal handle the event.  We assume it will
 				* clear whatever condition caused the interrupt.
 				*/
-				ath_hal_mibevent(hal,
+				ath_hal_mibevent(ah,
 					&ATH_NODE(sc->sc_ic.ic_bss)->an_halstats);
-				ath_hal_intrset(hal, sc->sc_imask);
+				ath_hal_intrset(ah, sc->sc_imask);
 			}
 		}
-	} while (pending_interrupt);
+	} while (ath_hal_intrpend(ah));
 	
 	if (needmark) {
 	    mark_bh(IMMEDIATE_BH);
 	}
 	return IRQ_HANDLED;
-#undef pending_interrupt
 }
 
 static void
