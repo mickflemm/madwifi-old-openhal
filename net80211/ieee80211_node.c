@@ -394,7 +394,7 @@ ieee80211_create_ibss(struct ieee80211com* ic, struct ieee80211_channel *chan)
 	 * are long-lived associations.
 	 */
 	nt = &ic->ic_sta;
-	IEEE80211_NODE_LOCK(nt);
+	IEEE80211_NODE_LOCK_BH(nt);
 	if (ic->ic_opmode == IEEE80211_M_HOSTAP) {
 		nt->nt_name = "station";
 		nt->nt_inact_init = ic->ic_inact_init;
@@ -402,7 +402,7 @@ ieee80211_create_ibss(struct ieee80211com* ic, struct ieee80211_channel *chan)
 		nt->nt_name = "neighbor";
 		nt->nt_inact_init = ic->ic_inact_run;
 	}
-	IEEE80211_NODE_UNLOCK(nt);
+	IEEE80211_NODE_UNLOCK_BH(nt);
 
 	ni = ieee80211_alloc_node(nt, ic->ic_myaddr);
 	if (ni == NULL) {
@@ -816,10 +816,10 @@ ieee80211_sta_join(struct ieee80211com *ic, struct ieee80211_node *selbs)
 		 * XXX ic_sta always setup so this is unnecessary?
 		 */
 		nt = &ic->ic_sta;
-		IEEE80211_NODE_LOCK(nt);
+		IEEE80211_NODE_LOCK_BH(nt);
 		nt->nt_name = "neighbor";
 		nt->nt_inact_init = ic->ic_inact_run;
-		IEEE80211_NODE_UNLOCK(nt);
+		IEEE80211_NODE_UNLOCK_BH(nt);
 	}
 
 	/*
@@ -1459,9 +1459,9 @@ static void
 ieee80211_free_allnodes(struct ieee80211_node_table *nt)
 {
 
-	IEEE80211_NODE_LOCK(nt);
+	IEEE80211_NODE_LOCK_BH(nt);
 	ieee80211_free_allnodes_locked(nt);
-	IEEE80211_NODE_UNLOCK(nt);
+	IEEE80211_NODE_UNLOCK_BH(nt);
 }
 
 /*
@@ -1517,7 +1517,7 @@ ieee80211_timeout_stations(struct ieee80211_node_table *nt)
 	IEEE80211_DPRINTF(ic, IEEE80211_MSG_NODE,
 		"%s: %s scangen %u\n", __func__, nt->nt_name, gen);
 restart:
-	IEEE80211_NODE_LOCK(nt);
+	IEEE80211_NODE_LOCK_BH(nt);
 	TAILQ_FOREACH(ni, &nt->nt_node, ni_list) {
 		if (ni->ni_scangen == gen)	/* previously handled */
 			continue;
@@ -1599,7 +1599,7 @@ IEEE80211_DPRINTF(ic, IEEE80211_MSG_POWER, "[%s] discard frame, age %u\n", ether
 				IEEE80211_DPRINTF(ic, IEEE80211_MSG_NODE,
 				    "[%s] probe station due to inactivity\n",
 				    ether_sprintf(ni->ni_macaddr));
-				IEEE80211_NODE_UNLOCK(nt);
+				IEEE80211_NODE_UNLOCK_BH(nt);
 				ieee80211_send_nulldata(ni);
 				/* XXX stat? */
 				goto restart;
@@ -1625,7 +1625,7 @@ IEEE80211_DPRINTF(ic, IEEE80211_MSG_POWER, "[%s] discard frame, age %u\n", ether
 			 * in case the driver takes a lock, as this will result
 			 * in  LOR between the node lock and the driver lock.
 			 */
-			IEEE80211_NODE_UNLOCK(nt);
+			IEEE80211_NODE_UNLOCK_BH(nt);
 			if (ni->ni_associd != 0) {
 				IEEE80211_SEND_MGMT(ic, ni,
 				    IEEE80211_FC0_SUBTYPE_DEAUTH,
@@ -1636,7 +1636,7 @@ IEEE80211_DPRINTF(ic, IEEE80211_MSG_POWER, "[%s] discard frame, age %u\n", ether
 			goto restart;
 		}
 	}
-	IEEE80211_NODE_UNLOCK(nt);
+	IEEE80211_NODE_UNLOCK_BH(nt);
 
 	IEEE80211_SCAN_UNLOCK(nt);
 
@@ -1649,7 +1649,7 @@ ieee80211_iterate_nodes(struct ieee80211_node_table *nt, ieee80211_iter_func *f,
 	struct ieee80211_node *ni;
 	u_int gen;
 
-	IEEE80211_SCAN_LOCK(nt);
+	IEEE80211_SCAN_LOCK_BH(nt);
 	gen = nt->nt_scangen++;
 restart:
 	IEEE80211_NODE_LOCK(nt);
@@ -1665,7 +1665,7 @@ restart:
 	}
 	IEEE80211_NODE_UNLOCK(nt);
 
-	IEEE80211_SCAN_UNLOCK(nt);
+	IEEE80211_SCAN_UNLOCK_BH(nt);
 }
 EXPORT_SYMBOL(ieee80211_iterate_nodes);
 
@@ -2048,10 +2048,10 @@ ieee80211_node_table_reset(struct ieee80211_node_table *nt)
 	IEEE80211_DPRINTF(nt->nt_ic, IEEE80211_MSG_NODE,
 		"%s %s table\n", __func__, nt->nt_name);
 
-	IEEE80211_NODE_LOCK(nt);
+	IEEE80211_NODE_LOCK_BH(nt);
 	nt->nt_inact_timer = 0;
 	ieee80211_free_allnodes_locked(nt);
-	IEEE80211_NODE_UNLOCK(nt);
+	IEEE80211_NODE_UNLOCK_BH(nt);
 }
 
 static void
