@@ -42,7 +42,7 @@
 #ifdef __KERNEL__
 #include <linux/types.h>
 #endif
-#ifndef __bitwise
+#if !defined(__KERNEL__) || !defined (__bitwise)
 #define __le16 u_int16_t
 #define __le32 u_int32_t
 #define __le64 u_int64_t
