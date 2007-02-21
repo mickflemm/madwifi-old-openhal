@@ -6567,7 +6567,7 @@ ath_dynamic_sysctl_register(struct ath_softc *sc)
 			sc->sc_sysctls[i].extra1 = sc;
 
 	/* and register everything */
-	sc->sc_sysctl_header = register_sysctl_table(sc->sc_sysctls, 1);
+	sc->sc_sysctl_header = ATH_REGISTER_SYSCTL_TABLE(sc->sc_sysctls);
 	if (!sc->sc_sysctl_header) {
 		printk("%s: failed to register sysctls!\n", sc->sc_dev.name);
 		kfree(sc->sc_sysctls);
@@ -6736,7 +6736,7 @@ ath_sysctl_register(void)
 
 	if (!initialized) {
 		ath_sysctl_header =
-			register_sysctl_table(ath_root_table, 1);
+			ATH_REGISTER_SYSCTL_TABLE(ath_root_table);
 		initialized = 1;
 	}
 }

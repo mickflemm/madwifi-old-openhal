@@ -533,7 +533,7 @@ ieee80211_sysctl_register(struct ieee80211com *ic)
 			ic->ic_sysctls[i].extra1 = ic;
 
 	/* and register everything */
-	ic->ic_sysctl_header = register_sysctl_table(ic->ic_sysctls, 1);
+	ic->ic_sysctl_header = ATH_REGISTER_SYSCTL_TABLE(ic->ic_sysctls);
 	if (!ic->ic_sysctl_header) {
 		printk("%s: failed to register sysctls!\n", ic->ic_procname);
 		kfree(ic->ic_sysctls);

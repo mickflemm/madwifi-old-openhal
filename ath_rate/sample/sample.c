@@ -1006,7 +1006,7 @@ ath_rate_dynamic_sysctl_register(struct ath_softc *sc)
 			ssc->sysctls[i].extra1 = sc;
 
 	/* and register everything */
-	ssc->sysctl_header = register_sysctl_table(ssc->sysctls, 1);
+	ssc->sysctl_header = ATH_REGISTER_SYSCTL_TABLE(ssc->sysctls);
 	if (!ssc->sysctl_header) {
 		printk("%s: failed to register sysctls for %s!\n", dev_info, 
 		       sc->sc_dev.name);
@@ -1090,7 +1090,7 @@ init_ath_rate_sample(void)
 {
 	printk(KERN_INFO "%s: %s\n", dev_info, version);
 
-	ath_sysctl_header = register_sysctl_table(ath_root_table, 1);
+	ath_sysctl_header = ATH_REGISTER_SYSCTL_TABLE(ath_root_table);
 	return (0);
 }
 module_init(init_ath_rate_sample);
