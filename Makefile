@@ -76,7 +76,7 @@ svnversion.h:
 	else \
 		touch $@.tmp; \
 	fi; \
-	diff $@ $@.tmp >/dev/null >&2 || cp -f $@.tmp $@; rm -f $@.tmp
+	diff $@ $@.tmp >/dev/null 2>&1 || cp -f $@.tmp $@; rm -f $@.tmp
 
 # conflicts with the 'tools' subdirectory
 .PHONY: tools
