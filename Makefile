@@ -69,13 +69,14 @@ endif
 svnversion.h:
 	@if [ -d .svn ]; then \
 		ver=`svnversion -nc . | sed -e 's/^[^:]*://;s/[A-Za-z]//'`; \
-		echo "#define SVNVERSION \"svn r$$ver\"" > $@; \
+		echo "#define SVNVERSION \"svn r$$ver\"" > $@.tmp; \
 	elif [ -s SNAPSHOT ]; then \
 		ver=`sed -e '/^Revision: */!d;s///;q' SNAPSHOT`; \
-		echo "#define SVNVERSION \"svn r$$ver\"" > $@; \
+		echo "#define SVNVERSION \"svn r$$ver\"" > $@.tmp; \
 	else \
-		touch svnversion.h; \
+		touch $@.tmp; \
 	fi; \
+	diff $@ $@.tmp >/dev/null >&2 || cp -f $@.tmp $@; rm -f $@.tmp
 
 # conflicts with the 'tools' subdirectory
 .PHONY: tools
