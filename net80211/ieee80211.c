@@ -50,7 +50,6 @@ __KERNEL_RCSID(0, "$NetBSD: ieee80211.c,v 1.7 2003/10/16 22:25:00 matt Exp $");
 #include "if_media.h"
 
 #include <net80211/ieee80211_var.h>
-#include <net80211/ieee80211_dot1x.h>
 
 const char *ieee80211_phymode_name[] = {
 	"auto",		/* IEEE80211_MODE_AUTO */

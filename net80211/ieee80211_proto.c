@@ -51,7 +51,6 @@ __KERNEL_RCSID(0, "$NetBSD: ieee80211_proto.c,v 1.5 2003/10/13 04:23:56 dyoung E
 #include "if_media.h"
 
 #include <net80211/ieee80211_var.h>
-#include <net80211/ieee80211_dot1x.h>
 
 /* XXX tunables */
 #define	AGGRESSIVE_MODE_SWITCH_HYSTERESIS	3	/* pkts / 100ms */
