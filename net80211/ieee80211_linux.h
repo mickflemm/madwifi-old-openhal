@@ -351,12 +351,6 @@ get_jiffies_64(void)
 #error "Please fix asm/byteorder.h"
 #endif
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,9)
-#define __user
-#define __kernel
-#define __iomem
-#endif
-
 
 /*
  * Deal with the sysctl handler api changing.
