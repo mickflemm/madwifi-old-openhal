@@ -94,7 +94,7 @@ install-modules:
 		$(MAKE) -C $$i install || exit 1; \
 	done
 ifeq ($(DESTDIR),)
-	(export KMODPATH=$(KMODPATH); /sbin/depmod -ae)
+	(export KMODPATH=$(KMODPATH); /sbin/depmod -ae $(KERNELRELEASE))
 endif
 
 install-tools:
