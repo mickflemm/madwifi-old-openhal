@@ -141,7 +141,7 @@ void
 ieee80211_vlan_kill_vid(struct ieee80211com *ic, unsigned short vid)
 {
 	if (ic->ic_vlgrp)
-		ic->ic_vlgrp->vlan_devices[vid] = NULL;
+		vlan_group_set_device(ic->ic_vlgrp, vid, NULL);
 }
 EXPORT_SYMBOL(ieee80211_vlan_kill_vid);
 #endif /* IEEE80211_VLAN_TAG_USED */
