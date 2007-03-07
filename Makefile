@@ -169,7 +169,7 @@ ifeq ($(strip $(BUS)),PCI)
 endif
 	
 	@# check wireless extensions support is enabled
-	@if [ -z "$(CONFIG_NET_RADIO)" ]; then \
+	@if [ -z "$(CONFIG_NET_RADIO)$(CONFIG_WIRELESS_EXT)" ]; then \
 	    echo "FAILED"; \
 	    echo "Please enable wireless extensions."; \
 	    exit 1; \
