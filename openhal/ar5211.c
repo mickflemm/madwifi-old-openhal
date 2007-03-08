@@ -714,8 +714,8 @@ ar5k_ar5211_set_opmode(struct ath_hal *hal)
 	/*
 	 * Set PCU registers
 	 */
-	low_id = le32_to_cpu(*(__le32 *)hal->ah_sta_id);
-	high_id = le16_to_cpu(*(__le16 *)(hal->ah_sta_id + 4));
+	low_id = AR5K_LOW_ID(hal->ah_sta_id);
+	high_id = AR5K_HIGH_ID(hal->ah_sta_id);
 	AR5K_REG_WRITE(AR5K_AR5211_STA_ID0, low_id);
 	AR5K_REG_WRITE(AR5K_AR5211_STA_ID1, pcu_reg | high_id);
 
@@ -1635,8 +1635,8 @@ ar5k_ar5211_set_lladdr(struct ath_hal *hal, const u_int8_t *mac)
 	/* Set new station ID */
 	bcopy(mac, hal->ah_sta_id, IEEE80211_ADDR_LEN);
 
-	low_id = le32_to_cpu(*(__le32 *)mac);
-	high_id = le16_to_cpu(*(__le16 *)(mac + 4));
+	low_id = AR5K_LOW_ID(mac);
+	high_id = AR5K_HIGH_ID(mac);
 
 	AR5K_REG_WRITE(AR5K_AR5211_STA_ID0, low_id);
 	AR5K_REG_WRITE(AR5K_AR5211_STA_ID1, high_id);
@@ -1711,8 +1711,8 @@ ar5k_ar5211_set_associd(struct ath_hal *hal, const u_int8_t *bssid,
 	/*
 	 * Set BSSID which triggers the "SME Join" operation
 	 */
-	low_id = le32_to_cpu(*(__le32 *)bssid);
-	high_id = le16_to_cpu(*(__le16 *)(bssid + 4));
+	low_id = AR5K_LOW_ID(bssid);
+	high_id = AR5K_HIGH_ID(bssid);
 	AR5K_REG_WRITE(AR5K_AR5211_BSS_ID0, low_id);
 	AR5K_REG_WRITE(AR5K_AR5211_BSS_ID1, high_id |
 	    ((assoc_id & 0x3fff) << AR5K_AR5211_BSS_ID1_AID_S));
@@ -2115,8 +2115,8 @@ ar5k_ar5211_set_key_lladdr(struct ath_hal *hal, u_int16_t entry,
 	/* MAC may be NULL if it's a broadcast key */
 	mac_v = mac == NULL ? etherbroadcastaddr : mac;
 
-	low_id = le32_to_cpu(*(__le32 *)mac_v);
-	high_id = le16_to_cpu(*(__le16 *)(mac_v + 4));
+	low_id = AR5K_LOW_ID(mac_v);
+	high_id = AR5K_HIGH_ID(mac_v);
 	high_id |= AR5K_AR5211_KEYTABLE_VALID;
 
 	AR5K_REG_WRITE(AR5K_AR5211_KEYTABLE_MAC0(entry), low_id);

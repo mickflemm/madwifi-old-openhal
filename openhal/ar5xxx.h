@@ -1242,6 +1242,11 @@ struct ar5k_eeprom_info {
 	(AR5K_INIT_TIM_OFFSET << 16) | (AR5K_INIT_BEACON_PERIOD)	\
 )
 
+#define AR5K_LOW_ID(_a)		(					\
+	(_a)[0] | (_a)[1] << 8 | (_a)[2] << 16 | (_a)[3] << 24		\
+)
+#define AR5K_HIGH_ID(_a)	((_a)[4] | (_a)[5] << 8)
+
 /*
  * Non - common initial register values
  */
