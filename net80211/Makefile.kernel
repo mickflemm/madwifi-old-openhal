@@ -29,7 +29,7 @@ MOD_AUTH	:= wlan_xauth.o
 obj-$(CONFIG_ATHEROS) += wlan.o wlan_wep.o wlan_tkip.o wlan_ccmp.o wlan_acl.o \
 		   $(MOD_AUTH)
 
-wlan-objs	:= if_media.o rc4.o \
+wlan-objs	:= if_media.o \
 		   ieee80211.o ieee80211_crypto.o \
 		   ieee80211_crypto_none.o ieee80211_input.o ieee80211_node.o \
 		   ieee80211_output.o ieee80211_proto.o \
@@ -41,7 +41,7 @@ wlan_xauth-objs	:= ieee80211_xauth.o
 wlan_acl-objs	:= ieee80211_acl.o
 
 ifeq ($(VERSION).$(PATCHLEVEL),2.4)
-export-objs	:= if_media.o rc4.o \
+export-objs	:= if_media.o \
 		   ieee80211.o ieee80211_crypto.o \
 		   ieee80211_crypto_none.o ieee80211_input.o ieee80211_node.o \
 		   ieee80211_output.o ieee80211_proto.o \
