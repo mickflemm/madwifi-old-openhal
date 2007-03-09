@@ -622,7 +622,7 @@ void
 ieee80211_end_scan(struct ieee80211com *ic)
 {
 	struct ieee80211_node_table *nt = &ic->ic_scan;
-	struct ieee80211_node *ni, *selbs;
+	struct ieee80211_node *ni, *selbs, *tni;
 	ic->ic_flags &= ~IEEE80211_F_SSCAN;
 
 	ic->ic_scan.nt_scangen++;
@@ -711,7 +711,7 @@ ieee80211_end_scan(struct ieee80211com *ic)
 	IEEE80211_DPRINTF(ic, IEEE80211_MSG_SCAN, "\t%s\n",
 	    "macaddr          bssid         chan  rssi rate flag  wep  essid");
 	IEEE80211_NODE_LOCK(nt);
-	TAILQ_FOREACH(ni, &nt->nt_node, ni_list) {
+	TAILQ_FOREACH_SAFE(ni, &nt->nt_node, ni_list, tni) {
 		if (ni->ni_fails) {
 			/*
 			 * The configuration of the access points may change
