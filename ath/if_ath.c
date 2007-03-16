@@ -3008,6 +3008,7 @@ ath_desc_alloc(struct ath_softc *sc)
 	/* allocate descriptors */
 	sc->sc_desc_len = sizeof(struct ath_desc) *
 				(ATH_TXBUF * ATH_TXDESC + ATH_RXBUF + ATH_BCBUF + 1);
+	barrier();	/* get_order() rounds down constants before Linux 2.6.21 */
 	sc->sc_desc = bus_alloc_consistent(sc->sc_bdev,
 				sc->sc_desc_len, &sc->sc_desc_daddr);
 	if (sc->sc_desc == NULL) {
