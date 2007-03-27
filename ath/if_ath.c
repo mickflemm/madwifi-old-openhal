@@ -1048,7 +1048,7 @@ ath_init(struct net_device *dev)
 	 * Change our interface type if we are in monitor mode.
 	 */
 	dev->type = (ic->ic_opmode == IEEE80211_M_MONITOR) ?
-		ARPHRD_IEEE80211_PRISM : ARPHRD_ETHER;
+		ARPHRD_IEEE80211_RADIOTAP : ARPHRD_ETHER;
 
 	/*
 	 * The basic interface to setting the hardware in a good
