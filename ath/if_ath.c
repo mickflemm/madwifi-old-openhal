@@ -352,11 +352,7 @@ ath_attach(u_int16_t devid, struct net_device *dev)
 	ATH_INIT_TQUEUE(&sc->sc_radartq,ath_radar_tasklet,	dev);
 	
 	/*
-	 * Attach the hal and verify ABI compatibility by checking
-	 * the hal's ABI signature against the one the driver was
-	 * compiled with.  A mismatch indicates the driver was
-	 * built with an ah.h that does not correspond to the hal
-	 * module loaded in the kernel.
+	 * Attach the hal
 	 */
 	ah = _ath_hal_attach(devid, sc, 0, sc->sc_iobase, &status);
 	if (ah == NULL) {
@@ -2293,7 +2289,7 @@ ath_calcrxfilter(struct ath_softc *sc, enum ieee80211_state state)
 	struct net_device *dev = ic->ic_dev;
 	u_int32_t rfilt;
 
-	rfilt = (ath_hal_getrxfilter(ah) & AR5K_RX_FILTER_PHYERR)
+	rfilt = (ath_hal_getrxfilter(ah) & AR5K_RX_FILTER_PHYERROR)
 	      | AR5K_RX_FILTER_UCAST | AR5K_RX_FILTER_BCAST | AR5K_RX_FILTER_MCAST | AR5K_RX_FILTER_PHYRADAR;
 	if (ic->ic_opmode != IEEE80211_M_STA && 
 	    ic->ic_opmode != IEEE80211_M_AHDEMO)
@@ -3776,7 +3772,7 @@ ath_rx_tasklet(TQUEUE_ARG data)
 			 * or in monitor mode if we ask for them.
 			 * we'll explicity drop them after capture.
 			 */
-			if (sc->sc_rxfilter & AR5K_RX_FILTER_PHYERR)
+			if (sc->sc_rxfilter & AR5K_RX_FILTER_PHYERROR)
 				goto rx_accept;
 
 			/*
