@@ -74,8 +74,8 @@ typedef u_int32_t AR5K_BUS_ADDR;
 #define bcopy(_a, _b, _c)       memcpy(_b, _a, _c)
 #define bzero(_a, _b)           memset(_a, 0, _b)
 
-#define AR5K_REG_WRITE(_reg, _val)      (writel(_val, hal->ah_sh + (_reg)))
+//#define AR5K_REG_WRITE(_reg, _val)      (writel(_val, hal->ah_sh + (_reg)))
 //      bus_space_write_4(hal->ah_st, hal->ah_sh, (_reg), (_val))
 
-#define AR5K_REG_READ(_reg)             (readl(hal->ah_sh + (_reg)))
+//#define AR5K_REG_READ(_reg)             (readl(hal->ah_sh + (_reg)))
 //      bus_space_read_4(hal->ah_st, hal->ah_sh, (_reg))

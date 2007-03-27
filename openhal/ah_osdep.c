@@ -41,7 +41,7 @@ static char *dev_info = "ath_hal";
 
 MODULE_AUTHOR("Nick Kossifidis");
 MODULE_DESCRIPTION("OpenHAL");
-MODULE_SUPPORTED_DEVICE("");
+MODULE_SUPPORTED_DEVICE("Atheros AR5xxx WLAN cards");
 #ifdef MODULE_LICENSE
 MODULE_LICENSE("Dual BSD/GPL");
 #endif
@@ -53,7 +53,7 @@ _ath_hal_attach(u_int16_t devid, AR5K_SOFTC sc,
                 AR5K_BUS_TAG t, AR5K_BUS_HANDLE h, void* s)
 {
         AR5K_STATUS status;
-        struct ath_hal *ah = ath_hal_attach(devid, sc, t, h, &status);
+        struct ath_hal *ah = ath5k_hw_init(devid, sc, t, h, &status);
 
         *(AR5K_STATUS *)s = status;
         if (ah)

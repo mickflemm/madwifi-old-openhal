@@ -20,7 +20,7 @@
  * Basic regulation domain extensions for the IEEE 802.11 stack
  */
 
-#include "ar5xxx.h"
+#include "ah_osdep.h"
 #include "ieee80211_regdomain.h"
 
 

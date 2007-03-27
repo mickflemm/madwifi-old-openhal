@@ -1,13 +1,14 @@
-Linux OpenHAL 20061412
+Linux OpenHAL 20072703
 ======================
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
  * This is a port of the ar5k hal for atheros device drivers that is         *
- * source-compatible with the Madwifi driver for linux 			     *
- * (before the BSD - HEAD merge).					     *
+ * source-compatible with the Madwifi driver for linux.			     *
  *									     *
  * Code ported, modified for combatibility and some bugs were fixed by 	     *
  * Nick "Mick Flemm" Kossifidis (Athens Wireless Metropolitan Network)	     *
- * <mickflemm'at'gmail.com> so ar5k can work propertly on Linux.	     *
+ * <mickflemm'at'gmail.com> and Pavel Roskin so ar5k can work propertly      *
+ * on Linux.								     *
+ *									     *
  * Currently only the 5212 code has been tested due to lack of hardware.     *
  *									     *
  * Some code from John Bicket's port (roofnet project) was taken, you can    *
@@ -91,8 +92,7 @@ After that, go to the top directory and build like you normally would.
 
 WARNING: Don't delete the empty files included (ah_desc.h etc)
 
-Note: Currenty works for MadWiFi versions before HEAD - BSD merge
-(that means it works with 07/11/05 snapshot).
+Note: Currenty works for MadWiFi-old
 
 Use
 =====

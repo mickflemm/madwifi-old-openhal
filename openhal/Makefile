@@ -5,7 +5,7 @@ endif
 TOP = $(obj)/..
 
 obj-m		+= ath_hal.o
-ath_hal-objs	:= ah_osdep.o ar5xxx.o ar5212.o ar5211.o ar5210.o ieee80211_regdomain.o
+ath_hal-objs	:= ah_osdep.o ath5k_hw.o ieee80211_regdomain.o
 
 include $(TOP)/Makefile.inc
 
