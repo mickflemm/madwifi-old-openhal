@@ -56,6 +56,8 @@
 #include <unistd.h>
 #include <err.h>
 
+#include <include/compat.h>
+
 #include "wireless_copy.h"
 #include "ah_desc.h"
 #include "ieee80211_radiotap.h"
