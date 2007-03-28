@@ -3513,9 +3513,8 @@ ath_rx_capture(struct net_device *dev, struct ath_desc *ds, struct sk_buff *skb)
 		th->wr_chan_flags = ic->ic_ibss_chan->ic_flags;
 		th->wr_antenna = ds->ds_rxstat.rs_antenna;
 		th->wr_antsignal = ds->ds_rxstat.rs_rssi;
-		th->wr_rx_flags = 0;
 		if (ds->ds_rxstat.rs_status & AR5K_RXERR_CRC)
-			th->wr_rx_flags |= IEEE80211_RADIOTAP_F_RX_BADFCS;
+			th->wr_flags |= IEEE80211_RADIOTAP_F_BADFCS;
 
 		break;
 	}

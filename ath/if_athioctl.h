@@ -131,7 +131,6 @@ struct ath_diag {
 	(1 << IEEE80211_RADIOTAP_CHANNEL)	| \
 	(1 << IEEE80211_RADIOTAP_ANTENNA)	| \
 	(1 << IEEE80211_RADIOTAP_DB_ANTSIGNAL)	| \
-	(1 << IEEE80211_RADIOTAP_RX_FLAGS)	| \
 	0)
 
 struct ath_rx_radiotap_header {
@@ -142,7 +141,6 @@ struct ath_rx_radiotap_header {
 	u_int16_t	wr_chan_flags;
 	u_int8_t	wr_antenna;
 	u_int8_t	wr_antsignal;
-	u_int16_t       wr_rx_flags;
 };
 
 #define ATH_TX_RADIOTAP_PRESENT (		\
