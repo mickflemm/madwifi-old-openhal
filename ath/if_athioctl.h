@@ -137,8 +137,8 @@ struct ath_rx_radiotap_header {
 	struct ieee80211_radiotap_header wr_ihdr;
 	u_int8_t	wr_flags;		/* XXX for padding */
 	u_int8_t	wr_rate;
-	u_int16_t	wr_chan_freq;
-	u_int16_t	wr_chan_flags;
+	__le16		wr_chan_freq;
+	__le16		wr_chan_flags;
 	u_int8_t	wr_antenna;
 	u_int8_t	wr_antsignal;
 };
@@ -159,7 +159,7 @@ struct ath_tx_radiotap_header {
 	u_int8_t	wt_rate;
 	u_int8_t	wt_txpower;
 	u_int8_t	wt_antenna;
-	u_int16_t       wt_tx_flags;
+	__le16		wt_tx_flags;
 	u_int8_t        wt_rts_retries;
 	u_int8_t        wt_data_retries;
 

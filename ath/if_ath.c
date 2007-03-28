@@ -1314,7 +1314,7 @@ static int rt_el_present(struct ieee80211_radiotap_header *th, u_int32_t element
 {
 	if (element > NUM_RADIOTAP_ELEMENTS)
 		return 0;
-	return th->it_present & (1 << element);
+	return le32_to_cpu(th->it_present) & (1 << element);
 }
 
 static int rt_check_header(struct ieee80211_radiotap_header *th, int len) 
@@ -1324,7 +1324,7 @@ static int rt_check_header(struct ieee80211_radiotap_header *th, int len)
 	if (th->it_version != 0) 
 		return 0;
 
-	if (th->it_len < sizeof(struct ieee80211_radiotap_header))
+	if (le16_to_cpu(th->it_len) < sizeof(struct ieee80211_radiotap_header))
 		return 0;
 	
 	for (x = 0; x < NUM_RADIOTAP_ELEMENTS; x++) {
@@ -1332,10 +1332,10 @@ static int rt_check_header(struct ieee80211_radiotap_header *th, int len)
 		    bytes += radiotap_elem_to_bytes[x];
 	}
 
-	if (th->it_len < sizeof(struct ieee80211_radiotap_header) + bytes) 
+	if (le16_to_cpu(th->it_len) < sizeof(struct ieee80211_radiotap_header) + bytes) 
 		return 0;
 	
-	if (th->it_len > len)
+	if (le16_to_cpu(th->it_len) > len)
 		return 0;
 
 	return 1;
@@ -1462,7 +1462,7 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 				
 			}
 
-			skb_pull(skb, th->it_len);
+			skb_pull(skb, le16_to_cpu(th->it_len));
 		}
 		break;
 	}
@@ -3352,15 +3352,15 @@ ath_tx_capture(struct net_device *dev, struct ath_desc *ds, struct sk_buff *skb)
 		th = (struct ath_tx_radiotap_header *) skb_push(skb, sizeof(struct ath_tx_radiotap_header));
 		memset(th, 0, sizeof(struct ath_tx_radiotap_header));
 		th->wt_ihdr.it_version = 0;
-		th->wt_ihdr.it_len = sizeof(struct ath_tx_radiotap_header);
-		th->wt_ihdr.it_present = ATH_TX_RADIOTAP_PRESENT;
+		th->wt_ihdr.it_len = cpu_to_le16(sizeof(struct ath_tx_radiotap_header));
+		th->wt_ihdr.it_present = cpu_to_le32(ATH_TX_RADIOTAP_PRESENT);
 		th->wt_flags = 0;
 		th->wt_rate = sc->sc_hwmap[ds->ds_txstat.ts_rate &~ AR5K_TXSTAT_ALTRATE].ieeerate;
 		th->wt_txpower = 0;
 		th->wt_antenna = ds->ds_txstat.ts_antenna;
 		th->wt_tx_flags = 0;
 		if (ds->ds_txstat.ts_status) 
-			th->wt_tx_flags |= IEEE80211_RADIOTAP_F_TX_FAIL;
+			th->wt_tx_flags |= cpu_to_le16(IEEE80211_RADIOTAP_F_TX_FAIL);
 		th->wt_rts_retries = ds->ds_txstat.ts_shortretry;
 		th->wt_data_retries = ds->ds_txstat.ts_longretry;
 		
@@ -3505,12 +3505,12 @@ ath_rx_capture(struct net_device *dev, struct ath_desc *ds, struct sk_buff *skb)
 		memset(th, 0, sizeof(struct ath_rx_radiotap_header));
 
 		th->wr_ihdr.it_version = 0;
-		th->wr_ihdr.it_len = sizeof(struct ath_rx_radiotap_header);
-		th->wr_ihdr.it_present = ATH_RX_RADIOTAP_PRESENT;
+		th->wr_ihdr.it_len = cpu_to_le16(sizeof(struct ath_rx_radiotap_header));
+		th->wr_ihdr.it_present = cpu_to_le32(ATH_RX_RADIOTAP_PRESENT);
 		th->wr_flags = IEEE80211_RADIOTAP_F_FCS;
 		th->wr_rate = sc->sc_hwmap[ds->ds_rxstat.rs_rate].ieeerate;
-		th->wr_chan_freq = ic->ic_ibss_chan->ic_freq;
-		th->wr_chan_flags = ic->ic_ibss_chan->ic_flags;
+		th->wr_chan_freq = cpu_to_le16(ic->ic_ibss_chan->ic_freq);
+		th->wr_chan_flags = cpu_to_le16(ic->ic_ibss_chan->ic_flags);
 		th->wr_antenna = ds->ds_rxstat.rs_antenna;
 		th->wr_antsignal = ds->ds_rxstat.rs_rssi;
 		if (ds->ds_rxstat.rs_status & AR5K_RXERR_CRC)
