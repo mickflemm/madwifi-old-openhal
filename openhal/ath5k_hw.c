@@ -244,7 +244,7 @@ ath_hal_getwirelessmodes(struct ath_hal *hal, AR5K_CTRY_CODE country)
  * Functions used internaly
  */
 
-u_int32_t
+static u_int32_t
 ath5k_hw_bitswap(u_int32_t val, u_int bits)
 {
 	u_int32_t retval = 0, bit, i;
@@ -299,7 +299,7 @@ static inline void ath5k_hw_reg_write(struct ath_hal *hal, u32 val, u16 reg)
 /*
  * Check if a register write has been completed
  */
-AR5K_BOOL
+static AR5K_BOOL
 ath5k_hw_register_timeout(struct ath_hal *hal, u_int32_t reg, u_int32_t flag,
     u_int32_t val, AR5K_BOOL is_set)
 {
@@ -3403,7 +3403,7 @@ ath5k_hw_get_slot_time(struct ath_hal *hal)
 /*
  * Initialize the tx descriptor on 5211
  */
-AR5K_BOOL
+static AR5K_BOOL
 ath5k_ar5211_setup_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
     u_int packet_length, u_int header_length, AR5K_PKT_TYPE type, u_int tx_power,
     u_int tx_rate0, u_int tx_tries0, u_int key_index, u_int antenna_mode,
@@ -3465,7 +3465,7 @@ ath5k_ar5211_setup_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Initialize tx descriptor on 5212
  */
-AR5K_BOOL
+static AR5K_BOOL
 ath5k_ar5212_setup_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 	u_int packet_length, u_int header_length, AR5K_PKT_TYPE type, u_int tx_power,
 	u_int tx_rate0, u_int tx_tries0, u_int key_index, u_int antenna_mode,
@@ -3550,7 +3550,7 @@ ath5k_ar5212_setup_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Fill tx descriptor on 5211
  */
-AR5K_BOOL/*Added an argument *last_desc -need revision*/
+static AR5K_BOOL/*Added an argument *last_desc -need revision*/
 ath5k_ar5211_fill_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
     u_int segment_length, AR5K_BOOL first_segment, AR5K_BOOL last_segment, const struct ath_desc *last_desc)
 {
@@ -3578,7 +3578,7 @@ ath5k_ar5211_fill_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Fill tx descriptor on 5212
  */
-AR5K_BOOL /*Added an argument *last_desc -need revision*/
+static AR5K_BOOL /*Added an argument *last_desc -need revision*/
 ath5k_ar5212_fill_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 	u_int segment_length, AR5K_BOOL first_segment, AR5K_BOOL last_segment,
 	const struct ath_desc *last_desc)
@@ -3617,7 +3617,7 @@ ath5k_ar5212_fill_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * There is no XR in5211
  */
-AR5K_BOOL
+static AR5K_BOOL
 ath5k_ar5211_setup_xtx_desc(struct ath_hal *hal, struct ath_desc *desc,
     u_int tx_rate1, u_int tx_tries1, u_int tx_rate2, u_int tx_tries2,
     u_int tx_rate3, u_int tx_tries3)
@@ -3629,7 +3629,7 @@ ath5k_ar5211_setup_xtx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Initialize an XR tx descriptor on 5212
  */
-AR5K_BOOL
+static AR5K_BOOL
 ath5k_ar5212_setup_xtx_desc(struct ath_hal *hal, struct ath_desc *desc,
     u_int tx_rate1, u_int tx_tries1, u_int tx_rate2, u_int tx_tries2,
     u_int tx_rate3, u_int tx_tries3)
@@ -3660,7 +3660,7 @@ ath5k_ar5212_setup_xtx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Proccess a tx descriptor on 5211
  */
-AR5K_STATUS
+static AR5K_STATUS
 ath5k_ar5211_proc_tx_desc(struct ath_hal *hal, struct ath_desc *desc)
 {
 	struct ath5k_tx_status *tx_status;
@@ -3718,7 +3718,7 @@ ath5k_ar5211_proc_tx_desc(struct ath_hal *hal, struct ath_desc *desc)
 /*
  * Proccess a tx descriptor on 5212
  */
-AR5K_STATUS
+static AR5K_STATUS
 ath5k_ar5212_proc_tx_desc(struct ath_hal *hal, struct ath_desc *desc)
 {
 	struct ath5k_tx_status *tx_status;
@@ -3847,7 +3847,7 @@ ath5k_hw_setup_rx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Proccess an rx descriptor on 5211
  */
-AR5K_STATUS
+static AR5K_STATUS
 ath5k_ar5211_proc_rx_desc(struct ath_hal *hal, struct ath_desc *desc,
     u_int32_t phys_addr, struct ath_desc *next)
 {
@@ -3919,7 +3919,7 @@ ath5k_ar5211_proc_rx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Proccess an rx descriptor on 5212
  */
-AR5K_STATUS
+static AR5K_STATUS
 ath5k_ar5212_proc_rx_desc(struct ath_hal *hal, struct ath_desc *desc,
     u_int32_t phys_addr, struct ath_desc *next)
 {
