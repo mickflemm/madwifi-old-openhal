@@ -61,6 +61,7 @@ __FBSDID("$FreeBSD: src/sys/dev/ath/if_ath.c,v 1.76 2005/01/24 20:31:24 sam Exp 
 #include <net/iw_handler.h>
 
 #include <asm/uaccess.h>
+#include <asm/unaligned.h>
 
 #include "if_ethersubr.h"		/* for ETHER_IS_MULTICAST */
 #include "if_media.h"
@@ -91,13 +92,8 @@ __FBSDID("$FreeBSD: src/sys/dev/ath/if_ath.c,v 1.76 2005/01/24 20:31:24 sam Exp 
 #include "ath_hw.h"
 
 /* unaligned little endian access */
-#define LE_READ_2(p)							\
-	((u_int16_t)							\
-	 ((((u_int8_t *)(p))[0]      ) | (((u_int8_t *)(p))[1] <<  8)))
-#define LE_READ_4(p)							\
-	((u_int32_t)							\
-	 ((((u_int8_t *)(p))[0]      ) | (((u_int8_t *)(p))[1] <<  8) |	\
-	  (((u_int8_t *)(p))[2] << 16) | (((u_int8_t *)(p))[3] << 24)))
+#define LE_READ_2(_p) (le16_to_cpu(get_unaligned((__le16 *)(_p))))
+#define LE_READ_4(_p) (le32_to_cpu(get_unaligned((__le32 *)(_p))))
 
 enum {
 	ATH_LED_TX,

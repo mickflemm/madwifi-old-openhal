@@ -34,6 +34,7 @@
 //#include <linux/cpufreq.h>
 
 #include <asm/byteorder.h>
+#include <asm/unaligned.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
 

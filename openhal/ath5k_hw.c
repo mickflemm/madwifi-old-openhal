@@ -296,6 +296,26 @@ static inline void ath5k_hw_reg_write(struct ath_hal *hal, u32 val, u16 reg)
 	writel(val, hal->ah_sh + reg);
 }
 
+static inline __u16 ath5k_hw_unaligned_read_16(__le16 *p)
+{
+	return le16_to_cpu(get_unaligned(p));
+}
+
+static inline void ath5k_hw_unaligned_write_16(__u16 v, __le16* p)
+{
+	put_unaligned(cpu_to_le16(v), p);
+}
+
+static inline __u32 ath5k_hw_unaligned_read_32(__le32 *p)
+{
+	return le32_to_cpu(get_unaligned(p));
+}
+
+static inline void ath5k_hw_unaligned_write_32(__u32 v, __le32 *p)
+{
+	put_unaligned(cpu_to_le32(v), p);
+}
+
 /*
  * Check if a register write has been completed
  */

@@ -20,6 +20,7 @@
 /*
  * Gain settings
  */
+
 typedef enum {
 	AR5K_RFGAIN_INACTIVE = 0,
 	AR5K_RFGAIN_READ_REQUESTED,
@@ -265,21 +266,10 @@ struct ath5k_eeprom_info {
 /*
  * Unaligned little endian access
  */
-#define AR5K_LE_READ_2(_p)						\
-	(((const u_int8_t *)(_p))[0] | (((const u_int8_t *)(_p))[1] << 8))
-#define AR5K_LE_READ_4(_p) \
-	(((const u_int8_t *)(_p))[0] |					\
-	(((const u_int8_t *)(_p))[1] << 8) |				\
-	(((const u_int8_t *)(_p))[2] << 16) |				\
-	(((const u_int8_t *)(_p))[3] << 24))
-#define AR5K_LE_WRITE_2(_p, _val) \
-	((((u_int8_t *)(_p))[0] = ((u_int32_t)(_val) & 0xff)),		\
-	(((u_int8_t *)(_p))[1] = (((u_int32_t)(_val) >> 8) & 0xff)))
-#define AR5K_LE_WRITE_4(_p, _val)					\
-	((((u_int8_t *)(_p))[0] = ((u_int32_t)(_val) & 0xff)),		\
-	(((u_int8_t *)(_p))[1] = (((u_int32_t)(_val) >> 8) & 0xff)),	\
-	(((u_int8_t *)(_p))[2] = (((u_int32_t)(_val) >> 16) & 0xff)),	\
-	(((u_int8_t *)(_p))[3] = (((u_int32_t)(_val) >> 24) & 0xff)))
+#define AR5K_LE_READ_2	ath5k_hw_read_unaligned_16
+#define AR5K_LE_READ_4	ath5k_hw_read_unaligned_32
+#define AR5K_LE_WRITE_2	ath5k_hw_write_unaligned_16
+#define AR5K_LE_WRITE_4	ath5k_hw_write_unaligned_32
 
 #define AR5K_LOW_ID(_a)(				\
 (_a)[0] | (_a)[1] << 8 | (_a)[2] << 16 | (_a)[3] << 24	\

@@ -49,6 +49,8 @@ __FBSDID("$FreeBSD: src/sys/net80211/ieee80211_input.c,v 1.32 2005/01/24 19:32:0
 #include <linux/random.h>
 #include <linux/if_vlan.h>
 
+#include <asm/unaligned.h>
+
 #include "if_llc.h"
 #include "if_ethersubr.h"
 #include "if_media.h"
@@ -1333,16 +1335,8 @@ ieee80211_ssid_mismatch(struct ieee80211com *ic, const char *tag,
 #endif /* !IEEE80211_DEBUG */
 
 /* unalligned little endian access */     
-#define LE_READ_2(p)					\
-	((u_int16_t)					\
-	 ((((const u_int8_t *)(p))[0]      ) |		\
-	  (((const u_int8_t *)(p))[1] <<  8)))
-#define LE_READ_4(p)					\
-	((u_int32_t)					\
-	 ((((const u_int8_t *)(p))[0]      ) |		\
-	  (((const u_int8_t *)(p))[1] <<  8) |		\
-	  (((const u_int8_t *)(p))[2] << 16) |		\
-	  (((const u_int8_t *)(p))[3] << 24)))
+#define LE_READ_2(_p) (le16_to_cpu(get_unaligned((__le16 *)(_p))))
+#define LE_READ_4(_p) (le32_to_cpu(get_unaligned((__le32 *)(_p))))
 
 static __inline int
 iswpaoui(const u_int8_t *frm)
