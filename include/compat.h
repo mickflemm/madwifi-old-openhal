@@ -118,7 +118,9 @@
 #ifdef __KERNEL__
 
 #include <linux/version.h>
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)
+#include <linux/sysctl.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21) && \
+    (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,20) || defined(CTL_ANY))
 #define ATH_REGISTER_SYSCTL_TABLE(t) register_sysctl_table(t, 1)
 #else
 #define ATH_REGISTER_SYSCTL_TABLE(t) register_sysctl_table(t)
