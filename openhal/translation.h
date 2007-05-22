@@ -31,7 +31,7 @@
  */
 //reset
 //set_opmode
-#define ah_perCalibration	ah_calibrate
+#define ah_perCalibration	ah_phy_calibrate
 #define ah_phyDisable		ah_phy_disable
 
 /*

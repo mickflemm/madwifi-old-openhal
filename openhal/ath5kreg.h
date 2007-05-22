@@ -57,19 +57,19 @@
  * 5210 has only 2 transmit queues so no DCU/QCU, just
  * 2 transmit descriptor pointers...
  */
-#define AR5K_NOQCU_TXDP0	0x0000		/*Queue 0 - data*/
-#define AR5K_NOQCU_TXDP1	0x0004		/*Queue 1 - beacons*/
+#define AR5K_NOQCU_TXDP0	0x0000		/* Queue 0 - data */
+#define AR5K_NOQCU_TXDP1	0x0004		/* Queue 1 - beacons */
 
 /*
  * Mac Control Register
  */
-#define	AR5K_CR		0x0008			/*Register Address*/
-#define AR5K_CR_TXE0	0x00000001	/*TX Enable for queue 0 on 5210*/
-#define AR5K_CR_TXE1	0x00000002	/*TX Enable for queue 1 on 5210*/
-#define	AR5K_CR_RXE	0x00000004	/*RX Enable*/
-#define AR5K_CR_TXD0	0x00000008	/*TX Disable for queue 0 on 5210*/
-#define AR5K_CR_TXD1	0x00000010	/*TX Disable for queue 1 on 5210*/
-#define	AR5K_CR_RXD	0x00000020	/*RX Disable*/
+#define	AR5K_CR		0x0008			/* Register Address */
+#define AR5K_CR_TXE0	0x00000001	/* TX Enable for queue 0 on 5210 */
+#define AR5K_CR_TXE1	0x00000002	/* TX Enable for queue 1 on 5210 */
+#define	AR5K_CR_RXE	0x00000004	/* RX Enable */
+#define AR5K_CR_TXD0	0x00000008	/* TX Disable for queue 0 on 5210 */
+#define AR5K_CR_TXD1	0x00000010	/* TX Disable for queue 1 on 5210 */
+#define	AR5K_CR_RXD	0x00000020	/* RX Disable */
 #define	AR5K_CR_SWI	0x00000040	
 
 /*
@@ -80,29 +80,29 @@
 /*
  * Configuration and status register
  */
-#define	AR5K_CFG		0x0014			/*Register Address*/
-#define	AR5K_CFG_SWTD		0x00000001	/*Bitswap TX descriptor (for big endian archs)*/
-#define	AR5K_CFG_SWTB		0x00000002	/*Bitswap TX buffer (?)*/
-#define	AR5K_CFG_SWRD		0x00000004	/*Bitswap RX descriptor*/
-#define	AR5K_CFG_SWRB		0x00000008	/*Bitswap RX buffer (?)*/
-#define	AR5K_CFG_SWRG		0x00000010	
-#define AR5K_CFG_ADHOC		0x00000020 	/*not found on 5210*/
-#define AR5K_CFG_PHY_OK		0x00000100	/*not found on 5210*/
-#define AR5K_CFG_EEBS		0x00000200	/*EEPROM is busy*/
-#define	AR5K_CFG_CLKGD		0x00000400	
-#define AR5K_CFG_TXCNT		0x00007800	/*5210 only*/
+#define	AR5K_CFG		0x0014			/* Register Address */
+#define	AR5K_CFG_SWTD		0x00000001	/* Byte-swap TX descriptor (for big endian archs) */
+#define	AR5K_CFG_SWTB		0x00000002	/* Byte-swap TX buffer (?) */
+#define	AR5K_CFG_SWRD		0x00000004	/* Byte-swap RX descriptor */
+#define	AR5K_CFG_SWRB		0x00000008	/* Byte-swap RX buffer (?) */
+#define	AR5K_CFG_SWRG		0x00000010	/* Byte-swap Register values (?) */
+#define AR5K_CFG_ADHOC		0x00000020 	/* [5211+] */
+#define AR5K_CFG_PHY_OK		0x00000100	/* [5211+] */
+#define AR5K_CFG_EEBS		0x00000200	/* EEPROM is busy */
+#define	AR5K_CFG_CLKGD		0x00000400	/* Clock gated (?) */
+#define AR5K_CFG_TXCNT		0x00007800	/* [5210] */
 #define AR5K_CFG_TXCNT_S	11
-#define AR5K_CFG_TXFSTAT	0x00008000	/*5210 only*/
-#define AR5K_CFG_TXFSTRT	0x00010000	/*5210 only*/
-#define	AR5K_CFG_PCI_THRES	0x00060000	/*not found on 5210*/
+#define AR5K_CFG_TXFSTAT	0x00008000	/* [5210] */
+#define AR5K_CFG_TXFSTRT	0x00010000	/* [5210 */
+#define	AR5K_CFG_PCI_THRES	0x00060000	/* [5211+] */
 #define	AR5K_CFG_PCI_THRES_S	17		
 
 /*
  * Interrupt enable register
  */
-#define AR5K_IER		0x0024			/*Register Address*/
-#define AR5K_IER_DISABLE	0x00000000	/*Disable card interrupts*/
-#define AR5K_IER_ENABLE		0x00000001	/*Enable card interrupts*/
+#define AR5K_IER		0x0024			/* Register Address */
+#define AR5K_IER_DISABLE	0x00000000	/* Disable card interrupts */
+#define AR5K_IER_ENABLE		0x00000001	/* Enable card interrupts */
 
 
 /*
@@ -111,27 +111,27 @@
  */
 
 /*
- * Beacon control register -5210 only-
+ * Beacon control register [5210]
  */
-#define AR5K_BCR		0x0028			/*Register Address*/
-#define AR5K_BCR_AP		0x00000000	/*AP mode*/
-#define AR5K_BCR_ADHOC		0x00000001	/*Ad-Hoc mode*/
-#define AR5K_BCR_BDMAE		0x00000002	/*DMA enable*/
-#define AR5K_BCR_TQ1FV		0x00000004	/*Use Queue1 for CAB traffic*/
-#define AR5K_BCR_TQ1V		0x00000008	/*Use Queue1 for Beacon traffic*/
+#define AR5K_BCR		0x0028			/* Register Address */
+#define AR5K_BCR_AP		0x00000000	/* AP mode */
+#define AR5K_BCR_ADHOC		0x00000001	/* Ad-Hoc mode */
+#define AR5K_BCR_BDMAE		0x00000002	/* DMA enable */
+#define AR5K_BCR_TQ1FV		0x00000004	/* Use Queue1 for CAB traffic */
+#define AR5K_BCR_TQ1V		0x00000008	/* Use Queue1 for Beacon traffic */
 #define AR5K_BCR_BCGET		0x00000010	
 
 /*
- * First RTS duration register -5211 only-
+ * First RTS duration register [5211]
  */
-#define AR5K_RTSD0		0x0028			/*Register Address*/
-#define	AR5K_RTSD0_6		0x000000ff	/*6Mb RTS duration mask (?)*/
-#define	AR5K_RTSD0_6_S		0		/*6Mb RTS duration shift (?)*/
-#define	AR5K_RTSD0_9		0x0000ff00	/*9Mb*/
+#define AR5K_RTSD0		0x0028			/* Register Address */
+#define	AR5K_RTSD0_6		0x000000ff	/* 6Mb RTS duration mask (?) */
+#define	AR5K_RTSD0_6_S		0		/* 6Mb RTS duration shift (?) */
+#define	AR5K_RTSD0_9		0x0000ff00	/* 9Mb*/
 #define	AR5K_RTSD0_9_S		8
-#define	AR5K_RTSD0_12		0x00ff0000	/*12Mb*/
+#define	AR5K_RTSD0_12		0x00ff0000	/* 12Mb*/
 #define	AR5K_RTSD0_12_S		16
-#define	AR5K_RTSD0_18		0xff000000	/*16Mb*/
+#define	AR5K_RTSD0_18		0xff000000	/* 16Mb*/
 #define	AR5K_RTSD0_18_S		24
 
 
@@ -141,7 +141,7 @@
  */
 
 /*
- * Beacon status register -5210 only-
+ * Beacon status register [5210]
  *
  * As i can see in ar5k_ar5210_tx_start Reyk uses some of the values of BCR
  * for this register, so i guess TQ1V,TQ1FV and BDMAE have the same meaning
@@ -150,41 +150,41 @@
  * renamed it to SNAPSHOTSVALID to make more sense. I realy have no idea what
  * else can it be. I also renamed SNPBCMD to SNPADHOC to match BCR.
  */
-#define AR5K_BSR		0x002c			/*Register Address*/
-#define AR5K_BSR_BDLYSW		0x00000001	/*SW Beacon delay (?)*/
-#define AR5K_BSR_BDLYDMA	0x00000002	/*DMA Beacon delay (?)*/
-#define AR5K_BSR_TXQ1F		0x00000004	
-#define AR5K_BSR_ATIMDLY	0x00000008	/*ATIM delay (?)*/
-#define AR5K_BSR_SNPADHOC	0x00000100	/*Ad-hoc mode set (?)*/
-#define AR5K_BSR_SNPBDMAE	0x00000200	/*Beacon DMA enabled (?)*/
-#define AR5K_BSR_SNPTQ1FV	0x00000400	/*Queue1 is used for CAB traffic (?)*/
-#define AR5K_BSR_SNPTQ1V	0x00000800	/*Queue1 is used for Beacon traffic (?)*/
-#define AR5K_BSR_SNAPSHOTSVALID	0x00001000	/*BCR snapshots are valid (?)*/
+#define AR5K_BSR		0x002c			/* Register Address */
+#define AR5K_BSR_BDLYSW		0x00000001	/* SW Beacon delay (?) */
+#define AR5K_BSR_BDLYDMA	0x00000002	/* DMA Beacon delay (?) */
+#define AR5K_BSR_TXQ1F		0x00000004	/* Beacon queue (1) finished */
+#define AR5K_BSR_ATIMDLY	0x00000008	/* ATIM delay (?) */
+#define AR5K_BSR_SNPADHOC	0x00000100	/* Ad-hoc mode set (?) */
+#define AR5K_BSR_SNPBDMAE	0x00000200	/* Beacon DMA enabled (?) */
+#define AR5K_BSR_SNPTQ1FV	0x00000400	/* Queue1 is used for CAB traffic (?) */
+#define AR5K_BSR_SNPTQ1V	0x00000800	/* Queue1 is used for Beacon traffic (?) */
+#define AR5K_BSR_SNAPSHOTSVALID	0x00001000	/* BCR snapshots are valid (?) */
 #define AR5K_BSR_SWBA_CNT	0x00ff0000	
 
 /*
- * Second RTS duration register -5211 only-
+ * Second RTS duration register [5211]
  */
-#define AR5K_RTSD1		0x002c			/*Register Address*/
-#define	AR5K_RTSD1_24		0x000000ff	/*24Mb*/
+#define AR5K_RTSD1		0x002c			/* Register Address */
+#define	AR5K_RTSD1_24		0x000000ff	/* 24Mb */
 #define	AR5K_RTSD1_24_S		0
-#define	AR5K_RTSD1_36		0x0000ff00	/*36Mb*/
+#define	AR5K_RTSD1_36		0x0000ff00	/* 36Mb */
 #define	AR5K_RTSD1_36_S		8
-#define	AR5K_RTSD1_48		0x00ff0000	/*48Mb*/
+#define	AR5K_RTSD1_48		0x00ff0000	/* 48Mb */
 #define	AR5K_RTSD1_48_S		16
-#define	AR5K_RTSD1_54		0xff000000	/*54Mb*/
+#define	AR5K_RTSD1_54		0xff000000	/* 54Mb */
 #define	AR5K_RTSD1_54_S		24
 
 
 /*
  * Transmit configuration register
  */
-#define AR5K_TXCFG		0x0030			/*Register Address*/
-#define AR5K_TXCFG_SDMAMR	0x00000007	/*DMA size*/
+#define AR5K_TXCFG		0x0030			/* Register Address */
+#define AR5K_TXCFG_SDMAMR	0x00000007	/* DMA size */
 #define AR5K_TXCFG_SDMAMR_S	0
-#define AR5K_TXCFG_B_MODE	0x00000008	/*Set b mode for 5111 (enable 2111)*/
-#define AR5K_TXCFG_TXFSTP	0x00000008	/*TX DMA Stop -5210 only-*/
-#define AR5K_TXCFG_TXFULL	0x000003f0	/*TX Triger level mask*/
+#define AR5K_TXCFG_B_MODE	0x00000008	/* Set b mode for 5111 (enable 2111) */
+#define AR5K_TXCFG_TXFSTP	0x00000008	/* TX DMA full Stop [5210] */
+#define AR5K_TXCFG_TXFULL	0x000003f0	/* TX Triger level mask */
 #define AR5K_TXCFG_TXFULL_S	4
 #define AR5K_TXCFG_TXFULL_0B	0x00000000
 #define AR5K_TXCFG_TXFULL_64B	0x00000010
@@ -192,22 +192,22 @@
 #define AR5K_TXCFG_TXFULL_192B	0x00000030
 #define AR5K_TXCFG_TXFULL_256B	0x00000040
 #define AR5K_TXCFG_TXCONT_EN	0x00000080	
-#define AR5K_TXCFG_DMASIZE	0x00000100	/*flag for passing DMA size -non 5210*/
-#define AR5K_TXCFG_JUMBO_TXE	0x00000400	/*enable jumbo frames transmition (?) -non 5210*/
-#define AR5K_TXCFG_RTSRND	0x00001000	/*non 5210*/
-#define AR5K_TXCFG_FRMPAD_DIS	0x00002000	/*non 5210*/
-#define AR5K_TXCFG_RDY_DIS	0x00004000	/*non 5210*/
+#define AR5K_TXCFG_DMASIZE	0x00000100	/* Flag for passing DMA size [5210] */
+#define AR5K_TXCFG_JUMBO_TXE	0x00000400	/* Enable jumbo frames transmition (?) [5211+] */
+#define AR5K_TXCFG_RTSRND	0x00001000	/* [5211+] */
+#define AR5K_TXCFG_FRMPAD_DIS	0x00002000	/* [5211+] */
+#define AR5K_TXCFG_RDY_DIS	0x00004000	/* [5211+] */
 
 /*
  * Receive configuration register
  */
-#define AR5K_RXCFG		0x0034			/*Register Address*/
-#define AR5K_RXCFG_SDMAMW	0x00000007	/*DMA size*/
+#define AR5K_RXCFG		0x0034			/* Register Address */
+#define AR5K_RXCFG_SDMAMW	0x00000007	/* DMA size */
 #define AR5K_RXCFG_SDMAMW_S	0
-#define	AR5K_RXCFG_DEF_ANTENNA	0x00000008	/*default antenna*/
-#define AR5K_RXCFG_ZLFDMA	0x00000010	/*zero-length DMA*/
-#define AR5K_RXCFG_JUMBO_RXE	0x00000020	/*enable jumbo frames recieve (?) -non 5210*/
-#define AR5K_RXCFG_JUMBO_WRAP	0x00000040	/*wrap jumbo frames (?) -non 5210*/
+#define	AR5K_RXCFG_DEF_ANTENNA	0x00000008	/* Default antenna */
+#define AR5K_RXCFG_ZLFDMA	0x00000010	/* Zero-length DMA */
+#define AR5K_RXCFG_JUMBO_RXE	0x00000020	/* Enable jumbo frames reception (?) [5211+] */
+#define AR5K_RXCFG_JUMBO_WRAP	0x00000040	/* Wrap jumbo frames (?) [5211+] */
 
 /*
  * Receive jumbo descriptor last address register
@@ -218,48 +218,48 @@
 /*
  * MIB control register
  */
-#define AR5K_MIBC		0x0040			/*Register Address*/
+#define AR5K_MIBC		0x0040			/* Register Address */
 #define AR5K_MIBC_COW		0x00000001	
-#define AR5K_MIBC_FMC		0x00000002	/*Freeze Mib Counters (?)*/
-#define AR5K_MIBC_CMC		0x00000004	/*Clean Mib Counters (?)*/
+#define AR5K_MIBC_FMC		0x00000002	/* Freeze Mib Counters (?) */
+#define AR5K_MIBC_CMC		0x00000004	/* Clean Mib Counters (?) */
 #define AR5K_MIBC_MCS		0x00000008	
 
 /*
  * Timeout prescale register
  */
 #define AR5K_TOPS		0x0044
-#define	AR5K_TOPS_M		0x0000ffff	/*non 5210*/
+#define	AR5K_TOPS_M		0x0000ffff	/* [5211+] (?) */
 
 /*
  * Receive timeout register (no frame received)
  */
 #define AR5K_RXNOFRM		0x0048
-#define	AR5K_RXNOFRM_M		0x000003ff	/*non 5210*/
+#define	AR5K_RXNOFRM_M		0x000003ff	/* [5211+] (?) */
 
 /*
  * Transmit timeout register (no frame sent)
  */
 #define AR5K_TXNOFRM		0x004c
-#define	AR5K_TXNOFRM_M		0x000003ff	/*non 5210*/
-#define	AR5K_TXNOFRM_QCU	0x000ffc00	/*non 5210*/
+#define	AR5K_TXNOFRM_M		0x000003ff	/* [5211+] (?) */
+#define	AR5K_TXNOFRM_QCU	0x000ffc00	/* [5211+] (?) */
 
 /*
  * Receive frame gap timeout register
  */
 #define AR5K_RPGTO		0x0050
-#define AR5K_RPGTO_M		0x000003ff	/*non 5210*/
+#define AR5K_RPGTO_M		0x000003ff	/* [5211+] (?) */
 
 /*
  * Receive frame count limit register
  */
 #define AR5K_RFCNT		0x0054
-#define AR5K_RFCNT_M		0x0000001f	/*non 5210*/
-#define AR5K_RFCNT_RFCL		0x0000000f	/*5210*/
+#define AR5K_RFCNT_M		0x0000001f	/* [5211+] (?) */
+#define AR5K_RFCNT_RFCL		0x0000000f	/* [5210] */
 
 /*
  * Misc settings register
  */
-#define AR5K_MISC		0x0058			/*Register Address*/
+#define AR5K_MISC		0x0058			/* Register Address */
 #define	AR5K_MISC_DMA_OBS_M	0x000001e0	
 #define	AR5K_MISC_DMA_OBS_S	5
 #define	AR5K_MISC_MISC_OBS_M	0x00000e00	
@@ -268,15 +268,15 @@
 #define	AR5K_MISC_MAC_OBS_LSB_S	12
 #define	AR5K_MISC_MAC_OBS_MSB_M	0x00038000	
 #define	AR5K_MISC_MAC_OBS_MSB_S	15
-#define AR5K_MISC_LED_DECAY	0x001c0000	/*5210*/
-#define AR5K_MISC_LED_BLINK	0x00e00000	/*5210*/
+#define AR5K_MISC_LED_DECAY	0x001c0000	/* [5210] */
+#define AR5K_MISC_LED_BLINK	0x00e00000	/* [5210] */
 
 /*
  * QCU/DCU clock gating register (5311)
  */
-#define	AR5K_QCUDCU_CLKGT	0x005c			/*Register Address (?)*/
-#define	AR5K_QCUDCU_CLKGT_QCU	0x0000ffff	/*Mask for QCU clock*/
-#define	AR5K_QCUDCU_CLKGT_DCU	0x07ff0000	/*Mask for DCU clock*/
+#define	AR5K_QCUDCU_CLKGT	0x005c			/* Register Address (?) */
+#define	AR5K_QCUDCU_CLKGT_QCU	0x0000ffff	/* Mask for QCU clock */
+#define	AR5K_QCUDCU_CLKGT_DCU	0x07ff0000	/* Mask for DCU clock */
 
 /*
  * Interrupt Status Registers
@@ -286,83 +286,83 @@
  * So we have AR5K_ISR for 5210 and AR5K_PISR /SISRx for 5211/5212.
  * Most of these bits are common for all chipsets.
  */
-#define AR5K_ISR		0x001c			/*Register Address (5210)*/
-#define AR5K_PISR		0x0080			/*Register Address (5211/5212)*/
-#define AR5K_ISR_RXOK		0x00000001	/*Frame successfuly recieved*/
-#define AR5K_ISR_RXDESC		0x00000002	/*RX descriptor request*/
-#define AR5K_ISR_RXERR		0x00000004	/*Receive error*/
-#define AR5K_ISR_RXNOFRM	0x00000008	/*No frame received (receive timeout)*/
-#define AR5K_ISR_RXEOL		0x00000010	/*Empty RX descriptor*/
-#define AR5K_ISR_RXORN		0x00000020	/*Receive FIFO overrun*/
-#define AR5K_ISR_TXOK		0x00000040	/*Frame successfuly transmited*/
-#define AR5K_ISR_TXDESC		0x00000080	/*TX descriptor request*/
-#define AR5K_ISR_TXERR		0x00000100	/*Transmit error*/
-#define AR5K_ISR_TXNOFRM	0x00000200	/*No frame transmited (transmit timeout)*/
-#define AR5K_ISR_TXEOL		0x00000400	/*Empty TX descriptor*/
-#define AR5K_ISR_TXURN		0x00000800	/*Transmit FIFO underrun*/
-#define AR5K_ISR_MIB		0x00001000	/*Update MIB counters*/
-#define AR5K_ISR_SWI		0x00002000	
-#define AR5K_ISR_RXPHY		0x00004000	/*PHY error*/
+#define AR5K_ISR		0x001c			/* Register Address [5210] */
+#define AR5K_PISR		0x0080			/* Register Address [5211+] */
+#define AR5K_ISR_RXOK		0x00000001	/* Frame successfuly recieved */
+#define AR5K_ISR_RXDESC		0x00000002	/* RX descriptor request */
+#define AR5K_ISR_RXERR		0x00000004	/* Receive error */
+#define AR5K_ISR_RXNOFRM	0x00000008	/* No frame received (receive timeout) */
+#define AR5K_ISR_RXEOL		0x00000010	/* Empty RX descriptor */
+#define AR5K_ISR_RXORN		0x00000020	/* Receive FIFO overrun */
+#define AR5K_ISR_TXOK		0x00000040	/* Frame successfuly transmited */
+#define AR5K_ISR_TXDESC		0x00000080	/* TX descriptor request */
+#define AR5K_ISR_TXERR		0x00000100	/* Transmit error */
+#define AR5K_ISR_TXNOFRM	0x00000200	/* No frame transmited (transmit timeout) */
+#define AR5K_ISR_TXEOL		0x00000400	/* Empty TX descriptor */
+#define AR5K_ISR_TXURN		0x00000800	/* Transmit FIFO underrun */
+#define AR5K_ISR_MIB		0x00001000	/* Update MIB counters */
+#define AR5K_ISR_SWI		0x00002000	/* Software interrupt (?) */
+#define AR5K_ISR_RXPHY		0x00004000	/* PHY error */
 #define AR5K_ISR_RXKCM		0x00008000	
-#define AR5K_ISR_SWBA		0x00010000	/*Software beacon alert*/
+#define AR5K_ISR_SWBA		0x00010000	/* Software beacon alert */
 #define AR5K_ISR_BRSSI		0x00020000	
-#define AR5K_ISR_BMISS		0x00040000	/*Beacon missed*/
-#define AR5K_ISR_HIUERR		0x00080000	/*Host Interface Unit error -non 5210*/
-#define AR5K_ISR_BNR		0x00100000 	/*Beacon not ready -non 5210*/
-#define AR5K_ISR_MCABT		0x00100000	/*5210*/
-#define AR5K_ISR_RXCHIRP	0x00200000	/*5212 only*/
-#define AR5K_ISR_SSERR		0x00200000	/*5210 only*/
-#define AR5K_ISR_DPERR		0x00400000	/*5210 only*/
-#define AR5K_ISR_TIM		0x00800000	/*non 5210*/
-#define AR5K_ISR_BCNMISC	0x00800000	/*5212 only*/
-#define AR5K_ISR_GPIO		0x01000000	/*GPIO (rf kill)*/
-#define AR5K_ISR_QCBRORN	0x02000000	/*CBR overrun (?) -non 5210*/
-#define AR5K_ISR_QCBRURN	0x04000000	/*CBR underrun (?) -non 5210*/
-#define AR5K_ISR_QTRIG		0x08000000	/*non 5210*/
+#define AR5K_ISR_BMISS		0x00040000	/* Beacon missed */
+#define AR5K_ISR_HIUERR		0x00080000	/* Host Interface Unit error [5211+] */
+#define AR5K_ISR_BNR		0x00100000 	/* Beacon not ready [5211+] */
+#define AR5K_ISR_MCABT		0x00100000	/* [5210] */
+#define AR5K_ISR_RXCHIRP	0x00200000	/* [5212+] */
+#define AR5K_ISR_SSERR		0x00200000	/* [5210] */
+#define AR5K_ISR_DPERR		0x00400000	/* [5210] */
+#define AR5K_ISR_TIM		0x00800000	/* [5210] */
+#define AR5K_ISR_BCNMISC	0x00800000	/* [5212+] */
+#define AR5K_ISR_GPIO		0x01000000	/* GPIO (rf kill)*/
+#define AR5K_ISR_QCBRORN	0x02000000	/* CBR overrun (?)  [5211+] */
+#define AR5K_ISR_QCBRURN	0x04000000	/* CBR underrun (?) [5211+] */
+#define AR5K_ISR_QTRIG		0x08000000	/* [5211+] */
 
 /*
- * Secondary status registers (5211/5212) (0 - 4)
+ * Secondary status registers [5211+] (0 - 4)
  *
  * I guess from the names that these give the status for each 
  * queue, that's why only masks are defined here, haven't got
  * any info about them (couldn't find them anywhere in ar5k code).
  */
-#define AR5K_SISR0		0x0084			/*Register Address (5211/5212)*/
-#define AR5K_SISR0_QCU_TXOK	0x000003ff	/*Mask for QCU_TXOK*/
-#define AR5K_SISR0_QCU_TXDESC	0x03ff0000	/*Mask for QCU_TXDESC*/
+#define AR5K_SISR0		0x0084			/* Register Address [5211+] */
+#define AR5K_SISR0_QCU_TXOK	0x000003ff	/* Mask for QCU_TXOK */
+#define AR5K_SISR0_QCU_TXDESC	0x03ff0000	/* Mask for QCU_TXDESC */
 
-#define AR5K_SISR1		0x0088			/*Register Address (5211/5212)*/
-#define AR5K_SISR1_QCU_TXERR	0x000003ff	/*Mask for QCU_TXERR*/
-#define AR5K_SISR1_QCU_TXEOL	0x03ff0000	/*Mask for QCU_TXEOL*/
+#define AR5K_SISR1		0x0088			/* Register Address [5211+] */
+#define AR5K_SISR1_QCU_TXERR	0x000003ff	/* Mask for QCU_TXERR */
+#define AR5K_SISR1_QCU_TXEOL	0x03ff0000	/* Mask for QCU_TXEOL */
 
-#define AR5K_SISR2		0x008c			/*Register Address (5211/5212)*/
-#define AR5K_SISR2_QCU_TXURN	0x000003ff	/*Mask for QCU_TXURN*/
+#define AR5K_SISR2		0x008c			/* Register Address [5211+] */
+#define AR5K_SISR2_QCU_TXURN	0x000003ff	/* Mask for QCU_TXURN */
 #define	AR5K_SISR2_MCABT	0x00100000	
 #define	AR5K_SISR2_SSERR	0x00200000	
 #define	AR5K_SISR2_DPERR	0x00400000	
-#define	AR5K_SISR2_TIM		0x01000000	/*5212 only*/
-#define	AR5K_SISR2_CAB_END	0x02000000	/*5212 only*/
-#define	AR5K_SISR2_DTIM_SYNC	0x04000000	/*5212 only*/
-#define	AR5K_SISR2_BCN_TIMEOUT	0x08000000	/*5212 only*/
-#define	AR5K_SISR2_CAB_TIMEOUT	0x10000000	/*5212 only*/
-#define	AR5K_SISR2_DTIM		0x20000000	/*5212 only*/
+#define	AR5K_SISR2_TIM		0x01000000	/* [5212+] */
+#define	AR5K_SISR2_CAB_END	0x02000000	/* [5212+] */
+#define	AR5K_SISR2_DTIM_SYNC	0x04000000	/* [5212+] */
+#define	AR5K_SISR2_BCN_TIMEOUT	0x08000000	/* [5212+] */
+#define	AR5K_SISR2_CAB_TIMEOUT	0x10000000	/* [5212+] */
+#define	AR5K_SISR2_DTIM		0x20000000	/* [5212+] */
 
-#define AR5K_SISR3		0x0090			/*Register Address (5211/5212)*/
-#define AR5K_SISR3_QCBRORN	0x000003ff	/*Mask for QCBRORN*/
-#define AR5K_SISR3_QCBRURN	0x03ff0000	/*Mask for QCBRURN*/
+#define AR5K_SISR3		0x0090			/* Register Address [5211+] */
+#define AR5K_SISR3_QCBRORN	0x000003ff	/* Mask for QCBRORN */
+#define AR5K_SISR3_QCBRURN	0x03ff0000	/* Mask for QCBRURN */
 
-#define AR5K_SISR4		0x0094			/*Register Address (5211/5212)*/
-#define AR5K_SISR4_QTRIG	0x000003ff	/*Mask for QTRIG*/
+#define AR5K_SISR4		0x0094			/* Register Address [5211+] */
+#define AR5K_SISR4_QTRIG	0x000003ff	/* Mask for QTRIG */
 
 /*
- * Shadow read-and-clear interrupt status registers (5211/5212)
+ * Shadow read-and-clear interrupt status registers [5211+]
  */
-#define AR5K_RAC_PISR		0x00c0		/*Read and clear PISR*/
-#define AR5K_RAC_SISR0		0x00c4		/*Read and clear SISR0*/
-#define AR5K_RAC_SISR1		0x00c8		/*Read and clear SISR1*/
-#define AR5K_RAC_SISR2		0x00cc		/*Read and clear SISR2*/
-#define AR5K_RAC_SISR3		0x00d0		/*Read and clear SISR3*/
-#define AR5K_RAC_SISR4		0x00d4		/*Read and clear SISR4*/
+#define AR5K_RAC_PISR		0x00c0		/* Read and clear PISR */
+#define AR5K_RAC_SISR0		0x00c4		/* Read and clear SISR0 */
+#define AR5K_RAC_SISR1		0x00c8		/* Read and clear SISR1 */
+#define AR5K_RAC_SISR2		0x00cc		/* Read and clear SISR2 */
+#define AR5K_RAC_SISR3		0x00d0		/* Read and clear SISR3 */
+#define AR5K_RAC_SISR4		0x00d4		/* Read and clear SISR4 */
 
 /*
  * Interrupt Mask Registers
@@ -370,108 +370,108 @@
  * As whith ISRs 5210 has one IMR (AR5K_IMR) and 5211/5212 has one primary
  * (AR5K_PIMR) and 4 secondary IMRs (AR5K_SIMRx). Note that ISR/IMR flags match.
  */
-#define	AR5K_IMR		0x0020			/*Register Address (5210)*/
-#define AR5K_PIMR		0x00a0			/*Register Address (5211/5212)*/
-#define AR5K_IMR_RXOK		0x00000001	/*Frame successfuly recieved*/
-#define AR5K_IMR_RXDESC		0x00000002	/*RX descriptor request*/
-#define AR5K_IMR_RXERR		0x00000004	/*Receive error*/
-#define AR5K_IMR_RXNOFRM	0x00000008	/*No frame received (receive timeout)*/
-#define AR5K_IMR_RXEOL		0x00000010	/*Empty RX descriptor*/
-#define AR5K_IMR_RXORN		0x00000020	/*Receive FIFO overrun*/
-#define AR5K_IMR_TXOK		0x00000040	/*Frame successfuly transmited*/
-#define AR5K_IMR_TXDESC		0x00000080	/*TX descriptor request*/
-#define AR5K_IMR_TXERR		0x00000100	/*Transmit error*/
-#define AR5K_IMR_TXNOFRM	0x00000200	/*No frame transmited (transmit timeout)*/
-#define AR5K_IMR_TXEOL		0x00000400	/*Empty TX descriptor*/
-#define AR5K_IMR_TXURN		0x00000800	/*Transmit FIFO underrun*/
-#define AR5K_IMR_MIB		0x00001000	/*Update MIB counters*/
+#define	AR5K_IMR		0x0020			/* Register Address [5210] */
+#define AR5K_PIMR		0x00a0			/* Register Address [5211+] */
+#define AR5K_IMR_RXOK		0x00000001	/* Frame successfuly recieved*/
+#define AR5K_IMR_RXDESC		0x00000002	/* RX descriptor request*/
+#define AR5K_IMR_RXERR		0x00000004	/* Receive error*/
+#define AR5K_IMR_RXNOFRM	0x00000008	/* No frame received (receive timeout)*/
+#define AR5K_IMR_RXEOL		0x00000010	/* Empty RX descriptor*/
+#define AR5K_IMR_RXORN		0x00000020	/* Receive FIFO overrun*/
+#define AR5K_IMR_TXOK		0x00000040	/* Frame successfuly transmited*/
+#define AR5K_IMR_TXDESC		0x00000080	/* TX descriptor request*/
+#define AR5K_IMR_TXERR		0x00000100	/* Transmit error*/
+#define AR5K_IMR_TXNOFRM	0x00000200	/* No frame transmited (transmit timeout)*/
+#define AR5K_IMR_TXEOL		0x00000400	/* Empty TX descriptor*/
+#define AR5K_IMR_TXURN		0x00000800	/* Transmit FIFO underrun*/
+#define AR5K_IMR_MIB		0x00001000	/* Update MIB counters*/
 #define AR5K_IMR_SWI		0x00002000	
-#define AR5K_IMR_RXPHY		0x00004000	/*PHY error*/
+#define AR5K_IMR_RXPHY		0x00004000	/* PHY error*/
 #define AR5K_IMR_RXKCM		0x00008000	
-#define AR5K_IMR_SWBA		0x00010000	/*Software beacon alert*/
+#define AR5K_IMR_SWBA		0x00010000	/* Software beacon alert*/
 #define AR5K_IMR_BRSSI		0x00020000	
-#define AR5K_IMR_BMISS		0x00040000	/*Beacon missed*/
-#define AR5K_IMR_HIUERR		0x00080000	/*Host Interface Unit error -non 5210*/
-#define AR5K_IMR_BNR		0x00100000 	/*Beacon not ready -non 5210*/
-#define AR5K_IMR_MCABT		0x00100000	/*5210*/
-#define AR5K_IMR_RXCHIRP	0x00200000	/*5212 only*/
-#define AR5K_IMR_SSERR		0x00200000	/*5210 only*/
-#define AR5K_IMR_DPERR		0x00400000	/*5210 only*/
-#define AR5K_IMR_TIM		0x00800000	/*non 5210*/
-#define AR5K_IMR_BCNMISC	0x00800000	/*5212 only*/
-#define AR5K_IMR_GPIO		0x01000000	/*GPIO (rf kill)*/
-#define AR5K_IMR_QCBRORN	0x02000000	/*CBR overrun (?) -non 5210*/
-#define AR5K_IMR_QCBRURN	0x04000000	/*CBR underrun (?) -non 5210*/
-#define AR5K_IMR_QTRIG		0x08000000	/*non 5210*/
+#define AR5K_IMR_BMISS		0x00040000	/* Beacon missed*/
+#define AR5K_IMR_HIUERR		0x00080000	/* Host Interface Unit error [5211+] */
+#define AR5K_IMR_BNR		0x00100000 	/* Beacon not ready [5211+] */
+#define AR5K_IMR_MCABT		0x00100000	/* [5210] */
+#define AR5K_IMR_RXCHIRP	0x00200000	/* [5212+]*/
+#define AR5K_IMR_SSERR		0x00200000	/* [5210] */
+#define AR5K_IMR_DPERR		0x00400000	/* [5210] */
+#define AR5K_IMR_TIM		0x00800000	/* [5211+] */
+#define AR5K_IMR_BCNMISC	0x00800000	/* [5212+] */
+#define AR5K_IMR_GPIO		0x01000000	/* GPIO (rf kill)*/
+#define AR5K_IMR_QCBRORN	0x02000000	/* CBR overrun (?) [5211+] */
+#define AR5K_IMR_QCBRURN	0x04000000	/* CBR underrun (?) [5211+] */
+#define AR5K_IMR_QTRIG		0x08000000	/* [5211+] */
 
 /*
- * Secondary interrupt mask registers (5211/5212) (0 - 4)
+ * Secondary interrupt mask registers [5211+] (0 - 4)
  */
-#define AR5K_SIMR0		0x00a4			/*Register Address (5211/5212)*/
-#define AR5K_SIMR0_QCU_TXOK	0x000003ff	/*Mask for QCU_TXOK*/
+#define AR5K_SIMR0		0x00a4			/* Register Address [5211+] */
+#define AR5K_SIMR0_QCU_TXOK	0x000003ff	/* Mask for QCU_TXOK */
 #define AR5K_SIMR0_QCU_TXOK_S	0
-#define AR5K_SIMR0_QCU_TXDESC	0x03ff0000	/*Mask for QCU_TXDESC*/
+#define AR5K_SIMR0_QCU_TXDESC	0x03ff0000	/* Mask for QCU_TXDESC */
 #define AR5K_SIMR0_QCU_TXDESC_S	16
 
-#define AR5K_SIMR1		0x00a8			/*Register Address (5211/5212)*/
-#define AR5K_SIMR1_QCU_TXERR	0x000003ff	/*Mask for QCU_TXERR*/
+#define AR5K_SIMR1		0x00a8			/* Register Address [5211+] */
+#define AR5K_SIMR1_QCU_TXERR	0x000003ff	/* Mask for QCU_TXERR */
 #define AR5K_SIMR1_QCU_TXERR_S	0
-#define AR5K_SIMR1_QCU_TXEOL	0x03ff0000	/*Mask for QCU_TXEOL*/
+#define AR5K_SIMR1_QCU_TXEOL	0x03ff0000	/* Mask for QCU_TXEOL */
 #define AR5K_SIMR1_QCU_TXEOL_S	16
 
-#define AR5K_SIMR2		0x00ac			/*Register Address (5211/5212)*/
-#define AR5K_SIMR2_QCU_TXURN	0x000003ff	/*Mask for QCU_TXURN*/
+#define AR5K_SIMR2		0x00ac			/* Register Address [5211+] */
+#define AR5K_SIMR2_QCU_TXURN	0x000003ff	/* Mask for QCU_TXURN */
 #define AR5K_SIMR2_QCU_TXURN_S	0
 #define	AR5K_SIMR2_MCABT	0x00100000	
 #define	AR5K_SIMR2_SSERR	0x00200000	
 #define	AR5K_SIMR2_DPERR	0x00400000	
-#define	AR5K_SIMR2_TIM		0x01000000	/*5212 only*/
-#define	AR5K_SIMR2_CAB_END	0x02000000	/*5212 only*/
-#define	AR5K_SIMR2_DTIM_SYNC	0x04000000	/*5212 only*/
-#define	AR5K_SIMR2_BCN_TIMEOUT	0x08000000	/*5212 only*/
-#define	AR5K_SIMR2_CAB_TIMEOUT	0x10000000	/*5212 only*/
-#define	AR5K_SIMR2_DTIM		0x20000000	/*5212 only*/
+#define	AR5K_SIMR2_TIM		0x01000000	/* [5212+] */
+#define	AR5K_SIMR2_CAB_END	0x02000000	/* [5212+] */
+#define	AR5K_SIMR2_DTIM_SYNC	0x04000000	/* [5212+] */
+#define	AR5K_SIMR2_BCN_TIMEOUT	0x08000000	/* [5212+] */
+#define	AR5K_SIMR2_CAB_TIMEOUT	0x10000000	/* [5212+] */
+#define	AR5K_SIMR2_DTIM		0x20000000	/* [5212+] */
 
-#define AR5K_SIMR3		0x00b0			/*Register Address (5211/5212)*/
-#define AR5K_SIMR3_QCBRORN	0x000003ff	/*Mask for QCBRORN*/
+#define AR5K_SIMR3		0x00b0			/* Register Address [5211+] */
+#define AR5K_SIMR3_QCBRORN	0x000003ff	/* Mask for QCBRORN */
 #define AR5K_SIMR3_QCBRORN_S	0
-#define AR5K_SIMR3_QCBRURN	0x03ff0000	/*Mask for QCBRURN*/
+#define AR5K_SIMR3_QCBRURN	0x03ff0000	/* Mask for QCBRURN */
 #define AR5K_SIMR3_QCBRURN_S	16
 
-#define AR5K_SIMR4		0x00b4			/*Register Address (5211/5212)*/
-#define AR5K_SIMR4_QTRIG	0x000003ff	/*Mask for QTRIG*/
+#define AR5K_SIMR4		0x00b4			/* Register Address [5211+] */
+#define AR5K_SIMR4_QTRIG	0x000003ff	/* Mask for QTRIG */
 #define AR5K_SIMR4_QTRIG_S	0
 
 
 /*
- * Decompression mask registers (5212)
+ * Decompression mask registers [5212+]
  */
 #define AR5K_DCM_ADDR		0x0400		/*Decompression mask address (?)*/
 #define AR5K_DCM_DATA		0x0404		/*Decompression mask data (?)*/
 
 /*
- * Decompression configuration registers (5212)
+ * Decompression configuration registers [5212+]
  */
 #define AR5K_DCCFG		0x0420		
 
 /*
- * Compression configuration registers (5212)
+ * Compression configuration registers [5212+]
  */
 #define AR5K_CCFG		0x0600		
 #define AR5K_CCFG_CUP		0x0604		
 
 /*
- * Compression performance counter registers (5212)
+ * Compression performance counter registers [5212+]
  */
-#define AR5K_CPC0		0x0610		/*Compression performance counter 0*/
-#define AR5K_CPC1		0x0614		/*Compression performance counter 1*/
-#define AR5K_CPC2		0x0618		/*Compression performance counter 2*/
-#define AR5K_CPC3		0x061c		/*Compression performance counter 3*/
-#define AR5K_CPCORN		0x0620		/*Compression performance overrun (?)*/
+#define AR5K_CPC0		0x0610		/* Compression performance counter 0 */
+#define AR5K_CPC1		0x0614		/* Compression performance counter 1*/
+#define AR5K_CPC2		0x0618		/* Compression performance counter 2 */
+#define AR5K_CPC3		0x061c		/* Compression performance counter 3 */
+#define AR5K_CPCORN		0x0620		/* Compression performance overrun (?) */
 
 
 /*
- * Queue control unit (QCU) registers (5211/5212)
+ * Queue control unit (QCU) registers [5211+]
  *
  * Card has 12 TX Queues but i see that only 0-9 are used (?) 
  * both in binary HAL (see ah.h) and ar5k. Each queue has it's own 
@@ -497,7 +497,7 @@
 /*
  * QCU Transmit descriptor pointer registers
  */
-#define AR5K_QCU_TXDP_BASE	0x0800		/*Register Address - Queue0 TXDP*/
+#define AR5K_QCU_TXDP_BASE	0x0800		/* Register Address - Queue0 TXDP */
 #define AR5K_QUEUE_TXDP(_q)	AR5K_QUEUE_REG(AR5K_QCU_TXDP_BASE, _q)
 
 /*
@@ -517,62 +517,62 @@
 /*
  * QCU Constant Bit Rate configuration registers
  */
-#define	AR5K_QCU_CBRCFG_BASE		0x08c0	/*Register Address - Queue0 CBRCFG*/
-#define	AR5K_QCU_CBRCFG_INTVAL		0x00ffffff	/*CBR Interval mask*/
+#define	AR5K_QCU_CBRCFG_BASE		0x08c0	/* Register Address - Queue0 CBRCFG */
+#define	AR5K_QCU_CBRCFG_INTVAL		0x00ffffff	/* CBR Interval mask */
 #define AR5K_QCU_CBRCFG_INTVAL_S	0
-#define	AR5K_QCU_CBRCFG_ORN_THRES	0xff000000	/*CBR overrun threshold mask*/
+#define	AR5K_QCU_CBRCFG_ORN_THRES	0xff000000	/* CBR overrun threshold mask */
 #define AR5K_QCU_CBRCFG_ORN_THRES_S	24
 #define	AR5K_QUEUE_CBRCFG(_q)		AR5K_QUEUE_REG(AR5K_QCU_CBRCFG_BASE, _q)
 
 /*
  * QCU Ready time configuration registers
  */
-#define	AR5K_QCU_RDYTIMECFG_BASE	0x0900	/*Register Address - Queue0 RDYTIMECFG*/
-#define	AR5K_QCU_RDYTIMECFG_INTVAL	0x00ffffff	/*Ready time interval mask*/
+#define	AR5K_QCU_RDYTIMECFG_BASE	0x0900	/* Register Address - Queue0 RDYTIMECFG */
+#define	AR5K_QCU_RDYTIMECFG_INTVAL	0x00ffffff	/* Ready time interval mask */
 #define AR5K_QCU_RDYTIMECFG_INTVAL_S	0
-#define	AR5K_QCU_RDYTIMECFG_DURATION	0x00ffffff	/*Ready time duration mask*/
-#define	AR5K_QCU_RDYTIMECFG_ENABLE	0x01000000	/*Ready time enable mask*/
+#define	AR5K_QCU_RDYTIMECFG_DURATION	0x00ffffff	/* Ready time duration mask */
+#define	AR5K_QCU_RDYTIMECFG_ENABLE	0x01000000	/* Ready time enable mask */
 #define AR5K_QUEUE_RDYTIMECFG(_q)	AR5K_QUEUE_REG(AR5K_QCU_RDYTIMECFG_BASE, _q)
 
 /*
  * QCU one shot arm set registers
  */
-#define	AR5K_QCU_ONESHOTARM_SET		0x0940	/*Register Address -QCU "one shot arm set (?)"*/
+#define	AR5K_QCU_ONESHOTARM_SET		0x0940	/* Register Address -QCU "one shot arm set (?)" */
 #define	AR5K_QCU_ONESHOTARM_SET_M	0x0000ffff
 
 /*
  * QCU one shot arm clear registers
  */
-#define	AR5K_QCU_ONESHOTARM_CLEAR	0x0980	/*Register Address -QCU "one shot arm clear (?)"*/
+#define	AR5K_QCU_ONESHOTARM_CLEAR	0x0980	/* Register Address -QCU "one shot arm clear (?)" */
 #define	AR5K_QCU_ONESHOTARM_CLEAR_M	0x0000ffff
 
 /*
  * QCU misc registers
  */
-#define AR5K_QCU_MISC_BASE		0x09c0			/*Register Address -Queue0 MISC*/
-#define	AR5K_QCU_MISC_FRSHED_M		0x0000000f	/*Frame sheduling mask*/
-#define	AR5K_QCU_MISC_FRSHED_ASAP	0		/*ASAP*/
-#define	AR5K_QCU_MISC_FRSHED_CBR	1		/*Constant Bit Rate*/
-#define	AR5K_QCU_MISC_FRSHED_DBA_GT	2		/*DMA Beacon alert (GaTed ?)*/
-#define	AR5K_QCU_MISC_FRSHED_TIM_GT	3		
-#define	AR5K_QCU_MISC_FRSHED_BCN_SENT_GT	4	/*Beacon sent gated (?)*/
-#define	AR5K_QCU_MISC_ONESHOT_ENABLE	0x00000010	/*Oneshot enable*/
-#define	AR5K_QCU_MISC_CBREXP		0x00000020	/*CBR expired (normal queue)*/
-#define	AR5K_QCU_MISC_CBREXP_BCN	0x00000040	/*CBR expired (beacon queue)*/
-#define	AR5K_QCU_MISC_BCN_ENABLE	0x00000080	/*Beacons enabled*/
-#define	AR5K_QCU_MISC_CBR_THRES_ENABLE	0x00000100	/*CBR threshold enabled (?)*/
-#define	AR5K_QCU_MISC_TXE		0x00000200	/*TXE reset when RDYTIME enalbed (?)*/
-#define	AR5K_QCU_MISC_CBR		0x00000400	/*CBR threshold reset (?)*/
-#define	AR5K_QCU_MISC_DCU_EARLY		0x00000800	/*DCU reset (?)*/
+#define AR5K_QCU_MISC_BASE		0x09c0			/* Register Address -Queue0 MISC */
+#define	AR5K_QCU_MISC_FRSHED_M		0x0000000f	/* Frame sheduling mask */
+#define	AR5K_QCU_MISC_FRSHED_ASAP	0		/* ASAP */
+#define	AR5K_QCU_MISC_FRSHED_CBR	1		/* Constant Bit Rate */
+#define	AR5K_QCU_MISC_FRSHED_DBA_GT	2		/* DMA Beacon alert gated (?) */
+#define	AR5K_QCU_MISC_FRSHED_TIM_GT	3		/* Time gated (?) */
+#define	AR5K_QCU_MISC_FRSHED_BCN_SENT_GT	4	/* Beacon sent gated (?) */
+#define	AR5K_QCU_MISC_ONESHOT_ENABLE	0x00000010	/* Oneshot enable */
+#define	AR5K_QCU_MISC_CBREXP		0x00000020	/* CBR expired (normal queue) */
+#define	AR5K_QCU_MISC_CBREXP_BCN	0x00000040	/* CBR expired (beacon queue) */
+#define	AR5K_QCU_MISC_BCN_ENABLE	0x00000080	/* Beacons enabled */
+#define	AR5K_QCU_MISC_CBR_THRES_ENABLE	0x00000100	/* CBR threshold enabled (?) */
+#define	AR5K_QCU_MISC_TXE		0x00000200	/* TXE reset when RDYTIME enalbed (?) */
+#define	AR5K_QCU_MISC_CBR		0x00000400	/* CBR threshold reset (?) */
+#define	AR5K_QCU_MISC_DCU_EARLY		0x00000800	/* DCU reset (?) */
 #define AR5K_QUEUE_MISC(_q)		AR5K_QUEUE_REG(AR5K_QCU_MISC_BASE, _q)
 
 
 /*
  * QCU status registers
  */
-#define AR5K_QCU_STS_BASE	0x0a00			/*Register Address - Queue0 STS*/
-#define	AR5K_QCU_STS_FRMPENDCNT	0x00000003	/*Frames pending counter*/
-#define	AR5K_QCU_STS_CBREXPCNT	0x0000ff00	/*CBR expired counter (?)*/
+#define AR5K_QCU_STS_BASE	0x0a00			/* Register Address - Queue0 STS */
+#define	AR5K_QCU_STS_FRMPENDCNT	0x00000003	/* Frames pending counter */
+#define	AR5K_QCU_STS_CBREXPCNT	0x0000ff00	/* CBR expired counter (?) */
 #define	AR5K_QUEUE_STATUS(_q)	AR5K_QUEUE_REG(AR5K_QCU_STS_BASE, _q)
 
 /*
@@ -582,13 +582,13 @@
 #define AR5K_QCU_RDYTIMESHDN_M	0x000003ff
 
 /*
- * QCU compression buffer base registers (5212 only)
+ * QCU compression buffer base registers [5212+]
  */
 #define AR5K_QCU_CBB_SELECT	0x0b00
 #define AR5K_QCU_CBB_ADDR	0x0b04
 
 /*
- * QCU compression buffer configuration register (5212 only)
+ * QCU compression buffer configuration register [5212+]
  */
 #define AR5K_QCU_CBCFG		0x0b08
 
@@ -596,7 +596,7 @@
 
 /*
  * Distributed Coordination Function (DCF) control unit (DCU) 
- * registers (5211/5212)
+ * registers [5211+]
  *
  * These registers control the various characteristics of each queue
  * for 802.11e (WME) combatibility so they go together with
@@ -613,77 +613,83 @@
 /*
  * DCU QCU mask registers
  */
-#define AR5K_DCU_QCUMASK_BASE	0x1000		/*Register Address -Queue0 DCU_QCUMASK*/
+#define AR5K_DCU_QCUMASK_BASE	0x1000		/* Register Address -Queue0 DCU_QCUMASK */
 #define AR5K_DCU_QCUMASK_M	0x000003ff
 #define AR5K_QUEUE_QCUMASK(_q)	AR5K_QUEUE_REG(AR5K_DCU_QCUMASK_BASE, _q)
 
 /*
  * DCU local Inter Frame Space settings register
  */
-#define AR5K_DCU_LCL_IFS_BASE		0x1040			/*Register Address -Queue0 DCU_LCL_IFS*/
-#define	AR5K_DCU_LCL_IFS_CW_MIN	        0x000003ff	/*Minimum Contention Window*/
+#define AR5K_DCU_LCL_IFS_BASE		0x1040			/* Register Address -Queue0 DCU_LCL_IFS */
+#define	AR5K_DCU_LCL_IFS_CW_MIN	        0x000003ff	/* Minimum Contention Window */
 #define	AR5K_DCU_LCL_IFS_CW_MIN_S	0
-#define	AR5K_DCU_LCL_IFS_CW_MAX	        0x000ffc00	/*Maximum Contention Window*/
+#define	AR5K_DCU_LCL_IFS_CW_MAX	        0x000ffc00	/* Maximum Contention Window */
 #define	AR5K_DCU_LCL_IFS_CW_MAX_S	10
-#define	AR5K_DCU_LCL_IFS_AIFS		0x0ff00000	/*Arbitrated Interframe Space*/
+#define	AR5K_DCU_LCL_IFS_AIFS		0x0ff00000	/* Arbitrated Interframe Space */
 #define	AR5K_DCU_LCL_IFS_AIFS_S		20
 #define	AR5K_QUEUE_DFS_LOCAL_IFS(_q)	AR5K_QUEUE_REG(AR5K_DCU_LCL_IFS_BASE, _q)
 
 /*
  * DCU retry limit registers
  */
-#define AR5K_DCU_RETRY_LMT_BASE		0x1080			/*Register Address -Queue0 DCU_RETRY_LMT*/
-#define AR5K_DCU_RETRY_LMT_SH_RETRY	0x0000000f	/*Short retry limit mask*/
+#define AR5K_DCU_RETRY_LMT_BASE		0x1080			/* Register Address -Queue0 DCU_RETRY_LMT */
+#define AR5K_DCU_RETRY_LMT_SH_RETRY	0x0000000f	/* Short retry limit mask */
 #define AR5K_DCU_RETRY_LMT_SH_RETRY_S	0
-#define AR5K_DCU_RETRY_LMT_LG_RETRY	0x000000f0	/*Long retry limit mask*/
+#define AR5K_DCU_RETRY_LMT_LG_RETRY	0x000000f0	/* Long retry limit mask */
 #define AR5K_DCU_RETRY_LMT_LG_RETRY_S	4
-#define AR5K_DCU_RETRY_LMT_SSH_RETRY	0x00003f00	/*Station short retry limit mask (?)*/
+#define AR5K_DCU_RETRY_LMT_SSH_RETRY	0x00003f00	/* Station short retry limit mask (?) */
 #define AR5K_DCU_RETRY_LMT_SSH_RETRY_S	8
-#define AR5K_DCU_RETRY_LMT_SLG_RETRY	0x000fc000	/*Station long retry limit mask (?)*/
+#define AR5K_DCU_RETRY_LMT_SLG_RETRY	0x000fc000	/* Station long retry limit mask (?) */
 #define AR5K_DCU_RETRY_LMT_SLG_RETRY_S	14
 #define	AR5K_QUEUE_DFS_RETRY_LIMIT(_q)	AR5K_QUEUE_REG(AR5K_DCU_RETRY_LMT_BASE, _q)
 
 /*
  * DCU channel time registers
  */
-#define AR5K_DCU_CHAN_TIME_BASE		0x10c0			/*Register Address -Queue0 DCU_CHAN_TIME*/
-#define	AR5K_DCU_CHAN_TIME_DUR		0x000fffff	/*Channel time duration*/
+#define AR5K_DCU_CHAN_TIME_BASE		0x10c0			/* Register Address -Queue0 DCU_CHAN_TIME */
+#define	AR5K_DCU_CHAN_TIME_DUR		0x000fffff	/* Channel time duration */
 #define	AR5K_DCU_CHAN_TIME_DUR_S	0
-#define	AR5K_DCU_CHAN_TIME_ENABLE	0x00100000	/*Enable channel time*/
+#define	AR5K_DCU_CHAN_TIME_ENABLE	0x00100000	/* Enable channel time */
 #define AR5K_QUEUE_DFS_CHANNEL_TIME(_q)	AR5K_QUEUE_REG(AR5K_DCU_CHAN_TIME_BASE, _q)
 
 /*
- * DCU misc registers
+ * DCU misc registers [5211+]
  *
  * For some of the registers i couldn't find in the code 
  * (only backoff stuff is there realy) i tried to match the 
  * names with 802.11e parameters etc, so i guess VIRTCOL here 
  * means Virtual Collision and HCFPOLL means Hybrid Coordination
- * factor Poll (CF- Poll). ARBLOCK_CTL_GLOBAL is used for beacon
- * queue and CAB queue but i couldn't find any more infos.
+ * factor Poll (CF- Poll). Arbiter lockout control controls the
+ * behaviour on low priority queues when we have multiple queues
+ * with pending frames. Intra-frame lockout means we wait until
+ * the queue's current frame transmits (with post frame backoff and bursting)
+ * before we transmit anything else and global lockout means we 
+ * wait for the whole queue to finish before higher priority queues
+ * can transmit (this is used on beacon and CAB queues).
+ * No lockout means there is no special handling.
  */
-#define AR5K_DCU_MISC_BASE		0x1100			/*Register Address -Queue0 DCU_MISC*/
-#define	AR5K_DCU_MISC_BACKOFF		0x000007ff	/*Mask for backoff setting (?)*/
-#define AR5K_DCU_MISC_BACKOFF_FRAG	0x00000200	/*Enable backoff while bursting*/
-#define	AR5K_DCU_MISC_HCFPOLL_ENABLE	0x00000800	/*CF - Poll (?)*/
-#define	AR5K_DCU_MISC_BACKOFF_PERSIST	0x00001000	/*Persistent backoff (?)*/
-#define	AR5K_DCU_MISC_FRMPRFTCH_ENABLE	0x00002000	/*Enable frame pre-fetch (?)*/
-#define	AR5K_DCU_MISC_VIRTCOL		0x0000c000	/*Mask for Virtual Collision (?)*/
+#define AR5K_DCU_MISC_BASE		0x1100			/* Register Address -Queue0 DCU_MISC */
+#define	AR5K_DCU_MISC_BACKOFF		0x000007ff	/* Mask for backoff setting (?) */
+#define AR5K_DCU_MISC_BACKOFF_FRAG	0x00000200	/* Enable backoff while bursting */
+#define	AR5K_DCU_MISC_HCFPOLL_ENABLE	0x00000800	/* CF - Poll (?) */
+#define	AR5K_DCU_MISC_BACKOFF_PERSIST	0x00001000	/* Persistent backoff (?) */
+#define	AR5K_DCU_MISC_FRMPRFTCH_ENABLE	0x00002000	/* Enable frame pre-fetch (?) */
+#define	AR5K_DCU_MISC_VIRTCOL		0x0000c000	/* Mask for Virtual Collision (?) */
 #define	AR5K_DCU_MISC_VIRTCOL_NORMAL	0
 #define	AR5K_DCU_MISC_VIRTCOL_MODIFIED	1
 #define	AR5K_DCU_MISC_VIRTCOL_IGNORE	2
-#define	AR5K_DCU_MISC_BCN_ENABLE	0x00010000	/*Beacon enable (?)*/
-#define	AR5K_DCU_MISC_ARBLOCK_CTL	0x00060000	
+#define	AR5K_DCU_MISC_BCN_ENABLE	0x00010000	/* Beacon enable (?) */
+#define	AR5K_DCU_MISC_ARBLOCK_CTL	0x00060000	/* Arbiter lockout control mask */
 #define	AR5K_DCU_MISC_ARBLOCK_CTL_S	17
-#define	AR5K_DCU_MISC_ARBLOCK_CTL_NONE	0
-#define	AR5K_DCU_MISC_ARBLOCK_CTL_INTFRM	1
-#define	AR5K_DCU_MISC_ARBLOCK_CTL_GLOBAL	2
+#define	AR5K_DCU_MISC_ARBLOCK_CTL_NONE	0		/* No arbiter lockout */
+#define	AR5K_DCU_MISC_ARBLOCK_CTL_INTFRM	1	/* Intra-frame lockout */
+#define	AR5K_DCU_MISC_ARBLOCK_CTL_GLOBAL	2	/* Global lockout */
 #define	AR5K_DCU_MISC_ARBLOCK_IGNORE	0x00080000	
-#define	AR5K_DCU_MISC_SEQ_NUM_INCR_DIS	0x00100000	/*Disable sequence number increment (?)*/
-#define	AR5K_DCU_MISC_POST_FR_BKOFF_DIS	0x00200000	/*Disable post-frame backoff (?)*/
-#define	AR5K_DCU_MISC_VIRT_COLL_POLICY	0x00400000	/*Virtual Collision policy (?)*/
+#define	AR5K_DCU_MISC_SEQ_NUM_INCR_DIS	0x00100000	/* Disable sequence number increment (?) */
+#define	AR5K_DCU_MISC_POST_FR_BKOFF_DIS	0x00200000	/* Disable post-frame backoff (?) */
+#define	AR5K_DCU_MISC_VIRT_COLL_POLICY	0x00400000	/* Virtual Collision policy (?) */
 #define	AR5K_DCU_MISC_BLOWN_IFS_POLICY	0x00800000	
-#define	AR5K_DCU_MISC_SEQNUM_CTL	0x01000000	/*Sequence number control (?)*/
+#define	AR5K_DCU_MISC_SEQNUM_CTL	0x01000000	/* Sequence number control (?) */
 #define AR5K_QUEUE_DFS_MISC(_q)		AR5K_QUEUE_REG(AR5K_DCU_MISC_BASE, _q)
 
 /*
@@ -714,10 +720,10 @@
 /*
  * DCU global IFS misc registers
  */
-#define AR5K_DCU_GBL_IFS_MISC			0x10f0			/*Register Address*/
+#define AR5K_DCU_GBL_IFS_MISC			0x10f0			/* Register Address */
 #define	AR5K_DCU_GBL_IFS_MISC_LFSR_SLICE	0x00000007	
-#define	AR5K_DCU_GBL_IFS_MISC_TURBO_MODE	0x00000008	/*Turbo mode (?)*/
-#define	AR5K_DCU_GBL_IFS_MISC_SIFS_DUR_USEC	0x000003f0	/*SIFS Duration mask (?)*/
+#define	AR5K_DCU_GBL_IFS_MISC_TURBO_MODE	0x00000008	/* Turbo mode (?) */
+#define	AR5K_DCU_GBL_IFS_MISC_SIFS_DUR_USEC	0x000003f0	/* SIFS Duration mask (?) */
 #define	AR5K_DCU_GBL_IFS_MISC_USEC_DUR		0x000ffc00	
 #define	AR5K_DCU_GBL_IFS_MISC_DCU_ARB_DELAY	0x00300000	
 
@@ -729,9 +735,9 @@
 /*
  * DCU transmit pause control/status register
  */
-#define AR5K_DCU_TXP		0x1270			/*Register Address*/
-#define	AR5K_DCU_TXP_M		0x000003ff	/*Tx pause mask (?)*/
-#define	AR5K_DCU_TXP_STATUS	0x00010000	/*Tx pause status (?)*/
+#define AR5K_DCU_TXP		0x1270			/* Register Address */
+#define	AR5K_DCU_TXP_M		0x000003ff	/* Tx pause mask (?) */
+#define	AR5K_DCU_TXP_STATUS	0x00010000	/* Tx pause status (?) */
 
 /*
  * DCU transmit filter register
@@ -754,28 +760,28 @@
  * 4 and 8 are not used in 5211/5212 and
  * 2 means "baseband reset" on 5211/5212.
  */
-#define AR5K_RESET_CTL		0x4000			/*Register Address*/
-#define AR5K_RESET_CTL_PCU	0x00000001	/*Protocol Control Unit reset*/
-#define AR5K_RESET_CTL_DMA	0x00000002	/*DMA (Rx/Tx) reset -5210 only*/
-#define	AR5K_RESET_CTL_BASEBAND	0x00000002	/*Baseband reset (5211/5212)*/
-#define AR5K_RESET_CTL_MAC	0x00000004	/*MAC reset (PCU+Baseband ?) -5210 only*/
-#define AR5K_RESET_CTL_PHY	0x00000008	/*PHY reset -5210 only*/
-#define AR5K_RESET_CTL_PCI	0x00000010	/*PCI Core reset (interrupts etc)*/
+#define AR5K_RESET_CTL		0x4000			/* Register Address */
+#define AR5K_RESET_CTL_PCU	0x00000001	/* Protocol Control Unit reset */
+#define AR5K_RESET_CTL_DMA	0x00000002	/* DMA (Rx/Tx) reset [5210] */
+#define	AR5K_RESET_CTL_BASEBAND	0x00000002	/* Baseband reset [5211+] */
+#define AR5K_RESET_CTL_MAC	0x00000004	/* MAC reset (PCU+Baseband ?) [5210] */
+#define AR5K_RESET_CTL_PHY	0x00000008	/* PHY reset [5210] */
+#define AR5K_RESET_CTL_PCI	0x00000010	/* PCI Core reset (interrupts etc) */
 #define AR5K_RESET_CTL_CHIP	(AR5K_RESET_CTL_PCU | AR5K_RESET_CTL_DMA |	\
 				AR5K_RESET_CTL_MAC | AR5K_RESET_CTL_PHY)
 
 /*
  * Sleep control register
  */
-#define AR5K_SLEEP_CTL			0x4004			/*Register Address*/
-#define AR5K_SLEEP_CTL_SLDUR		0x0000ffff	/*Sleep duration mask*/
+#define AR5K_SLEEP_CTL			0x4004			/* Register Address */
+#define AR5K_SLEEP_CTL_SLDUR		0x0000ffff	/* Sleep duration mask */
 #define AR5K_SLEEP_CTL_SLDUR_S		0
-#define AR5K_SLEEP_CTL_SLE		0x00030000	/*Sleep enable mask*/
+#define AR5K_SLEEP_CTL_SLE		0x00030000	/* Sleep enable mask */
 #define AR5K_SLEEP_CTL_SLE_S		16
-#define AR5K_SLEEP_CTL_SLE_WAKE		0x00000000	/*Force chip awake*/
-#define AR5K_SLEEP_CTL_SLE_SLP		0x00010000	/*Force chip sleep*/
+#define AR5K_SLEEP_CTL_SLE_WAKE		0x00000000	/* Force chip awake */
+#define AR5K_SLEEP_CTL_SLE_SLP		0x00010000	/* Force chip sleep */
 #define AR5K_SLEEP_CTL_SLE_ALLOW	0x00020000	
-#define AR5K_SLEEP_CTL_SLE_UNITS	0x00000008	/*non 5210*/
+#define AR5K_SLEEP_CTL_SLE_UNITS	0x00000008	/* [5211+] */
 
 /*
  * Interrupt pending register
@@ -791,37 +797,34 @@
 
 /*
  * PCI configuration register
- *
- * (5210) = prop is also pressent at 5210 else it's only
- * for 5211/5212. Also some props are only present at 5210.
  */
-#define AR5K_PCICFG			0x4010			/*Register Address*/
-#define AR5K_PCICFG_EEAE		0x00000001	/*Eeprom access enable -5210 only*/
-#define AR5K_PCICFG_CLKRUNEN		0x00000004	/*CLKRUN enable*/
-#define AR5K_PCICFG_EESIZE		0x00000018	/*Mask for EEPROM size*/
+#define AR5K_PCICFG			0x4010			/* Register Address */
+#define AR5K_PCICFG_EEAE		0x00000001	/* Eeprom access enable [5210] */
+#define AR5K_PCICFG_CLKRUNEN		0x00000004	/* CLKRUN enable [5211+] */
+#define AR5K_PCICFG_EESIZE		0x00000018	/* Mask for EEPROM size [5211+] */
 #define AR5K_PCICFG_EESIZE_S		3
-#define AR5K_PCICFG_EESIZE_4K		0		/*4K*/
-#define AR5K_PCICFG_EESIZE_8K		1		/*8K*/
-#define AR5K_PCICFG_EESIZE_16K		2		/*16K*/
-#define AR5K_PCICFG_EESIZE_FAIL		3		/*Failed to get size (?)*/
-#define AR5K_PCICFG_LED			0x00000060	/*Led status*/
-#define AR5K_PCICFG_LED_NONE		0x00000000	/*Default*/
-#define AR5K_PCICFG_LED_PEND		0x00000020	/*Scan / Auth pending (5210)*/
-#define AR5K_PCICFG_LED_ASSOC		0x00000040	/*Associated (5210)*/
-#define	AR5K_PCICFG_BUS_SEL		0x00000380	/*Mask for "bus select" (?)*/
-#define	AR5K_PCICFG_CBEFIX_DIS		0x00000400	/*Disable CBE fix (?)*/
-#define AR5K_PCICFG_SL_INTEN		0x00000800	/*Enable interrupts when asleep (?) (5210)*/
-#define AR5K_PCICFG_LED_BCTL		0x00001000	/*Led blink (?) -5210 only*/
-#define AR5K_PCICFG_SL_INPEN		0x00002800	/*Sleep even whith pending interrupts (?) (5210)*/
-#define AR5K_PCICFG_SPWR_DN		0x00010000	/*Mask for power status (5210)*/
-#define AR5K_PCICFG_LEDMODE		0x000e0000	/*Ledmode*/
-#define AR5K_PCICFG_LEDMODE_PROP	0x00000000	/*Blink on standard traffic*/
-#define AR5K_PCICFG_LEDMODE_PROM	0x00020000	/*Default mode (blink on any traffic)*/
-#define AR5K_PCICFG_LEDMODE_PWR		0x00040000	/*Some other blinking mode  (?)*/
-#define AR5K_PCICFG_LEDMODE_RAND	0x00060000	/*Random blinking (?)*/
+#define AR5K_PCICFG_EESIZE_4K		0		/* 4K */
+#define AR5K_PCICFG_EESIZE_8K		1		/* 8K */
+#define AR5K_PCICFG_EESIZE_16K		2		/* 16K */
+#define AR5K_PCICFG_EESIZE_FAIL		3		/* Failed to get size (?) [5211+] */
+#define AR5K_PCICFG_LED			0x00000060	/* Led status [5211+] */
+#define AR5K_PCICFG_LED_NONE		0x00000000	/* Default [5211+] */
+#define AR5K_PCICFG_LED_PEND		0x00000020	/* Scan / Auth pending */
+#define AR5K_PCICFG_LED_ASSOC		0x00000040	/* Associated */
+#define	AR5K_PCICFG_BUS_SEL		0x00000380	/* Mask for "bus select" [5211+] (?) */
+#define	AR5K_PCICFG_CBEFIX_DIS		0x00000400	/* Disable CBE fix (?) */
+#define AR5K_PCICFG_SL_INTEN		0x00000800	/* Enable interrupts when asleep (?) */
+#define AR5K_PCICFG_LED_BCTL		0x00001000	/* Led blink (?) [5210] */
+#define AR5K_PCICFG_SL_INPEN		0x00002800	/* Sleep even whith pending interrupts (?) */
+#define AR5K_PCICFG_SPWR_DN		0x00010000	/* Mask for power status */
+#define AR5K_PCICFG_LEDMODE		0x000e0000	/* Ledmode [5211+] */
+#define AR5K_PCICFG_LEDMODE_PROP	0x00000000	/* Blink on standard traffic [5211+] */
+#define AR5K_PCICFG_LEDMODE_PROM	0x00020000	/* Default mode (blink on any traffic) [5211+] */
+#define AR5K_PCICFG_LEDMODE_PWR		0x00040000	/* Some other blinking mode  (?) [5211+] */
+#define AR5K_PCICFG_LEDMODE_RAND	0x00060000	/* Random blinking (?) [5211+] */
 #define AR5K_PCICFG_LEDBLINK		0x00700000	
 #define AR5K_PCICFG_LEDBLINK_S		20
-#define AR5K_PCICFG_LEDSLOW		0x00800000	/*Slow led blink rate (?)*/
+#define AR5K_PCICFG_LEDSLOW		0x00800000	/* Slow led blink rate (?) [5211+] */
 #define AR5K_PCICFG_LEDSTATE				\
 	(AR5K_PCICFG_LED | AR5K_PCICFG_LEDMODE |	\
 	AR5K_PCICFG_LEDBLINK | AR5K_PCICFG_LEDSLOW)
@@ -844,15 +847,15 @@
  */
 #define AR5K_NUM_GPIO	6
 
-#define AR5K_GPIOCR		0x4014				/*Register Address*/
-#define AR5K_GPIOCR_INT_ENA	0x00008000		/*Enable GPIO interrupt*/
-#define AR5K_GPIOCR_INT_SELL	0x00000000		/*Generate interrupt when pin is off (?)*/
-#define AR5K_GPIOCR_INT_SELH	0x00010000		/*Generate interrupt when pin is on*/
-#define AR5K_GPIOCR_IN(n)	(0 << ((n) * 2))	/*Mode 0 for pin n*/
-#define AR5K_GPIOCR_OUT0(n)	(1 << ((n) * 2))	/*Mode 1 for pin n*/
-#define AR5K_GPIOCR_OUT1(n)	(2 << ((n) * 2))	/*Mode 2 for pin n*/
-#define AR5K_GPIOCR_OUT(n)	(3 << ((n) * 2))	/*Mode 3 for pin n*/
-#define AR5K_GPIOCR_INT_SEL(n)	((n) << 12)		/*Interrupt for GPIO pin n*/
+#define AR5K_GPIOCR		0x4014				/* Register Address */
+#define AR5K_GPIOCR_INT_ENA	0x00008000		/* Enable GPIO interrupt */
+#define AR5K_GPIOCR_INT_SELL	0x00000000		/* Generate interrupt when pin is off (?) */
+#define AR5K_GPIOCR_INT_SELH	0x00010000		/* Generate interrupt when pin is on */
+#define AR5K_GPIOCR_IN(n)	(0 << ((n) * 2))	/* Mode 0 for pin n */
+#define AR5K_GPIOCR_OUT0(n)	(1 << ((n) * 2))	/* Mode 1 for pin n */
+#define AR5K_GPIOCR_OUT1(n)	(2 << ((n) * 2))	/* Mode 2 for pin n */
+#define AR5K_GPIOCR_OUT(n)	(3 << ((n) * 2))	/* Mode 3 for pin n */
+#define AR5K_GPIOCR_INT_SEL(n)	((n) << 12)		/* Interrupt for GPIO pin n */
 
 /*
  * "General Purpose Input/Output" (GPIO) data output register
@@ -869,10 +872,10 @@
 /*
  * Silicon revision register
  */
-#define AR5K_SREV		0x4020			/*Register Address*/
-#define AR5K_SREV_REV		0x0000000f	/*Mask for revision*/
+#define AR5K_SREV		0x4020			/* Register Address */
+#define AR5K_SREV_REV		0x0000000f	/* Mask for revision */
 #define AR5K_SREV_REV_S		0
-#define AR5K_SREV_VER		0x000000ff	/*Mask for version*/
+#define AR5K_SREV_VER		0x000000ff	/* Mask for version */
 #define AR5K_SREV_VER_S		4
 
 
@@ -1016,22 +1019,22 @@
 /*
  * EEPROM command register
  */
-#define AR5K_EEPROM_CMD		0x6008			/*Register Addres*/
-#define AR5K_EEPROM_CMD_READ	0x00000001	/*EEPROM read*/
-#define AR5K_EEPROM_CMD_WRITE	0x00000002	/*EEPROM write*/
-#define AR5K_EEPROM_CMD_RESET	0x00000004	/*EEPROM reset*/
+#define AR5K_EEPROM_CMD		0x6008			/* Register Addres */
+#define AR5K_EEPROM_CMD_READ	0x00000001	/* EEPROM read */
+#define AR5K_EEPROM_CMD_WRITE	0x00000002	/* EEPROM write */
+#define AR5K_EEPROM_CMD_RESET	0x00000004	/* EEPROM reset */
 
 /*
  * EEPROM status register
  */
-#define AR5K_EEPROM_STAT_5210	0x6c00			/*Register Address -5210*/
-#define AR5K_EEPROM_STAT_5211	0x600c			/*Register Address -5211/5212*/
+#define AR5K_EEPROM_STAT_5210	0x6c00			/* Register Address [5210] */
+#define AR5K_EEPROM_STAT_5211	0x600c			/* Register Address [5211+] */
 #define	AR5K_EEPROM_STATUS	(hal->ah_version == AR5K_AR5210 ? \
 				AR5K_EEPROM_STAT_5210 : AR5K_EEPROM_STAT_5211)
-#define AR5K_EEPROM_STAT_RDERR	0x00000001	/*EEPROM read failed*/
-#define AR5K_EEPROM_STAT_RDDONE	0x00000002	/*EEPROM read successful*/
-#define AR5K_EEPROM_STAT_WRERR	0x00000004	/*EEPROM write failed*/
-#define AR5K_EEPROM_STAT_WRDONE	0x00000008	/*EEPROM write successful*/
+#define AR5K_EEPROM_STAT_RDERR	0x00000001	/* EEPROM read failed */
+#define AR5K_EEPROM_STAT_RDDONE	0x00000002	/* EEPROM read successful */
+#define AR5K_EEPROM_STAT_WRERR	0x00000004	/* EEPROM write failed */
+#define AR5K_EEPROM_STAT_WRDONE	0x00000008	/* EEPROM write successful */
 
 /*
  * EEPROM config register (?)
@@ -1043,7 +1046,10 @@
 /*
  * Protocol Control Unit (PCU) registers
  */
-/*Used for checking initial register writes during channel reset (see reset func)*/
+/* 
+ * Used for checking initial register writes
+ * during channel reset (see reset func)
+ */
 #define AR5K_PCU_MIN	0x8000
 #define AR5K_PCU_MAX	0x8fff
 
@@ -1055,21 +1061,21 @@
 /*
  * Second station id register (MAC address in upper 16 bits)
  */
-#define AR5K_STA_ID1			0x8004			/*Register Address*/
-#define AR5K_STA_ID1_AP			0x00010000	/*Set AP mode*/
-#define AR5K_STA_ID1_ADHOC		0x00020000	/*Set Ad-Hoc mode*/
-#define AR5K_STA_ID1_PWR_SV		0x00040000	/*Power save reporting (?)*/
-#define AR5K_STA_ID1_NO_KEYSRCH		0x00080000	/*No key search*/
-#define AR5K_STA_ID1_NO_PSPOLL		0x00100000	/*No uapsd polling -5210 only*/
-#define AR5K_STA_ID1_PCF_5211		0x00100000	/*Enable PCF on 5211/5212*/
-#define AR5K_STA_ID1_PCF_5210		0x00200000	/*Enable PCF on 5210*/
+#define AR5K_STA_ID1			0x8004			/* Register Address */
+#define AR5K_STA_ID1_AP			0x00010000	/* Set AP mode */
+#define AR5K_STA_ID1_ADHOC		0x00020000	/* Set Ad-Hoc mode */
+#define AR5K_STA_ID1_PWR_SV		0x00040000	/* Power save reporting (?) */
+#define AR5K_STA_ID1_NO_KEYSRCH		0x00080000	/* No key search */
+#define AR5K_STA_ID1_NO_PSPOLL		0x00100000	/* No power save polling [5210] */
+#define AR5K_STA_ID1_PCF_5211		0x00100000	/* Enable PCF on [5211+] */
+#define AR5K_STA_ID1_PCF_5210		0x00200000	/* Enable PCF on [5210]*/
 #define	AR5K_STA_ID1_PCF		(hal->ah_version == AR5K_AR5210 ? \
 					AR5K_STA_ID1_PCF_5210 : AR5K_STA_ID1_PCF_5211)
-#define AR5K_STA_ID1_DEFAULT_ANTENNA	0x00200000	/*Use default antenna on 5211/5212*/
-#define AR5K_STA_ID1_DESC_ANTENNA	0x00400000	/*Update antenna from descriptor*/
-#define AR5K_STA_ID1_RTS_DEF_ANTENNA	0x00800000	/*Use default antenna for RTS (?)*/
-#define AR5K_STA_ID1_ACKCTS_6MB		0x01000000	/*Use 6Mbit/s for ACK/CTS (?)*/
-#define AR5K_STA_ID1_BASE_RATE_11B	0x02000000	/*Use 11b base rate (for ACK/CTS ?) -non 5210*/
+#define AR5K_STA_ID1_DEFAULT_ANTENNA	0x00200000	/* Use default antenna */
+#define AR5K_STA_ID1_DESC_ANTENNA	0x00400000	/* Update antenna from descriptor */
+#define AR5K_STA_ID1_RTS_DEF_ANTENNA	0x00800000	/* Use default antenna for RTS (?) */
+#define AR5K_STA_ID1_ACKCTS_6MB		0x01000000	/* Use 6Mbit/s for ACK/CTS (?) */
+#define AR5K_STA_ID1_BASE_RATE_11B	0x02000000	/* Use 11b base rate (for ACK/CTS ?) [5211+] */
 
 /*
  * First BSSID register (MAC address, lower 32bits)
@@ -1093,20 +1099,20 @@
 /*
  * ACK/CTS timeout register
  */
-#define AR5K_TIME_OUT		0x8014			/*Register Address*/
-#define AR5K_TIME_OUT_ACK	0x00001fff	/*ACK timeout mask*/
+#define AR5K_TIME_OUT		0x8014			/* Register Address */
+#define AR5K_TIME_OUT_ACK	0x00001fff	/* ACK timeout mask */
 #define AR5K_TIME_OUT_ACK_S	0
-#define AR5K_TIME_OUT_CTS	0x1fff0000	/*CTS timeout mask*/
+#define AR5K_TIME_OUT_CTS	0x1fff0000	/* CTS timeout mask */
 #define AR5K_TIME_OUT_CTS_S	16
 
 /*
  * RSSI threshold register
  */
-#define AR5K_RSSI_THR			0x8018		/*Register Address*/
-#define AR5K_RSSI_THR_M			0x000000ff	/*Mask for RSSI threshold -non 5210*/
-#define AR5K_RSSI_THR_BMISS_5210	0x00000700	/*Mask for Beacon Missed threshold -5210*/
+#define AR5K_RSSI_THR			0x8018		/* Register Address */
+#define AR5K_RSSI_THR_M			0x000000ff	/* Mask for RSSI threshold [5211+] */
+#define AR5K_RSSI_THR_BMISS_5210	0x00000700	/* Mask for Beacon Missed threshold [5210] */
 #define AR5K_RSSI_THR_BMISS_5210_S	8
-#define AR5K_RSSI_THR_BMISS_5211	0x0000ff00	/*Mask for Beacon Missed threshold -5211/5212*/
+#define AR5K_RSSI_THR_BMISS_5211	0x0000ff00	/* Mask for Beacon Missed threshold [5211+] */
 #define AR5K_RSSI_THR_BMISS_5211_S	8
 #define	AR5K_RSSI_THR_BMISS		(hal->ah_version == AR5K_AR5210 ? \
 					AR5K_RSSI_THR_BMISS_5210 : AR5K_RSSI_THR_BMISS_5211)
@@ -1125,23 +1131,23 @@
  *
  * Retry limit register for 5210 (no QCU/DCU so it's done in PCU)
  */
-#define AR5K_NODCU_RETRY_LMT		0x801c			/*Register Address*/
-#define AR5K_NODCU_RETRY_LMT_SH_RETRY	0x0000000f	/*Short retry limit mask*/
+#define AR5K_NODCU_RETRY_LMT		0x801c			/*Register Address */
+#define AR5K_NODCU_RETRY_LMT_SH_RETRY	0x0000000f	/* Short retry limit mask */
 #define AR5K_NODCU_RETRY_LMT_SH_RETRY_S	0
-#define AR5K_NODCU_RETRY_LMT_LG_RETRY	0x000000f0	/*Long retry mask*/
+#define AR5K_NODCU_RETRY_LMT_LG_RETRY	0x000000f0	/* Long retry mask */
 #define AR5K_NODCU_RETRY_LMT_LG_RETRY_S	4
-#define AR5K_NODCU_RETRY_LMT_SSH_RETRY	0x00003f00	/*Station short retry limit mask*/
+#define AR5K_NODCU_RETRY_LMT_SSH_RETRY	0x00003f00	/* Station short retry limit mask */
 #define AR5K_NODCU_RETRY_LMT_SSH_RETRY_S	8
-#define AR5K_NODCU_RETRY_LMT_SLG_RETRY	0x000fc000	/*Station long retry limit mask*/
+#define AR5K_NODCU_RETRY_LMT_SLG_RETRY	0x000fc000	/* Station long retry limit mask */
 #define AR5K_NODCU_RETRY_LMT_SLG_RETRY_S	14
-#define AR5K_NODCU_RETRY_LMT_CW_MIN	0x3ff00000	/*Minimum contention window mask*/
+#define AR5K_NODCU_RETRY_LMT_CW_MIN	0x3ff00000	/* Minimum contention window mask */
 #define AR5K_NODCU_RETRY_LMT_CW_MIN_S	20
 
 /*
  * Transmit latency register
  */
-#define AR5K_USEC_5210			0x8020			/*Register Address (5210)*/
-#define AR5K_USEC_5211			0x801c			/*Register Address (5211/5212)*/
+#define AR5K_USEC_5210			0x8020			/* Register Address [5210] */
+#define AR5K_USEC_5211			0x801c			/* Register Address [5211+] */
 #define AR5K_USEC			(hal->ah_version == AR5K_AR5210 ? \
 					AR5K_USEC_5210 : AR5K_USEC_5211)
 #define AR5K_USEC_1			0x0000007f
@@ -1152,9 +1158,9 @@
 #define AR5K_USEC_TX_LATENCY_5211_S	14
 #define AR5K_USEC_RX_LATENCY_5211	0x1f800000
 #define AR5K_USEC_RX_LATENCY_5211_S	23
-#define AR5K_USEC_TX_LATENCY_5210	0x000fc000	/*also for 5311*/
+#define AR5K_USEC_TX_LATENCY_5210	0x000fc000	/* also for 5311 */
 #define AR5K_USEC_TX_LATENCY_5210_S	14
-#define AR5K_USEC_RX_LATENCY_5210	0x03f00000	/*also for 5311*/
+#define AR5K_USEC_RX_LATENCY_5210	0x03f00000	/* also for 5311 */
 #define AR5K_USEC_RX_LATENCY_5210_S	20
 
 /*
@@ -1244,8 +1250,8 @@
  * Receive filter register
  * TODO: Get these out of ar5xxx.h on ath5k
  */
-#define AR5K_RX_FILTER_5210	0x804c			/*Register Address (521)*/
-#define AR5K_RX_FILTER_5211	0x803c			/*Register Address (5211/5212)*/
+#define AR5K_RX_FILTER_5210	0x804c			/* Register Address [5210] */
+#define AR5K_RX_FILTER_5211	0x803c			/* Register Address [5211+] */
 #define AR5K_RX_FILTER		(hal->ah_version == AR5K_AR5210 ? \
 				AR5K_RX_FILTER_5210 : AR5K_RX_FILTER_5211)
 #define	AR5K_RX_FILTER_UCAST 	0x00000001	/* Don't filter unicast frames */
@@ -1254,12 +1260,12 @@
 #define	AR5K_RX_FILTER_CONTROL 	0x00000008	/* Don't filter control frames */
 #define	AR5K_RX_FILTER_BEACON 	0x00000010	/* Don't filter beacon frames */
 #define	AR5K_RX_FILTER_PROM 	0x00000020	/* Set promiscuous mode */
-#define	AR5K_RX_FILTER_XRPOLL 	0x00000040	/* Don't filter XR poll frame -5212 only*/
-#define	AR5K_RX_FILTER_PROBEREQ 0x00000080	/* Don't filter probe requests -5212 only*/
-#define	AR5K_RX_FILTER_PHYERR_5212	0x00000100	/* Don't filter phy errors */
-#define	AR5K_RX_FILTER_RADARERR_5212 	0x00000200	/* Don't filter phy radar errors*/
-#define AR5K_RX_FILTER_PHYERR_5211	0x00000040	/*5211 only*/
-#define AR5K_RX_FILTER_RADARERR_5211	0x00000080	/*5211 only*/
+#define	AR5K_RX_FILTER_XRPOLL 	0x00000040	/* Don't filter XR poll frame [5212+] */
+#define	AR5K_RX_FILTER_PROBEREQ 0x00000080	/* Don't filter probe requests [5212+] */
+#define	AR5K_RX_FILTER_PHYERR_5212	0x00000100	/* Don't filter phy errors [5212+] */
+#define	AR5K_RX_FILTER_RADARERR_5212 	0x00000200	/* Don't filter phy radar errors [5212+] */
+#define AR5K_RX_FILTER_PHYERR_5211	0x00000040	/* [5211] */
+#define AR5K_RX_FILTER_RADARERR_5211	0x00000080	/* [5211] */
 #define AR5K_RX_FILTER_PHYERR	(hal->ah_version == AR5K_AR5211 ? \
 				AR5K_RX_FILTER_PHYERR_5211 : AR5K_RX_FILTER_PHYERR_5212)
 #define	AR5K_RX_FILTER_RADARERR	(hal->ah_version == AR5K_AR5211 ? \
@@ -1282,22 +1288,22 @@
 
 
 /*
- * Transmit mask register (lower 32 bits) (5210)
+ * Transmit mask register (lower 32 bits) [5210]
  */
 #define AR5K_TX_MASK0	0x8058
 
 /*
- * Transmit mask register (higher 16 bits) (5210)
+ * Transmit mask register (higher 16 bits) [5210]
  */
 #define AR5K_TX_MASK1	0x805c
 
 /*
- * Clear transmit mask (5210)
+ * Clear transmit mask [5210]
  */
 #define AR5K_CLR_TMASK	0x8060
 
 /*
- * Trigger level register (before transmission) (5210)
+ * Trigger level register (before transmission) [5210]
  */
 #define AR5K_TRIG_LVL	0x8064
 
@@ -1308,21 +1314,21 @@
  * Only DIS_RX is used in the code, the rest i guess are
  * for tweaking/diagnostics.
  */
-#define AR5K_DIAG_SW_5210		0x8068			/*Register Address (5210)*/
-#define AR5K_DIAG_SW_5211		0x8048			/*Register Address (5211/5212)*/
+#define AR5K_DIAG_SW_5210		0x8068			/* Register Address [5210] */
+#define AR5K_DIAG_SW_5211		0x8048			/* Register Address [5211+] */
 #define AR5K_DIAG_SW			(hal->ah_version == AR5K_AR5210 ? \
 					AR5K_DIAG_SW_5210 : AR5K_DIAG_SW_5211)
 #define AR5K_DIAG_SW_DIS_WEP_ACK	0x00000001	
-#define AR5K_DIAG_SW_DIS_ACK		0x00000002	/*Disable ACKs (?)*/
-#define AR5K_DIAG_SW_DIS_CTS		0x00000004	/*Disable CTSs (?)*/
-#define AR5K_DIAG_SW_DIS_ENC		0x00000008	/*Disable encryption (?)*/
-#define AR5K_DIAG_SW_DIS_DEC		0x00000010	/*Disable decryption (?)*/
-#define AR5K_DIAG_SW_DIS_TX		0x00000020	/*Disable transmit -5210 only*/
-#define AR5K_DIAG_SW_DIS_RX_5210	0x00000040	/*Disable recieve*/
+#define AR5K_DIAG_SW_DIS_ACK		0x00000002	/* Disable ACKs (?) */
+#define AR5K_DIAG_SW_DIS_CTS		0x00000004	/* Disable CTSs (?) */
+#define AR5K_DIAG_SW_DIS_ENC		0x00000008	/* Disable encryption (?) */
+#define AR5K_DIAG_SW_DIS_DEC		0x00000010	/* Disable decryption (?) */
+#define AR5K_DIAG_SW_DIS_TX		0x00000020	/* Disable transmit [5210] */
+#define AR5K_DIAG_SW_DIS_RX_5210	0x00000040	/* Disable recieve */
 #define AR5K_DIAG_SW_DIS_RX_5211	0x00000020
 #define	AR5K_DIAG_SW_DIS_RX		(hal->ah_version == AR5K_AR5210 ? \
 					AR5K_DIAG_SW_DIS_RX_5210 : AR5K_DIAG_SW_DIS_RX_5211)
-#define AR5K_DIAG_SW_LOOP_BACK_5210	0x00000080	/*Loopback (i guess it goes with DIS_TX) -5210 only*/
+#define AR5K_DIAG_SW_LOOP_BACK_5210	0x00000080	/* Loopback (i guess it goes with DIS_TX) [5210] */
 #define AR5K_DIAG_SW_LOOP_BACK_5211	0x00000040
 #define AR5K_DIAG_SW_LOOP_BACK		(hal->ah_version == AR5K_AR5210 ? \
 					AR5K_DIAG_SW_LOOP_BACK_5210 : AR5K_DIAG_SW_LOOP_BACK_5211)
@@ -1334,15 +1340,15 @@
 #define AR5K_DIAG_SW_CHAN_INFO_5211	0x00000100
 #define AR5K_DIAG_SW_CHAN_INFO		(hal->ah_version == AR5K_AR5210 ? \
 					AR5K_DIAG_SW_CHAN_INFO_5210 : AR5K_DIAG_SW_CHAN_INFO_5211)
-#define AR5K_DIAG_SW_EN_SCRAM_SEED_5211	0x00000200	/*Scrambler seed (?)*/
+#define AR5K_DIAG_SW_EN_SCRAM_SEED_5211	0x00000200	/* Scrambler seed (?) */
 #define AR5K_DIAG_SW_EN_SCRAM_SEED_5210	0x00000400
 #define AR5K_DIAG_SW_EN_SCRAM_SEED	(hal->ah_version == AR5K_AR5210 ? \
 					AR5K_DIAG_SW_EN_SCRAM_SEED_5210 : AR5K_DIAG_SW_EN_SCRAM_SEED_5211)
-#define AR5K_DIAG_SW_ECO_ENABLE		0x00000400	/*non 5210*/
-#define AR5K_DIAG_SW_SCVRAM_SEED	0x0003f800	/*5210 only*/
-#define AR5K_DIAG_SW_SCRAM_SEED_M	0x0001fc00	/*Scrambler seed mask (?)*/
+#define AR5K_DIAG_SW_ECO_ENABLE		0x00000400	/* [5211+] */
+#define AR5K_DIAG_SW_SCVRAM_SEED	0x0003f800	/* [5210] */
+#define AR5K_DIAG_SW_SCRAM_SEED_M	0x0001fc00	/* Scrambler seed mask (?) */
 #define AR5K_DIAG_SW_SCRAM_SEED_S	10
-#define AR5K_DIAG_SW_DIS_SEQ_INC	0x00040000	/*Disable seqnum increment (?)-5210 only*/
+#define AR5K_DIAG_SW_DIS_SEQ_INC	0x00040000	/* Disable seqnum increment (?)[5210] */
 #define AR5K_DIAG_SW_FRAME_NV0_5210	0x00080000	
 #define AR5K_DIAG_SW_FRAME_NV0_5211	0x00020000
 #define	AR5K_DIAG_SW_FRAME_NV0		(hal->ah_version == AR5K_AR5210 ? \
@@ -1372,30 +1378,30 @@
 #define AR5K_LAST_TSTP	0x8080
 
 /*
- * ADDAC test register (5211/5212)
+ * ADDAC test register [5211+]
  */
 #define AR5K_ADDAC_TEST	0x8054
 
 /*
- * Default antenna register (5211/5212)
+ * Default antenna register [5211+]
  */
 #define AR5K_DEFAULT_ANTENNA	0x8058
 
 
 
 /*
- * Retry count register (5210)
+ * Retry count register [5210]
  */
-#define AR5K_RETRY_CNT		0x8084			/*Register Address (5210)*/
-#define AR5K_RETRY_CNT_SSH	0x0000003f	/*Station short retry count (?)*/
-#define AR5K_RETRY_CNT_SLG	0x00000fc0	/*Station long retry count (?)*/
+#define AR5K_RETRY_CNT		0x8084			/* Register Address [5210] */
+#define AR5K_RETRY_CNT_SSH	0x0000003f	/* Station short retry count (?) */
+#define AR5K_RETRY_CNT_SLG	0x00000fc0	/* Station long retry count (?) */
 
 /*
- * Back-off status register (5210)
+ * Back-off status register [5210]
  */
-#define AR5K_BACKOFF		0x8088			/*Register Address (5210)*/
-#define AR5K_BACKOFF_CW		0x000003ff	/*Backoff Contention Window (?)*/
-#define AR5K_BACKOFF_CNT	0x03ff0000	/*Backoff count (?)*/
+#define AR5K_BACKOFF		0x8088			/* Register Address [5210] */
+#define AR5K_BACKOFF_CW		0x000003ff	/* Backoff Contention Window (?) */
+#define AR5K_BACKOFF_CNT	0x03ff0000	/* Backoff count (?) */
 
 
 
@@ -1571,7 +1577,7 @@
 #define AR5K_RATE_DUR_BASE		0x8700
 #define AR5K_RATE_DUR(_n)		(AR5K_RATE_DUR_BASE + ((_n) << 2))
 
-/*===5212===*/
+/*===5212 end===*/
 
 /*
  * Key table (WEP) register
@@ -1587,11 +1593,11 @@
 #define AR5K_KEYTABLE_TYPE_40		0x00000000
 #define AR5K_KEYTABLE_TYPE_104		0x00000001
 #define AR5K_KEYTABLE_TYPE_128		0x00000003
-#define AR5K_KEYTABLE_TYPE_TKIP		0x00000004	/*5212*/
-#define AR5K_KEYTABLE_TYPE_AES		0x00000005	/*!5210*/
-#define AR5K_KEYTABLE_TYPE_CCM		0x00000006	/*5212*/
-#define AR5K_KEYTABLE_TYPE_NULL		0x00000007	/*!5210*/
-#define AR5K_KEYTABLE_ANTENNA		0x00000008	/*5212*/
+#define AR5K_KEYTABLE_TYPE_TKIP		0x00000004	/* [5212+] */
+#define AR5K_KEYTABLE_TYPE_AES		0x00000005	/* [5211+] */
+#define AR5K_KEYTABLE_TYPE_CCM		0x00000006	/* [5212+] */
+#define AR5K_KEYTABLE_TYPE_NULL		0x00000007	/* [5211+] */
+#define AR5K_KEYTABLE_ANTENNA		0x00000008	/* [5212+] */
 #define AR5K_KEYTABLE_MAC0(_n)		AR5K_KEYTABLE_OFF(_n, 6)
 #define AR5K_KEYTABLE_MAC1(_n)		AR5K_KEYTABLE_OFF(_n, 7)
 #define AR5K_KEYTABLE_VALID		0x00008000
@@ -1615,14 +1621,14 @@
 #define AR5K_PHY_SHIFT_5GHZ		0x00000007
 
 /*
- * PHY frame control register (5210) /turbo mode register (5211/5212)
+ * PHY frame control register [5110] /turbo mode register [5111+]
  *
- * There is another frame control register for 5211/5212
+ * There is another frame control register for [5111+]
  * at address 0x9944 (see below) but the 2 first flags
- * are common here between 5210 frame control register
- * and 5211/5212 turbo mode register, so this also works as 
- * a "turbo mode register" for 5210. We treat this one as 
- * a frame control register for 5210 below.
+ * are common here between 5110 frame control register
+ * and [5111+] turbo mode register, so this also works as 
+ * a "turbo mode register" for 5110. We treat this one as 
+ * a frame control register for 5110 below.
  */
 #define	AR5K_PHY_TURBO			0x9804
 #define	AR5K_PHY_TURBO_MODE		0x00000001
@@ -1635,7 +1641,7 @@
 #define	AR5K_PHY_AGC_DISABLE		0x08000000
 
 /*
- * PHY timing register (5212)
+ * PHY timing register [5112+]
  */
 #define	AR5K_PHY_TIMING_3		0x9814
 #define	AR5K_PHY_TIMING_3_DSC_MAN	0xfffe0000
@@ -1656,7 +1662,7 @@
 #define	AR5K_PHY_ACT_DISABLE		0x00000002
 
 /*
- * PHY signal register (5210)
+ * PHY signal register [5110]
  */
 #define	AR5K_PHY_SIG			0x9858
 #define	AR5K_PHY_SIG_FIRSTEP		0x0003f000
@@ -1665,7 +1671,7 @@
 #define	AR5K_PHY_SIG_FIRPWR_S		18
 
 /*
- * PHY coarse agility control register (5210)
+ * PHY coarse agility control register [5110]
  */
 #define	AR5K_PHY_AGCCOARSE		0x985c
 #define	AR5K_PHY_AGCCOARSE_LO		0x00007f80
@@ -1676,9 +1682,9 @@
 /*
  * PHY agility control register
  */
-#define	AR5K_PHY_AGCCTL			0x9860
-#define	AR5K_PHY_AGCCTL_CAL		0x00000001
-#define	AR5K_PHY_AGCCTL_NF		0x00000002
+#define	AR5K_PHY_AGCCTL			0x9860			/* Register address */
+#define	AR5K_PHY_AGCCTL_CAL		0x00000001	/* Enable PHY calibration */
+#define	AR5K_PHY_AGCCTL_NF		0x00000002	/* Enable Noise Floor calibration */
 
 /*
  * PHY noise floor status register
@@ -1691,7 +1697,7 @@
 #define AR5K_PHY_NF_SVAL(_n)		(((_n) & AR5K_PHY_NF_M) | (1 << 9))
 
 /*
- * PHY ADC saturation register (5210)
+ * PHY ADC saturation register [5110]
  */
 #define	AR5K_PHY_ADCSAT			0x9868
 #define	AR5K_PHY_ADCSAT_ICNT		0x0001f800
@@ -1700,7 +1706,7 @@
 #define	AR5K_PHY_ADCSAT_THR_S		5
 
 /*
- * PHY sleep registers (5212)
+ * PHY sleep registers [5112+]
  */
 #define AR5K_PHY_SCR			0x9870
 #define AR5K_PHY_SCR_32MHZ		0x0000001f
@@ -1710,10 +1716,10 @@
 #define AR5K_PHY_SCAL_32MHZ		0x0000000e
 
 /*
- * PHY PLL control register (!5210)
+ * PHY PLL control register [5111+]
  */
 #define	AR5K_PHY_PLL			0x987c
-#define	AR5K_PHY_PLL_20MHZ		0x13		/*5211 only*/
+#define	AR5K_PHY_PLL_20MHZ		0x13		/* [5111] */
 #define	AR5K_PHY_PLL_40MHZ_5211		0x18
 #define	AR5K_PHY_PLL_40MHZ_5212		0x000000aa
 #define	AR5K_PHY_PLL_40MHZ		(hal->ah_version == AR5K_AR5211 ? \
@@ -1722,23 +1728,23 @@
 #define	AR5K_PHY_PLL_44MHZ_5212		0x000000ab
 #define	AR5K_PHY_PLL_44MHZ		(hal->ah_version == AR5K_AR5211 ? \
 					AR5K_PHY_PLL_44MHZ_5211 : AR5K_PHY_PLL_44MHZ_5212)
-#define AR5K_PHY_PLL_AR5111		0x00000000
-#define AR5K_PHY_PLL_AR5112		0x00000040
+#define AR5K_PHY_PLL_RF5111		0x00000000
+#define AR5K_PHY_PLL_RF5112		0x00000040
 
 /*
- * PHY RF stage register (5210)
+ * PHY RF stage register [5110]
  */
 #define AR5K_PHY_RFSTG			0x98d4
 #define AR5K_PHY_RFSTG_DISABLE		0x00000021
 
 /*
- * PHY receiver delay register (!5210)
+ * PHY receiver delay register [5111+]
  */
 #define	AR5K_PHY_RX_DELAY		0x9914
 #define	AR5K_PHY_RX_DELAY_M		0x00003fff
 
 /*
- * PHY timing IQ control register (!5210)
+ * PHY timing IQ control register [5111+]
  */
 #define	AR5K_PHY_IQ			0x9920
 #define	AR5K_PHY_IQ_CORR_Q_Q_COFF	0x0000001f
@@ -1751,13 +1757,13 @@
 
 
 /*
- * PHY PAPD probe register (!5210)
+ * PHY PAPD probe register [5111+]
  */
 #define	AR5K_PHY_PAPD_PROBE		0x9930
 #define	AR5K_PHY_PAPD_PROBE_TXPOWER	0x00007e00
 #define	AR5K_PHY_PAPD_PROBE_TXPOWER_S	9
 #define	AR5K_PHY_PAPD_PROBE_TX_NEXT	0x00008000
-#define	AR5K_PHY_PAPD_PROBE_TYPE	0x01800000	/*5212 only*/
+#define	AR5K_PHY_PAPD_PROBE_TYPE	0x01800000	/* [5112+] */
 #define	AR5K_PHY_PAPD_PROBE_TYPE_S	23
 #define	AR5K_PHY_PAPD_PROBE_TYPE_OFDM	0
 #define	AR5K_PHY_PAPD_PROBE_TYPE_XR	1
@@ -1767,7 +1773,7 @@
 
 
 /*
- * PHY TX power registers (5212)
+ * PHY TX power registers [5112+]
  */
 #define	AR5K_PHY_TXPOWER_RATE1			0x9934
 #define	AR5K_PHY_TXPOWER_RATE2			0x9938
@@ -1777,16 +1783,16 @@
 #define	AR5K_PHY_TXPOWER_RATE4			0xa238
 
 /*
- * PHY frame control register (!5210)
+ * PHY frame control register [5111+]
  */
 #define	AR5K_PHY_FRAME_CTL_5210		0x9804
 #define	AR5K_PHY_FRAME_CTL_5211		0x9944
 #define	AR5K_PHY_FRAME_CTL		(hal->ah_version == AR5K_AR5210 ? \
 					AR5K_PHY_FRAME_CTL_5210 : AR5K_PHY_FRAME_CTL_5211)
-/*---non 5210---*/
+/*---[5111+]---*/
 #define	AR5K_PHY_FRAME_CTL_TX_CLIP	0x00000038
 #define	AR5K_PHY_FRAME_CTL_TX_CLIP_S	3
-/*---5210 only---*/
+/*---[5110]---*/
 #define	AR5K_PHY_FRAME_CTL_TIMING_ERR	0x01000000
 #define	AR5K_PHY_FRAME_CTL_PARITY_ERR	0x02000000
 #define	AR5K_PHY_FRAME_CTL_ILLRATE_ERR	0x04000000
@@ -1795,31 +1801,31 @@
 #define	AR5K_PHY_FRAME_CTL_TXURN_ERR	0x40000000
 
 /*
- * PHY radar detection enable register (!5210)
+ * PHY radar detection enable register [5111+]
  */
 #define	AR5K_PHY_RADAR			0x9954
 #define	AR5K_PHY_RADAR_DISABLE		0x00000000
 #define	AR5K_PHY_RADAR_ENABLE		0x00000001
 
 /*
- * PHY antenna switch table registers (!5210)
+ * PHY antenna switch table registers [5110]
  */
 #define AR5K_PHY_ANT_SWITCH_TABLE_0	0x9960
 #define AR5K_PHY_ANT_SWITCH_TABLE_1	0x9964
 
 /*
- * PHY clock sleep registers (5212)
+ * PHY clock sleep registers [5112+]
  */
 #define AR5K_PHY_SCLOCK			0x99f0
 #define AR5K_PHY_SCLOCK_32MHZ		0x0000000c
 #define AR5K_PHY_SDELAY			0x99f4
 #define AR5K_PHY_SDELAY_32MHZ		0x000000ff
 #define AR5K_PHY_SPENDING		0x99f8
-#define AR5K_PHY_SPENDING_AR5111	0x00000018
-#define AR5K_PHY_SPENDING_AR5112	0x00000014
+#define AR5K_PHY_SPENDING_RF5111	0x00000018
+#define AR5K_PHY_SPENDING_RF5112	0x00000014
 
 /*
- * Misc PHY/radio registers (5210/5211)
+ * Misc PHY/radio registers [5110 - 5111]
  */
 #define	AR5K_BB_GAIN_BASE		0x9b00
 #define AR5K_BB_GAIN(_n)		(AR5K_BB_GAIN_BASE + ((_n) << 2))
@@ -1827,25 +1833,25 @@
 #define AR5K_RF_GAIN(_n)		(AR5K_RF_GAIN_BASE + ((_n) << 2))
 
 /*
- * PHY timing IQ calibration result register (!5210)
+ * PHY timing IQ calibration result register [5111+]
  */
 #define	AR5K_PHY_IQRES_CAL_PWR_I	0x9c10
 #define	AR5K_PHY_IQRES_CAL_PWR_Q	0x9c14
 #define	AR5K_PHY_IQRES_CAL_CORR		0x9c18
 
 /*
- * PHY current RSSI register (!5210)
+ * PHY current RSSI register [5111+]
  */
 #define	AR5K_PHY_CURRENT_RSSI		0x9c1c
 
 /*
- * PHY PCDAC TX power register (5212)
+ * PHY PCDAC TX power register [5112+]
  */
 #define	AR5K_PHY_PCDAC_TXPOWER_BASE	0xa180
 #define	AR5K_PHY_PCDAC_TXPOWER(_n)	(AR5K_PHY_PCDAC_TXPOWER_BASE + ((_n) << 2))
 
 /*
- * PHY mode register (!5210)
+ * PHY mode register [5111+]
  */
 #define	AR5K_PHY_MODE			0x0a200
 #define	AR5K_PHY_MODE_MOD		0x00000001
@@ -1854,21 +1860,21 @@
 #define AR5K_PHY_MODE_FREQ		0x00000002
 #define	AR5K_PHY_MODE_FREQ_5GHZ		0
 #define	AR5K_PHY_MODE_FREQ_2GHZ		2
-#define AR5K_PHY_MODE_MOD_DYN		0x00000004	/*5212 only*/
-#define AR5K_PHY_MODE_RAD		0x00000008	/*5212 only*/
-#define AR5K_PHY_MODE_RAD_AR5111	0
-#define AR5K_PHY_MODE_RAD_AR5112	8
-#define AR5K_PHY_MODE_XR		0x00000010	/*5212 only*/
+#define AR5K_PHY_MODE_MOD_DYN		0x00000004	/* [5112+] */
+#define AR5K_PHY_MODE_RAD		0x00000008	/* [5112+] */
+#define AR5K_PHY_MODE_RAD_RF5111	0
+#define AR5K_PHY_MODE_RAD_RF5112	8
+#define AR5K_PHY_MODE_XR		0x00000010	/* [5112+] */
 
 /*
- * PHY CCK transmit control register (5212)
+ * PHY CCK transmit control register [5112+]
  */
 #define AR5K_PHY_CCKTXCTL		0xa204
 #define AR5K_PHY_CCKTXCTL_WORLD		0x00000000
 #define AR5K_PHY_CCKTXCTL_JAPAN		0x00000010
  	 
 /*
- * PHY 2GHz gain register (5212)
+ * PHY 2GHz gain register [5112+]
  */
 #define	AR5K_PHY_GAIN_2GHZ		0xa20c
 #define	AR5K_PHY_GAIN_2GHZ_MARGIN_TXRX	0x00fc0000
