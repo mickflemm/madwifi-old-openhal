@@ -6039,9 +6039,9 @@ ath5k_hw_txpower(struct ath_hal *hal, AR5K_CHANNEL *channel, u_int txpower)
 	 */
 	for (i = 0; i < (AR5K_EEPROM_POWER_TABLE_SIZE / 2); i++) {
 		AR5K_REG_WRITE(AR5K_PHY_PCDAC_TXPOWER(i),
-		    ((((hal->ah_txpower.txp_pcdac[(i << 1) + 1] << 8) | 0xff) &
-		    0xffff) << 16) | (((hal->ah_txpower.txp_pcdac[i << 1] << 8)
-		    | 0xff) & 0xffff));
+		      ((((hal->ah_txpower.txp_pcdac[(i << 1) + 1] << 8) | 0xff) & 0xffff) << 16) 
+		    | ((((hal->ah_txpower.txp_pcdac[(i << 1)    ] << 8) | 0xff) & 0xffff)      )
+		    );
 	}
 
 	AR5K_REG_WRITE(AR5K_PHY_TXPOWER_RATE1,
