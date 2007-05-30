@@ -1381,6 +1381,7 @@
  * ADDAC test register [5211+]
  */
 #define AR5K_ADDAC_TEST	0x8054
+#define AR5K_ADDAC_TEST_TXCONT 0x00000001
 
 /*
  * Default antenna register [5211+]
