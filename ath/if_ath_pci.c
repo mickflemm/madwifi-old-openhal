@@ -96,18 +96,23 @@ struct ath_pci_softc {
  * the HAL check them by defining a probe method.
  */
 static struct pci_device_id ath_pci_id_table[] __devinitdata = {
-	{ 0x168c, 0x0007, PCI_ANY_ID, PCI_ANY_ID },
-	{ 0x168c, 0x0012, PCI_ANY_ID, PCI_ANY_ID },
-	{ 0x168c, 0x0013, PCI_ANY_ID, PCI_ANY_ID },
-	{ 0xa727, 0x0013, PCI_ANY_ID, PCI_ANY_ID },	/* 3com */
-	{ 0x10b7, 0x0013, PCI_ANY_ID, PCI_ANY_ID },	/* 3com 3CRDAG675 */
+	{ 0x168c, 0x0207, PCI_ANY_ID, PCI_ANY_ID },	/* 5210 early */
+	{ 0x168c, 0x0007, PCI_ANY_ID, PCI_ANY_ID },	/* 5210 */
+	{ 0x168c, 0x0011, PCI_ANY_ID, PCI_ANY_ID },	/* 5311 */
+	{ 0x168c, 0x0012, PCI_ANY_ID, PCI_ANY_ID },	/* 5211 */
+	{ 0x168c, 0x0013, PCI_ANY_ID, PCI_ANY_ID },	/* 5212 */
+	{ 0xa727, 0x0013, PCI_ANY_ID, PCI_ANY_ID },	/* 3com 5212 */
+	{ 0x10b7, 0x0013, PCI_ANY_ID, PCI_ANY_ID },	/* 3com 3CRDAG675 5212 */
 	{ 0x168c, 0x1014, PCI_ANY_ID, PCI_ANY_ID },	/* IBM minipci 5212 */
-	{ 0x168c, 0x0015, PCI_ANY_ID, PCI_ANY_ID },
-	{ 0x168c, 0x0016, PCI_ANY_ID, PCI_ANY_ID },
-	{ 0x168c, 0x0017, PCI_ANY_ID, PCI_ANY_ID },
-	{ 0x168c, 0x0018, PCI_ANY_ID, PCI_ANY_ID },
-	{ 0x168c, 0x0019, PCI_ANY_ID, PCI_ANY_ID },
-	{ 0x168c, 0x001a, PCI_ANY_ID, PCI_ANY_ID },
+	{ 0x168c, 0x0014, PCI_ANY_ID, PCI_ANY_ID },	/* 5212 combatible */
+	{ 0x168c, 0x0015, PCI_ANY_ID, PCI_ANY_ID },	/* 5212 combatible */
+	{ 0x168c, 0x0016, PCI_ANY_ID, PCI_ANY_ID },	/* 5212 combatible */
+	{ 0x168c, 0x0017, PCI_ANY_ID, PCI_ANY_ID },	/* 5212 combatible */
+	{ 0x168c, 0x0018, PCI_ANY_ID, PCI_ANY_ID },	/* 5212 combatible */
+	{ 0x168c, 0x0019, PCI_ANY_ID, PCI_ANY_ID },	/* 5212 combatible */
+	{ 0x168c, 0x001a, PCI_ANY_ID, PCI_ANY_ID },	/* 2413 Griffin-lite */
+	{ 0x168c, 0x001b, PCI_ANY_ID, PCI_ANY_ID },	/* 5413 Eagle */
+	{ 0x168c, 0x001c, PCI_ANY_ID, PCI_ANY_ID },	/* 5424 Condor (PCI-E)*/
 	{ 0 }
 };
 
