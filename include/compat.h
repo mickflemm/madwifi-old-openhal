@@ -132,6 +132,44 @@
 #define __iomem
 #endif
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,22) 
+#include <linux/skbuff.h> 
+static inline unsigned char *skb_end_pointer(const struct sk_buff *skb) 
+{ 
+        return skb->end; 
+} 
+
+static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb) 
+{ 
+        return skb->tail; 
+} 
+
+static inline void skb_set_network_header(struct sk_buff *skb, const int offset) 
+{ 
+        skb->nh.raw = skb->data + offset; 
+} 
+ 
+static inline void skb_reset_network_header(struct sk_buff *skb) 
+{ 
+        skb->nh.raw = skb->data; 
+} 
+ 
+static inline unsigned char *skb_mac_header(const struct sk_buff *skb) 
+{ 
+        return skb->mac.raw; 
+} 
+ 
+static inline void skb_reset_mac_header(struct sk_buff *skb) 
+{ 
+        skb->mac.raw = skb->data; 
+}
+
+static inline struct iphdr *ip_hdr(const struct sk_buff *skb)
+{
+	return (struct iphdr *)skb->nh.iph;
+}
+#endif
+
 #endif /* __KERNEL__ */
 
 #endif /* _ATH_COMPAT_H_ */

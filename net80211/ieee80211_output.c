@@ -254,7 +254,7 @@ ieee80211_classify(struct ieee80211com *ic, struct sk_buff *skb, struct ieee8021
 	}
 	eh = (struct ether_header *) skb->data;
 	if (eh->ether_type == __constant_htons(ETHERTYPE_IP)) {
-		ip = skb->nh.iph;
+		ip = ip_hdr(skb);
 
 		/*
 		 * IP frame, map the DSCP field (corrected version, <<2).

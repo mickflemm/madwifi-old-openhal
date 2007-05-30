@@ -544,9 +544,8 @@ ieee80211_input(struct ieee80211com *ic, struct sk_buff *skb,
 			if (skb1 != NULL) {
 				len = skb1->len;
 				skb1->dev = dev;
-				skb1->mac.raw = skb1->data;
-				skb1->nh.raw = skb1->data + 
-					sizeof(struct ether_header);
+				skb_reset_mac_header(skb1);
+				skb_set_network_header(skb1, sizeof(struct ether_header));
 				skb1->protocol = __constant_htons(ETH_P_802_2);
 				dev_queue_xmit(skb1);			// NB: send directly to iface
 			}
@@ -768,14 +767,14 @@ ieee80211_defrag(struct ieee80211com *ic, struct ieee80211_node *ni,
 			 * (IEEE80211_MAX_LEN + cacheline size)
 			 * but maybe it's better to double check here
 			 */
-			if (skb->end - skb->head < ic->ic_dev->mtu+hdrspace) {
+			if (skb_end_pointer(skb) - skb->head < ic->ic_dev->mtu+hdrspace) {
 				/*
 				 * This should also linearize the skbuff
 				 * TODO: not 100% sure
 				 */
 				skbfrag = skb_copy_expand(skb, 0,
 					(ic->ic_dev->mtu+hdrspace)
-				         - (skb->end - skb->head), GFP_ATOMIC);
+				         - (skb_end_pointer(skb)- skb->head), GFP_ATOMIC);
 				dev_kfree_skb(skb);
 			}
 		}

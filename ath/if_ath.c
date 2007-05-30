@@ -3367,7 +3367,7 @@ ath_tx_capture(struct net_device *dev, struct ath_desc *ds, struct sk_buff *skb)
 	}
 
 	skb->dev = dev;
-	skb->mac.raw = skb->data;
+	skb_reset_mac_header(skb);
 	skb->ip_summed = CHECKSUM_NONE;
 	skb->pkt_type = PACKET_OTHERHOST;
 	skb->protocol = __constant_htons(0x0019);  /* ETH_P_80211_RAW */
@@ -3519,7 +3519,7 @@ ath_rx_capture(struct net_device *dev, struct ath_desc *ds, struct sk_buff *skb)
 	}
 	
 	skb->dev = dev;
-	skb->mac.raw = skb->data;
+	skb_reset_mac_header(skb);
 	skb->ip_summed = CHECKSUM_NONE;
 	skb->pkt_type = PACKET_OTHERHOST;
 	skb->protocol = __constant_htons(0x0019);  /* ETH_P_80211_RAW */
