@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (c) 2004-2007 Reyk Floeter <reyk@openbsd.org>
  * Copyright (c) 2006-2007 Nick Kossifidis <mickflemm@gmail.com>
  *
@@ -275,9 +275,9 @@ ath5k_hw_clocktoh(u_int clock, AR5K_BOOL turbo)
 inline void
 ath5k_hw_rtcopy(AR5K_RATE_TABLE *dst, const AR5K_RATE_TABLE *src)
 {
-	bzero(dst, sizeof(AR5K_RATE_TABLE));
+	memset(dst, 0, sizeof(AR5K_RATE_TABLE));
 	dst->rate_count = src->rate_count;
-	bcopy(src->rates, dst->rates, sizeof(dst->rates));
+	memcpy(dst->rates, src->rates, sizeof(dst->rates));
 }
 
 /*
@@ -332,7 +332,7 @@ ath5k_hw_register_timeout(struct ath_hal *hal, u_int32_t reg, u_int32_t flag,
 			break;
 		else if ((data & flag) == val)
 			break;
-		AR5K_DELAY(15);
+		udelay(15);
 	}
 
 	if (i <= 0)
@@ -355,7 +355,7 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 		AR5K_BUS_HANDLE sh, AR5K_STATUS *status)
 {
 	struct ath_hal *hal = NULL;
-	u_int8_t mac[IEEE80211_ADDR_LEN];
+	u_int8_t mac[ETH_ALEN];
 	u_int8_t mac_version = 255; /*Initialize this to something else than ath5k_version*/
 	int i;
 	u_int32_t srev;
@@ -379,15 +379,14 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 	}
 
 	/*If we passed the test malloc a hal struct*/
-	if ((hal = malloc(sizeof(struct ath_hal),
-		 M_DEVBUF, M_NOWAIT)) == NULL) {
+	if ((hal = kmalloc(sizeof(struct ath_hal), GFP_KERNEL)) == NULL) {
 		*status = AR5K_ENOMEM;
 		AR5K_PRINT("out of memory\n");
 		return (NULL);
 	}
 
 	/*Initialize it*/
-	bzero(hal, sizeof(struct ath_hal));
+	memset(hal, 0, sizeof(struct ath_hal));
 
 	hal->ah_sc = sc;
 	hal->ah_st = st;
@@ -474,10 +473,12 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 
 	hal->ah_phy = AR5K_PHY(0);
 
-	/*Is this bcopy O.K. ?*/
-	bcopy(etherbroadcastaddr, mac, IEEE80211_ADDR_LEN);
-
+	/* Set MAC to bcast: ff:ff:ff:ff:ff:ff, this is using 'mac' as a 
+ 	 * temporary variable for setting our BSSID. Right bellow we update 
+ 	 * it with ath5k_hw_get_lladdr() */
+	memset(mac, 0xff, ETH_ALEN);
 	ath5k_hw_set_associd(hal, mac, 0);
+
 	ath5k_hw_get_lladdr(hal, mac);
 	ath5k_hw_set_opmode(hal);
 		
@@ -549,7 +550,7 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 	return (hal);
 
  failed:
-	free(hal, M_DEVBUF);
+	kfree(hal);
 	return (NULL);
 }
 
@@ -626,7 +627,7 @@ ath5k_hw_nic_wakeup(struct ath_hal *hal, u_int16_t flags, AR5K_BOOL initial)
 				return (FALSE);
 			}
 
-			AR5K_DELAY(1000);
+			udelay(1000);
 		}
 
 		/* ...wakeup */
@@ -646,7 +647,7 @@ ath5k_hw_nic_wakeup(struct ath_hal *hal, u_int16_t flags, AR5K_BOOL initial)
 			return (FALSE);
 		}
 
-		AR5K_DELAY(1000);
+		udelay(1000);
 	}
 
 	/* ...reset chipset and PCI device */
@@ -657,7 +658,7 @@ ath5k_hw_nic_wakeup(struct ath_hal *hal, u_int16_t flags, AR5K_BOOL initial)
 	}
 
 	if (hal->ah_version == AR5K_AR5210)
-		AR5K_DELAY(2300);
+		udelay(2300);
 
 	/* ...wakeup */
 	if (ath5k_hw_set_power(hal,
@@ -675,7 +676,7 @@ ath5k_hw_nic_wakeup(struct ath_hal *hal, u_int16_t flags, AR5K_BOOL initial)
 	if (hal->ah_version != AR5K_AR5210){
 		/* ...set the PHY operating mode */
 		AR5K_REG_WRITE(AR5K_PHY_PLL, clock);
-		AR5K_DELAY(300);
+		udelay(300);
 
 		AR5K_REG_WRITE(AR5K_PHY_MODE, mode);
 		AR5K_REG_WRITE(AR5K_PHY_TURBO, turbo);
@@ -710,7 +711,7 @@ ath5k_hw_radio_revision(struct ath_hal *hal, AR5K_CHIP chip)
 		return (0);
 	}
 
-	AR5K_DELAY(2000);
+	udelay(2000);
 
 	/* ...wait until PHY is ready and read the selected radio revision */
 	AR5K_REG_WRITE(AR5K_PHY(0x34), 0x00001c16);
@@ -771,12 +772,12 @@ ath5k_hw_detach(struct ath_hal *hal)
 	AR5K_TRACE;
 
 	if (hal->ah_rf_banks != NULL)
-		free(hal->ah_rf_banks, M_DEVBUF);
+		kfree(hal->ah_rf_banks);
 
 	/*
 	 * Free HAL structure, assume interrupts are down
 	 */
-	free(hal, M_DEVBUF);
+	kfree(hal);
 }
 
 
@@ -794,7 +795,7 @@ ath5k_hw_reset(struct ath_hal *hal, AR5K_OPMODE op_mode, AR5K_CHANNEL *channel,
     AR5K_BOOL change_channel, AR5K_STATUS *status)
 {
 	struct ath5k_eeprom_info *ee = &hal->ah_capabilities.cap_eeprom;
-	u_int8_t mac[IEEE80211_ADDR_LEN];
+	u_int8_t mac[ETH_ALEN];
 	u_int32_t data, noise_floor, s_seq, s_ant, s_led[3];
 	u_int i, phy, mode, freq, off, ee_mode, ant[2];
 	const AR5K_RATE_TABLE *rt;
@@ -1011,7 +1012,7 @@ ath5k_hw_reset(struct ath_hal *hal, AR5K_OPMODE op_mode, AR5K_CHANNEL *channel,
 			return (FALSE);
 		}
 
-		AR5K_DELAY(1000);
+		udelay(1000);
 
 		/*
 		 * Set rate duration table on 5212
@@ -1186,10 +1187,10 @@ ath5k_hw_reset(struct ath_hal *hal, AR5K_OPMODE op_mode, AR5K_CHANNEL *channel,
 		}
 
 	} else {
-		AR5K_DELAY(1000);
+		udelay(1000);
 		/* Disable phy and wait */
 		AR5K_REG_WRITE(AR5K_PHY_ACT, AR5K_PHY_ACT_DISABLE);
-		AR5K_DELAY(1000);
+		udelay(1000);
 	}
 
 	/*
@@ -1207,12 +1208,18 @@ ath5k_hw_reset(struct ath_hal *hal, AR5K_OPMODE op_mode, AR5K_CHANNEL *channel,
 	/*
 	 * Misc
 	 */
-	bcopy(etherbroadcastaddr, mac, IEEE80211_ADDR_LEN);
+	memset(mac, 0xff, ETH_ALEN);
 	ath5k_hw_set_associd(hal, mac, 0);
 	ath5k_hw_set_opmode(hal);
 	/*PISR/SISR Not available on 5210*/
 	if (hal->ah_version != AR5K_AR5210) {
 		AR5K_REG_WRITE(AR5K_PISR, 0xffffffff);
+		/* XXX: AR5K_RSSI_THR has masks and shifts defined for it, so 
+ 		 * direct write using AR5K_REG_WRITE seems wrong. Test with:
+		 * AR5K_REG_WRITE_BITS(AR5K_RSSI_THR,
+		 *   AR5K_RSSI_THR_BMISS, AR5K_TUNE_RSSI_THRES);
+		 * with different variables and check results compared
+		 * to AR5K_REG_WRITE()  */
 		AR5K_REG_WRITE(AR5K_RSSI_THR, AR5K_TUNE_RSSI_THRES);
 	}
 
@@ -1248,9 +1255,9 @@ ath5k_hw_reset(struct ath_hal *hal, AR5K_OPMODE op_mode, AR5K_CHANNEL *channel,
 		data = (channel->channel_flags & CHANNEL_CCK) ?
 		    ((data << 2) / 22) : (data / 10);
 
-		AR5K_DELAY(100 + data);
+		udelay(100 + data);
 	} else {
-		AR5K_DELAY(1000);
+		udelay(1000);
 	}
 
 	/*
@@ -1281,7 +1288,7 @@ ath5k_hw_reset(struct ath_hal *hal, AR5K_OPMODE op_mode, AR5K_CHANNEL *channel,
 
 	/* Wait until the noise floor is calibrated */
 	for (i = 20; i > 0; i--) {
-		AR5K_DELAY(1000);
+		udelay(1000);
 		noise_floor = AR5K_REG_READ(AR5K_PHY_NF);
 
 		if (AR5K_PHY_NF_RVAL(noise_floor) &
@@ -1385,7 +1392,7 @@ ath5k_hw_nic_reset(struct ath_hal *hal, u_int32_t val)
 	AR5K_REG_WRITE(AR5K_RESET_CTL, val);
 
 	/* Wait at least 128 PCI clocks */
-	AR5K_DELAY(15);
+	udelay(15);
 
 	if (hal->ah_version == AR5K_AR5210) {
 		val &= AR5K_RESET_CTL_CHIP;
@@ -1459,7 +1466,7 @@ ath5k_hw_set_power(struct ath_hal *hal, AR5K_POWER_MODE mode,
 				break;
 
 			/* Wait a bit and retry */
-			AR5K_DELAY(200);
+			udelay(200);
 			AR5K_REG_WRITE(AR5K_SLEEP_CTL,
 			    AR5K_SLEEP_CTL_SLE_WAKE);
 		}
@@ -1532,7 +1539,7 @@ ath5k_hw_stop_rx_dma(struct ath_hal *hal)
 	for (i = 2000;
 	     i > 0 && (AR5K_REG_READ(AR5K_CR) & AR5K_CR_RXE) != 0;
 	     i--)
-		AR5K_DELAY(10);
+		udelay(10);
 
 	return (i > 0 ? TRUE : FALSE);
 }
@@ -1660,7 +1667,7 @@ ath5k_hw_stop_tx_dma(struct ath_hal *hal, u_int queue)
 		do {
 			pending = AR5K_REG_READ(AR5K_QUEUE_STATUS(queue)) &
 						AR5K_QCU_STS_FRMPENDCNT;
-			AR5K_DELAY(100);
+			udelay(100);
 		} while (--i && pending);
 
 		/* Clear register */
@@ -2047,7 +2054,7 @@ ath5k_hw_eeprom_read(struct ath_hal *hal, u_int32_t offset, u_int16_t *data)
 			    (AR5K_REG_READ(AR5K_EEPROM_DATA) & 0xffff);
 			return (0);
 		}
-		AR5K_DELAY(15);
+		udelay(15);
 	}
 
 	return (ETIMEDOUT);
@@ -2097,7 +2104,7 @@ ath5k_hw_eeprom_write(struct ath_hal *hal, u_int32_t offset, u_int16_t data)
 				return (EIO);
 			return (0);
 		}
-		AR5K_DELAY(15);
+		udelay(15);
 	}
 #endif
 	AR5K_PRINTF("EEPROM Write is disabled!");
@@ -2477,10 +2484,10 @@ ath5k_eeprom_read_mac(struct ath_hal *hal, u_int8_t *mac)
 	u_int32_t total, offset;
 	u_int16_t data;
 	int octet;
-	u_int8_t mac_d[IEEE80211_ADDR_LEN];
+	u_int8_t mac_d[ETH_ALEN];
 
-	bzero(mac, IEEE80211_ADDR_LEN);
-	bzero(&mac_d, IEEE80211_ADDR_LEN);
+	memset(mac, 0, ETH_ALEN);
+	memset(&mac_d, 0, ETH_ALEN);
 
 	if (hal->ah_eeprom_read(hal, 0x20, &data) != 0)
 		return (AR5K_EIO);
@@ -2496,7 +2503,7 @@ ath5k_eeprom_read_mac(struct ath_hal *hal, u_int8_t *mac)
 		octet += 2;
 	}
 
-	bcopy(mac_d, mac, IEEE80211_ADDR_LEN);
+	memcpy(mac, mac_d, ETH_ALEN);
 
 	if ((!total) || total == (3 * 0xffff))
 		return (AR5K_EINVAL);
@@ -2716,7 +2723,7 @@ void
 ath5k_hw_get_lladdr(struct ath_hal *hal, u_int8_t *mac)
 {
 	AR5K_TRACE;
-	bcopy(hal->ah_sta_id, mac, IEEE80211_ADDR_LEN);
+	memcpy(mac, hal->ah_sta_id, ETH_ALEN);
 }
 
 /*
@@ -2729,7 +2736,7 @@ ath5k_hw_set_lladdr(struct ath_hal *hal, const u_int8_t *mac)
 
 	AR5K_TRACE;
 	/* Set new station ID */
-	bcopy(mac, hal->ah_sta_id, IEEE80211_ADDR_LEN);
+	memcpy(hal->ah_sta_id, mac, ETH_ALEN);
 
 	low_id = AR5K_LOW_ID(mac);
 	high_id = AR5K_HIGH_ID(mac);
@@ -2766,7 +2773,7 @@ ath5k_hw_set_associd(struct ath_hal *hal, const u_int8_t *bssid,
 	AR5K_REG_WRITE(AR5K_BSS_ID0, low_id);
 	AR5K_REG_WRITE(AR5K_BSS_ID1, high_id |
 	    ((assoc_id & 0x3fff) << AR5K_BSS_ID1_AID_S));
-	bcopy(bssid, &hal->ah_bssid, IEEE80211_ADDR_LEN);
+	memcpy(&hal->ah_bssid, bssid, ETH_ALEN);
 
 	if (assoc_id == 0) {
 		ath5k_hw_disable_pspoll(hal);
@@ -3109,13 +3116,12 @@ ath5k_hw_set_beacon_timers(struct ath_hal *hal, const AR5K_BEACON_STATE *state)
 
 	/*
 	 * Write new beacon miss threshold, if it appears to be valid
-	 * XXX: < or <= ?
+	 * XXX: Figure out right values for min <= bs_bmiss_threshold <= max
+	 * and return if its not in range. We can test this by reading value and
+	 * setting value to a largest value and seeing which values register.
 	 */
-	if ((AR5K_RSSI_THR_BMISS >> AR5K_RSSI_THR_BMISS_S) <
-	    state->bs_bmiss_threshold)
-		return;
 
-	AR5K_REG_WRITE_BITS(AR5K_RSSI_THR_M,
+	AR5K_REG_WRITE_BITS(AR5K_RSSI_THR,
 	    AR5K_RSSI_THR_BMISS, state->bs_bmiss_threshold);
 
 	/*
@@ -3406,30 +3412,30 @@ ath5k_hw_set_key(struct ath_hal *hal, u_int16_t entry,
 	AR5K_TRACE;
 	AR5K_ASSERT_ENTRY(entry, AR5K_KEYTABLE_SIZE);
 
-	bzero(&key_v, sizeof(key_v));
+	memset(&key_v, 0, sizeof(key_v));
 
 	switch (keyval->wk_len) {
 	case AR5K_KEYVAL_LENGTH_40:
-		bcopy(keyval->wk_key, &key_v[0], 4);
-		bcopy(keyval->wk_key + 4, &key_v[1], 1);
+		memcpy(&key_v[0], keyval->wk_key, 4);
+		memcpy(&key_v[1], keyval->wk_key + 4, 1);
 		key_v[5] = AR5K_KEYTABLE_TYPE_40;
 		break;
 
 	case AR5K_KEYVAL_LENGTH_104:
-		bcopy(keyval->wk_key, &key_v[0], 4);
-		bcopy(keyval->wk_key + 4, &key_v[1], 2);
-		bcopy(keyval->wk_key + 6, &key_v[2], 4);
-		bcopy(keyval->wk_key + 10, &key_v[3], 2);
-		bcopy(keyval->wk_key + 12, &key_v[4], 1);
+		memcpy(&key_v[0], keyval->wk_key, 4);
+		memcpy(&key_v[1], keyval->wk_key + 4, 2);
+		memcpy(&key_v[2], keyval->wk_key + 6, 4);
+		memcpy(&key_v[3], keyval->wk_key + 10, 2);
+		memcpy(&key_v[4], keyval->wk_key + 12, 1);
 		key_v[5] = AR5K_KEYTABLE_TYPE_104;
 		break;
 
 	case AR5K_KEYVAL_LENGTH_128:
-		bcopy(keyval->wk_key, &key_v[0], 4);
-		bcopy(keyval->wk_key + 4, &key_v[1], 2);
-		bcopy(keyval->wk_key + 6, &key_v[2], 4);
-		bcopy(keyval->wk_key + 10, &key_v[3], 2);
-		bcopy(keyval->wk_key + 12, &key_v[4], 4);
+		memcpy(&key_v[0], keyval->wk_key, 4);
+		memcpy(&key_v[1], keyval->wk_key + 4, 2);
+		memcpy(&key_v[2], keyval->wk_key + 6, 4);
+		memcpy(&key_v[3], keyval->wk_key + 10, 2);
+		memcpy(&key_v[4], keyval->wk_key + 12, 4);
 		key_v[5] = AR5K_KEYTABLE_TYPE_128;
 		break;
 
@@ -3449,19 +3455,21 @@ ath5k_hw_set_key_lladdr(struct ath_hal *hal, u_int16_t entry,
     const u_int8_t *mac)
 {
 	u_int32_t low_id, high_id;
-	const u_int8_t *mac_v;
 
 	AR5K_TRACE;
-	/*
-	 * Invalid entry (key table overflow)
-	 */
+	 /* Invalid entry (key table overflow) */
 	AR5K_ASSERT_ENTRY(entry, AR5K_KEYTABLE_SIZE);
 
-	/* MAC may be NULL if it's a broadcast key */
-	mac_v = mac == NULL ? etherbroadcastaddr : mac;
-
-	low_id = AR5K_LOW_ID(mac_v);
-	high_id = AR5K_HIGH_ID(mac_v) | AR5K_KEYTABLE_VALID;
+	/* MAC may be NULL if it's a broadcast key. In this case no need to 
+ 	 * to compute AR5K_LOW_ID and AR5K_HIGH_ID as we already know it. */
+	if(unlikely(mac == NULL)) {
+		low_id = 0xffffffff;
+		high_id = 0xffff | AR5K_KEYTABLE_VALID;
+	}
+	else {
+		low_id = AR5K_LOW_ID(mac);
+		high_id = AR5K_HIGH_ID(mac) | AR5K_KEYTABLE_VALID;
+	}
 
 	AR5K_REG_WRITE(AR5K_KEYTABLE_MAC0(entry), low_id);
 	AR5K_REG_WRITE(AR5K_KEYTABLE_MAC1(entry), high_id);
@@ -3535,7 +3543,7 @@ ath5k_hw_setup_tx_queue(struct ath_hal *hal, AR5K_TX_QUEUE queue_type,
 	/*
 	 * Setup internal queue structure
 	 */
-	bzero(&hal->ah_txq[queue], sizeof(AR5K_TXQ_INFO));
+	memset(&hal->ah_txq[queue], 0, sizeof(AR5K_TXQ_INFO));
 	hal->ah_txq[queue].tqi_type = queue_type;
 
 	if (queue_info != NULL) {
@@ -3567,7 +3575,7 @@ ath5k_hw_setup_tx_queueprops(struct ath_hal *hal, int queue,
 	if (hal->ah_txq[queue].tqi_type == AR5K_TX_QUEUE_INACTIVE) 
 		return (FALSE);
 
-	bcopy(queue_info, &hal->ah_txq[queue], sizeof(AR5K_TXQ_INFO));
+	memcpy(&hal->ah_txq[queue], queue_info, sizeof(AR5K_TXQ_INFO));
 
 	/*XXX: Is this supported on 5210 ?*/
 	if ((queue_info->tqi_type == AR5K_TX_QUEUE_DATA && 
@@ -4115,7 +4123,7 @@ ath5k_hw_fill_2word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 	tx_desc = (struct ath5k_hw_2w_tx_desc*)&desc->ds_ctl0;
 
 	/* Clear status descriptor */
-	bzero(desc->ds_hw, sizeof(desc->ds_hw));
+	memset(desc->ds_hw, 0, sizeof(desc->ds_hw));
 
 	/* Validate segment length and initialize the descriptor */
 	if ((tx_desc->tx_control_1 = (segment_length &
@@ -4148,7 +4156,7 @@ ath5k_hw_fill_4word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 	tx_status = (struct ath5k_hw_tx_status*)&desc->ds_hw[2];
 
 	/* Clear status descriptor */
-	bzero(tx_status, sizeof(struct ath5k_hw_tx_status));
+	memset(tx_status, 0, sizeof(struct ath5k_hw_tx_status));
 
 	/* Validate segment length and initialize the descriptor */
 	if ((tx_desc->tx_control_1 = (segment_length &
@@ -4335,7 +4343,7 @@ ath5k_hw_setup_rx_desc(struct ath_hal *hal, struct ath_desc *desc,
 	 * most of them virtual, after some secs 
 	 * of scanning system hangs. M.F.
 	*/
-	bzero(desc->ds_hw, sizeof(desc->ds_hw));
+	memset(desc->ds_hw, 0, sizeof(desc->ds_hw));
 
 	/*Initialize rx descriptor*/
 	rx_desc->rx_control_0 = 0;
@@ -4772,8 +4780,8 @@ ath_hal_init_channels(struct ath_hal *hal, AR5K_CHANNEL *channels,
 	AR5K_CHANNEL *all_channels;
 	AR5K_CTRY_CODE country_current;
 
-	if ((all_channels = malloc(sizeof(AR5K_CHANNEL) * max_channels,
-	    M_TEMP, M_NOWAIT)) == NULL)
+	if ((all_channels = kmalloc(sizeof(AR5K_CHANNEL) * max_channels,
+	    GFP_KERNEL)) == NULL)
 		return (FALSE);
 
 	i = c = 0;
@@ -4896,9 +4904,9 @@ for loop starts from 1 and all channels are marked as 5GHz M.F.*/
 	}
 
  done:
-	bcopy(all_channels, channels, sizeof(AR5K_CHANNEL) * max_channels);
+	memcpy(channels, all_channels, sizeof(AR5K_CHANNEL) * max_channels);
 	*channels_size = c;
-	free(all_channels, M_TEMP);
+	kfree(all_channels);
 	return (TRUE);
 }
 
@@ -5049,7 +5057,7 @@ ath5k_hw_rf5110_channel(struct ath_hal *hal, AR5K_CHANNEL *channel)
 	data = ath5k_hw_rf5110_chan2athchan(channel);
 	AR5K_PHY_WRITE(0x27, data);
 	AR5K_PHY_WRITE(0x30, 0);
-	AR5K_DELAY(1000);
+	udelay(1000);
 
 	return (TRUE);
 }
@@ -5203,7 +5211,7 @@ ath5k_hw_rf5110_calibrate(struct ath_hal *hal, AR5K_CHANNEL *channel)
 #define AGC_DISABLE	{			\
 	AR5K_REG_ENABLE_BITS(AR5K_PHY_AGC,	\
 		AR5K_PHY_AGC_DISABLE);		\
-	AR5K_DELAY(10);				\
+	udelay(10);				\
 }
 
 #define AGC_ENABLE	{			\
@@ -5219,7 +5227,7 @@ ath5k_hw_rf5110_calibrate(struct ath_hal *hal, AR5K_CHANNEL *channel)
 	beacon = AR5K_REG_READ(AR5K_BEACON_5210);
 	AR5K_REG_WRITE(AR5K_BEACON_5210, beacon & ~AR5K_BEACON_ENABLE);
 
-	AR5K_DELAY(2300);
+	udelay(2300);
 
 	/*
 	 * Set the channel (with AGC turned off)
@@ -5231,7 +5239,7 @@ ath5k_hw_rf5110_calibrate(struct ath_hal *hal, AR5K_CHANNEL *channel)
 	 * Activate PHY and wait
 	 */
 	AR5K_REG_WRITE(AR5K_PHY_ACT, AR5K_PHY_ACT_ENABLE);
-	AR5K_DELAY(1000);
+	udelay(1000);
 
 	AGC_ENABLE;
 
@@ -5264,13 +5272,13 @@ ath5k_hw_rf5110_calibrate(struct ath_hal *hal, AR5K_CHANNEL *channel)
 		AR5K_REG_SM(2, AR5K_PHY_ADCSAT_ICNT) |
 		AR5K_REG_SM(12, AR5K_PHY_ADCSAT_THR));
 
-	AR5K_DELAY(20);
+	udelay(20);
 
 	AGC_DISABLE;
 	AR5K_REG_WRITE(AR5K_PHY_RFSTG, AR5K_PHY_RFSTG_DISABLE);
 	AGC_ENABLE;
 
-	AR5K_DELAY(1000);
+	udelay(1000);
 
 	/*
 	 * Enable calibration and wait until completion
@@ -5308,7 +5316,7 @@ ath5k_hw_rf5110_calibrate(struct ath_hal *hal, AR5K_CHANNEL *channel)
 
 	/* Wait until the noise floor is calibrated */
 	for (i = 20; i > 0; i--) {
-		AR5K_DELAY(1000);
+		udelay(1000);
 		noise_floor = AR5K_REG_READ(AR5K_PHY_NF);
 
 		if (AR5K_PHY_NF_RVAL(noise_floor) &
@@ -5627,8 +5635,8 @@ ath5k_hw_rfregs(struct ath_hal *hal, AR5K_CHANNEL *channel, u_int mode)
 
 	if (hal->ah_rf_banks == NULL) {
 		/* XXX do extra checks? */
-		if ((hal->ah_rf_banks = malloc(hal->ah_rf_banks_size,
-		    M_DEVBUF, M_NOWAIT)) == NULL) {
+		if ((hal->ah_rf_banks = kmalloc(hal->ah_rf_banks_size,
+		    GFP_KERNEL)) == NULL) {
 			AR5K_PRINT("out of memory\n");
 			return (FALSE);
 		}
@@ -5848,7 +5856,7 @@ ath5k_hw_ar5211_rfregs(struct ath_hal *hal, AR5K_CHANNEL *channel, u_int freq,
 	u_int32_t ob, db, obdb, xpds, xpdp, x_gain;
 	u_int i;
 
-	bcopy(ar5211_rf, rf, sizeof(rf));
+	memcpy(rf, ar5211_rf, sizeof(rf));
 	obdb = 0;
 
 	if (freq == AR5K_INI_RFGAIN_2GHZ &&
@@ -6028,7 +6036,7 @@ ath5k_hw_txpower(struct ath_hal *hal, AR5K_CHANNEL *channel, u_int txpower)
 	}
 
 	/* Reset TX power values */
-	bzero(&hal->ah_txpower, sizeof(hal->ah_txpower));
+	memset(&hal->ah_txpower, 0, sizeof(hal->ah_txpower));
 	hal->ah_txpower.txp_tpc = tpc;
 
 	/* Initialize TX power table */

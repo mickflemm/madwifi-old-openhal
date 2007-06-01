@@ -198,7 +198,7 @@ struct ath5k_eeprom_info {
  */
 
 /*Swap RX/TX Descriptor for big endian archs*/
-#if BYTE_ORDER == BIG_ENDIAN
+#if defined(__BIG_ENDIAN)
 #define AR5K_INIT_CFG	(		\
 	AR5K_CFG_SWTD | AR5K_CFG_SWRD	\
 )
@@ -216,6 +216,11 @@ struct ath5k_eeprom_info {
 #define AR5K_REG_MS(_val, _flags)					\
 	(((_val) & (_flags)) >> _flags##_S)
 
+/* Some registers can hold multiple values of interest. For this
+ * reason when we want to write to these registers we must first
+ * retrieve the values which we do not want to clear (lets call this 
+ * old_data) and then set the register with this and our new_value: 
+ * ( old_data | new_value) */
 #define AR5K_REG_WRITE_BITS(_reg, _flags, _val)				\
 	AR5K_REG_WRITE(_reg, (AR5K_REG_READ(_reg) &~ (_flags)) |	\
 	    (((_val) << _flags##_S) & (_flags)))
@@ -237,7 +242,7 @@ struct ath5k_eeprom_info {
 
 #define AR5K_REG_WAIT(_i)						\
 	if (_i % 64)							\
-		AR5K_DELAY(1);
+		udelay(1);
 
 #define AR5K_EEPROM_READ(_o, _v)	{				\
 	if ((ret = hal->ah_eeprom_read(hal, (_o),			\

@@ -46,22 +46,6 @@ typedef u_int32_t AR5K_BUS_ADDR;
 #define bus_space_tag_t AR5K_BUS_TAG
 #define bus_space_handle_t AR5K_BUS_HANDLE
 
- /*
- * Linux uses __BIG_ENDIAN and __LITTLE_ENDIAN while BSD uses _foo
- * and an explicit _BYTE_ORDER.  Sorry, BSD got there first--define
- * things in the BSD way...
- */
-#define LITTLE_ENDIAN  1234    /* LSB first: i386, vax */
-#define BIG_ENDIAN     4321    /* MSB first: 68000, ibm, net */
-
-#if defined(__LITTLE_ENDIAN)
-#define BYTE_ORDER     LITTLE_ENDIAN
-#elif defined(__BIG_ENDIAN)
-#define BYTE_ORDER     BIG_ENDIAN
-#else
-#error "Please fix asm/byteorder.h"
-#endif
-
 #define AR5K_PRINTF(fmt, ...)   printk("%s: " fmt, __func__, ##__VA_ARGS__)
 #define AR5K_PRINT(fmt)         printk("%s: " fmt, __func__)
 #ifdef AR5K_DEBUG
@@ -69,14 +53,3 @@ typedef u_int32_t AR5K_BUS_ADDR;
 #else
 #define AR5K_TRACE
 #endif
-#define AR5K_DELAY(_n)          udelay(_n)
-#define malloc(_a, _b, _c) kmalloc(_a, GFP_KERNEL)
-#define free(_a, _b) kfree(_a)
-#define bcopy(_a, _b, _c)       memcpy(_b, _a, _c)
-#define bzero(_a, _b)           memset(_a, 0, _b)
-
-//#define AR5K_REG_WRITE(_reg, _val)      (writel(_val, hal->ah_sh + (_reg)))
-//      bus_space_write_4(hal->ah_st, hal->ah_sh, (_reg), (_val))
-
-//#define AR5K_REG_READ(_reg)             (readl(hal->ah_sh + (_reg)))
-//      bus_space_read_4(hal->ah_st, hal->ah_sh, (_reg))

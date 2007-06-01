@@ -118,26 +118,16 @@ typedef enum {
 /* token to use for aifs, cwmin, cwmax in MadWiFi */
 #define	AR5K_TXQ_USEDEFAULT	((u_int32_t) -1)
 
-#define IEEE80211_ADDR_LEN      6       /* size of 802.11 address */
-#define ETHER_ADDR_LEN          6       /* length of an Ethernet address */
-static const u_char etherbroadcastaddr[ETHER_ADDR_LEN] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-//#define etherbroadcastaddr 0xff
+/* GENERIC CHIPSET DEFINITIONS */
 
-
-
-
-/*****************************\
-  GENERIC CHIPSET DEFINITIONS
-\*****************************/
-
-/* MAC Chips*/
+/* MAC Chips */
 enum ath5k_version {
 	AR5K_AR5210	= 0,
 	AR5K_AR5211	= 1,
 	AR5K_AR5212	= 2,
 };
 
-/*PHY Chips*/
+/* PHY Chips */
 enum ath5k_radio {
 	AR5K_RF5110	= 0,
 	AR5K_RF5111	= 1,
@@ -1146,8 +1136,8 @@ struct ath_hal {
 	u_int32_t		ah_antenna[AR5K_EEPROM_N_MODES][AR5K_ANT_MAX];
 	AR5K_BOOL		ah_ant_diversity;
 
-	u_int8_t		ah_sta_id[IEEE80211_ADDR_LEN];
-	u_int8_t		ah_bssid[IEEE80211_ADDR_LEN];
+	u_int8_t		ah_sta_id[ETH_ALEN];
+	u_int8_t		ah_bssid[ETH_ALEN];
 
 	u_int32_t		ah_gpio[AR5K_MAX_GPIO];
 	int			ah_gpio_npins;
