@@ -2040,7 +2040,7 @@ ath5k_hw_eeprom_read(struct ath_hal *hal, u_int32_t offset, u_int16_t *data)
 		AR5K_REG_ENABLE_BITS(AR5K_PCICFG, AR5K_PCICFG_EEAE);
 		(void)AR5K_REG_READ(AR5K_EEPROM_BASE + (4 * offset));
 	} else {
-		AR5K_REG_WRITE(AR5K_EEPROM_BASE, (u_int8_t)offset);
+		AR5K_REG_WRITE(AR5K_EEPROM_BASE, offset);
 		AR5K_REG_ENABLE_BITS(AR5K_EEPROM_CMD,
 				AR5K_EEPROM_CMD_READ);
 	}
@@ -2088,7 +2088,7 @@ ath5k_hw_eeprom_write(struct ath_hal *hal, u_int32_t offset, u_int16_t data)
 	if (hal->ah_version == AR5K_AR5210) {
 		AR5K_REG_WRITE(AR5K_EEPROM_BASE + (4 * offset), data);
 	} else {
-		AR5K_REG_WRITE(AR5K_EEPROM_BASE, (u_int8_t)offset - 1);
+		AR5K_REG_WRITE(AR5K_EEPROM_BASE, offset);
 		AR5K_REG_WRITE(AR5K_EEPROM_DATA, data);
 		AR5K_REG_ENABLE_BITS(AR5K_EEPROM_CMD, AR5K_EEPROM_CMD_WRITE);
 	}
@@ -4707,11 +4707,15 @@ ath_hal_mhz2ieee(u_int freq, u_int flags)
 	if (flags & CHANNEL_2GHZ) {	/* 2GHz band */
 		if (freq == 2484)		/* Japan */
 			return 14;
-		if ((freq >= 2412) && (freq < 2484)) /* don't number non-IEEE channels */
+		/* don't number non-IEEE channels unless we do channel tests */
+		if ((freq >= 2412) && (freq < 2484))
 			return (freq - 2407) / 5;
+		if (CHAN_DEBUG == 1) /* 15-26 */
+			return ((freq - 2512)/20) + 15;
 		return 0;
 	} else if (flags & CHANNEL_5GHZ)	{	/* 5Ghz band */
-		if ((freq >= 5150) && (freq <= 5825))	/* don't number non-IEEE channels */
+		/* don't number non-IEEE channels unless we do channel tests */
+		if (((freq >= 5150) && (freq <= 5825))|| CHAN_DEBUG == 1)
 			return (freq - 5000) / 5;
 		return 0;
 	} else
@@ -4792,14 +4796,13 @@ ath_hal_init_channels(struct ath_hal *hal, AR5K_CHANNEL *channels,
 	/*
 	 * In debugging mode, enable all channels supported by the chipset
 	 */
-	if (domain_current == DMN_DEFAULT || SUPERCHANNEL == 1) {
+	if (domain_current == DMN_DEFAULT || CHAN_DEBUG == 1) {
 		int min, max, freq;
 		u_int flags;
 
-		min = ath_hal_mhz2ieee(IEEE80211_CHANNELS_2GHZ_MIN,
-		    CHANNEL_2GHZ);
-		max = ath_hal_mhz2ieee(IEEE80211_CHANNELS_2GHZ_MAX,
-		    CHANNEL_2GHZ);
+		min = 1; /* 2GHz channel 1 -2412Mhz */
+		max = 26;/* 2GHz channel 26 (non-ieee) -2732Mhz */
+
 		flags = CHANNEL_B /*| CHANNEL_TG |
 		    (hal->ah_version == AR5K_AR5211 ?
 		    CHANNEL_PUREG : CHANNEL_G)*/;
@@ -4810,7 +4813,8 @@ ath_hal_init_channels(struct ath_hal *hal, AR5K_CHANNEL *channels,
 			if (ath5k_check_channel(hal, freq, flags) == FALSE)
 				continue;
 			all_channels[c].freq = freq;
-			all_channels[c++].channel_flags = flags;
+			all_channels[c].channel_flags = flags;
+			c++;
 		}
 
 		/* If is there to protect from infinite loop */
@@ -4822,7 +4826,7 @@ for loop starts from 1 and all channels are marked as 5GHz M.F.*/
 /* Continue from where we stoped, skip last 2GHz channel */
 			min = max + 1;
 			max = ath_hal_mhz2ieee(IEEE80211_CHANNELS_5GHZ_MAX,
-			    CHANNEL_5GHZ);
+						CHANNEL_5GHZ);
 			flags = CHANNEL_A | CHANNEL_T | CHANNEL_XR;
 			goto debugchan;
 		}
