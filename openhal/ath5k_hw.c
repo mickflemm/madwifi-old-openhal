@@ -5841,7 +5841,7 @@ ath5k_hw_rf5112_rfregs(struct ath_hal *hal, AR5K_CHANNEL *channel, u_int mode)
 
 	/* Write RF values */
 	for (i = 0; i < rf_size; i++)
-		AR5K_REG_WRITE(rf5112_rf[i].rf_register, rf[i]);
+		AR5K_REG_WRITE(rf_ini[i].rf_register, rf[i]);
 
 	return (TRUE);
 }
