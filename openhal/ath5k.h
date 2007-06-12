@@ -537,18 +537,18 @@ struct ath_desc {
 /*
  * 802.11 operating modes...
  */
-#define AR5K_MODE_11A  	0x01
-#define AR5K_MODE_11B  	0x02
-#define AR5K_MODE_11G  	0x04
+#define AR5K_MODE_11A	0x01
+#define AR5K_MODE_11B	0x02
+#define AR5K_MODE_11G	0x04
 #define AR5K_MODE_TURBO	0x08
-#define AR5K_MODE_108G 	0x16
-#define AR5K_MODE_XR	0x32
-#define AR5K_MODE_ALL 	(AR5K_MODE_11A|	\
-			AR5K_MODE_11B|	\
-			AR5K_MODE_11G|	\
-			AR5K_MODE_TURBO|\
-			AR5K_MODE_108G|	\
-			AR5K_MODE_XR)
+#define AR5K_MODE_108G	0x10
+#define AR5K_MODE_XR	0x20
+#define AR5K_MODE_ALL	(AR5K_MODE_11A   |	\
+			 AR5K_MODE_11B   |	\
+			 AR5K_MODE_11G   |	\
+			 AR5K_MODE_TURBO |	\
+			 AR5K_MODE_108G	 |	\
+			 AR5K_MODE_XR)
 
 /*
  * Channel definitions
