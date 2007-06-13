@@ -90,10 +90,10 @@
 #define AR5K_CFG_PHY_OK		0x00000100	/* [5211+] */
 #define AR5K_CFG_EEBS		0x00000200	/* EEPROM is busy */
 #define	AR5K_CFG_CLKGD		0x00000400	/* Clock gated (?) */
-#define AR5K_CFG_TXCNT		0x00007800	/* [5210] */
+#define AR5K_CFG_TXCNT		0x00007800	/* Tx frame count (?) [5210] */
 #define AR5K_CFG_TXCNT_S	11
-#define AR5K_CFG_TXFSTAT	0x00008000	/* [5210] */
-#define AR5K_CFG_TXFSTRT	0x00010000	/* [5210 */
+#define AR5K_CFG_TXFSTAT	0x00008000	/* Tx frame status (?) [5210] */
+#define AR5K_CFG_TXFSTRT	0x00010000	/* [5210] */
 #define	AR5K_CFG_PCI_THRES	0x00060000	/* [5211+] */
 #define	AR5K_CFG_PCI_THRES_S	17		
 

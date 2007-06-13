@@ -1581,6 +1581,10 @@ ath5k_hw_tx_start(struct ath_hal *hal, u_int queue)
 	AR5K_TRACE;
 	AR5K_ASSERT_ENTRY(queue, hal->ah_capabilities.cap_queues.q_tx_num);
 
+	/* Return if queue is declared inactive */
+	if (hal->ah_txq[queue].tqi_type == AR5K_TX_QUEUE_INACTIVE)
+		return (FALSE);
+
 	if (hal->ah_version == AR5K_AR5210) {
 
 		tx_queue = AR5K_REG_READ(AR5K_CR);
@@ -1634,6 +1638,10 @@ ath5k_hw_stop_tx_dma(struct ath_hal *hal, u_int queue)
 
 	AR5K_TRACE;
 	AR5K_ASSERT_ENTRY(queue, hal->ah_capabilities.cap_queues.q_tx_num);
+
+	/* Return if queue is declared inactive */
+	if (hal->ah_txq[queue].tqi_type == AR5K_TX_QUEUE_INACTIVE)
+		return (FALSE);
 
 	if (hal->ah_version == AR5K_AR5210) {
 		tx_queue = AR5K_REG_READ(AR5K_CR);
@@ -2870,7 +2878,7 @@ ath5k_hw_set_mcast_filterindex(struct ath_hal *hal, u_int32_t index)
 }
 
 /*
- * Clear Multicast filter
+ * Clear Multicast filter by index
  */
 AR5K_BOOL
 ath5k_hw_clear_mcast_filter_idx(struct ath_hal *hal, u_int32_t index)
@@ -3787,7 +3795,7 @@ ath5k_hw_reset_tx_queue(struct ath_hal *hal, u_int queue)
 
 				AR5K_REG_ENABLE_BITS(AR5K_QUEUE_DFS_MISC(queue),
 					(AR5K_DCU_MISC_ARBLOCK_CTL_GLOBAL <<
-					AR5K_DCU_MISC_ARBLOCK_CTL_GLOBAL) |
+					AR5K_DCU_MISC_ARBLOCK_CTL_S) |
 					AR5K_DCU_MISC_POST_FR_BKOFF_DIS |
 					AR5K_DCU_MISC_BCN_ENABLE);
 
@@ -3807,7 +3815,7 @@ ath5k_hw_reset_tx_queue(struct ath_hal *hal, u_int queue)
 
 			AR5K_REG_ENABLE_BITS(AR5K_QUEUE_DFS_MISC(queue),
 				(AR5K_DCU_MISC_ARBLOCK_CTL_GLOBAL <<
-				AR5K_DCU_MISC_ARBLOCK_CTL_GLOBAL));
+				AR5K_DCU_MISC_ARBLOCK_CTL_S));
 			break;
 
 		case AR5K_TX_QUEUE_UAPSD:
@@ -3844,6 +3852,11 @@ ath5k_hw_num_tx_pending(struct ath_hal *hal, u_int queue) {
 	AR5K_TRACE;
 	AR5K_ASSERT_ENTRY(queue, hal->ah_capabilities.cap_queues.q_tx_num);
 
+	/* Return if queue is declared inactive */
+	if (hal->ah_txq[queue].tqi_type == AR5K_TX_QUEUE_INACTIVE)
+		return (FALSE);
+
+	/* XXX: How about AR5K_CFG_TXCNT ? */
 	if (hal->ah_version == AR5K_AR5210)
 		return (FALSE);
 
@@ -3964,7 +3977,7 @@ ath5k_hw_setup_2word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 	_TX_FLAGS(0, VEOL);
 	_TX_FLAGS(0, INTREQ);
 	_TX_FLAGS(0, RTSENA);
-	_TX_FLAGS(1, NOACK); /*???*/
+	_TX_FLAGS(1, NOACK);
 
 #undef _TX_FLAGS
 
@@ -4044,7 +4057,7 @@ ath5k_hw_setup_4word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 	_TX_FLAGS(0, INTREQ);
 	_TX_FLAGS(0, RTSENA);
 	_TX_FLAGS(0, CTSENA);
-	_TX_FLAGS(1, NOACK); /*???*/
+	_TX_FLAGS(1, NOACK);
 
 #undef _TX_FLAGS
 
