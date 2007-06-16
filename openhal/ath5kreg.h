@@ -1802,11 +1802,48 @@
 #define	AR5K_PHY_FRAME_CTL_TXURN_ERR	0x40000000
 
 /*
- * PHY radar detection enable register [5111+]
+ * PHY radar detection register [5111+]
  */
 #define	AR5K_PHY_RADAR			0x9954
-#define	AR5K_PHY_RADAR_DISABLE		0x00000000
+
+/* Radar enable 			........ ........ ........ .......1 */
 #define	AR5K_PHY_RADAR_ENABLE		0x00000001
+#define	AR5K_PHY_RADAR_DISABLE          0x00000000
+#define	AR5K_PHY_RADAR_ENABLE_S		0
+
+/* This is the value found on the card  .1.111.1 .1.1.... 111....1 1...1...
+at power on. */
+#define	AR5K_PHY_RADAR_PWONDEF_AR5213	0x5d50e188 
+
+/* This is the value found on the card 	.1.1.111 ..11...1 .1...1.1 1...11.1
+after DFS is enabled */
+#define	AR5K_PHY_RADAR_ENABLED_AR5213	0x5731458d
+
+/* Finite Impulse Response (FIR) filter .1111111 ........ ........ ........ 
+ * power out threshold.
+ * 7-bits, standard power range {0..127} in 1/2 dBm units. */
+#define AR5K_PHY_RADAR_FIRPWROUTTHR    	0x7f000000 
+#define AR5K_PHY_RADAR_FIRPWROUTTHR_S	24
+
+/* Radar RSSI/SNR threshold.		........ 111111.. ........ ........ 
+ * 6-bits, dBm range {0..63} in dBm units. */
+#define AR5K_PHY_RADAR_RADARRSSITHR    	0x00fc0000 
+#define AR5K_PHY_RADAR_RADARRSSITHR_S	18
+
+/* Pulse height threshold 		........ ......11 1111.... ........ 
+ * 6-bits, dBm range {0..63} in dBm units. */
+#define AR5K_PHY_RADAR_PULSEHEIGHTTHR   0x0003f000
+#define AR5K_PHY_RADAR_PULSEHEIGHTTHR_S	12
+
+/* Pulse RSSI/SNR threshold		........ ........ ....1111 11...... 
+ * 6-bits, dBm range {0..63} in dBm units. */
+#define AR5K_PHY_RADAR_PULSERSSITHR    	0x00000fc0
+#define AR5K_PHY_RADAR_PULSERSSITHR_S	6
+
+/* Inband threshold  			........ ........ ........ ..11111. 
+ * 5-bits, units unknown {0..31} (? MHz ?) */
+#define AR5K_PHY_RADAR_INBANDTHR    	0x0000003e
+#define AR5K_PHY_RADAR_INBANDTHR_S	1
 
 /*
  * PHY antenna switch table registers [5110]
