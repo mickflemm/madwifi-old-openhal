@@ -571,17 +571,12 @@ typedef struct {
 #define	CHANNEL_2GHZ	0x0080	/* 2GHz channel. */
 #define	CHANNEL_5GHZ	0x0100	/* 5GHz channel */
 #define	CHANNEL_PASSIVE	0x0200	/* Only passive scan allowed */
-#define	CHANNEL_DYN	0x0400	/* Dynamic CCK-OFDM channel (for g operation)*/
+#define	CHANNEL_DYN	0x0400	/* Dynamic CCK-OFDM channel (for g operation) */
 #define	CHANNEL_XR	0x0800	/* XR channel */
 
 #define	CHANNEL_A	(CHANNEL_5GHZ|CHANNEL_OFDM)
 #define	CHANNEL_B	(CHANNEL_2GHZ|CHANNEL_CCK)
-#define	CHANNEL_PUREG	(CHANNEL_2GHZ|CHANNEL_OFDM)
-//#ifdef notdef
-#define	CHANNEL_G	(CHANNEL_2GHZ|CHANNEL_DYN)
-//#else
-//#define	CHANNEL_G	(CHANNEL_2GHZ|CHANNEL_OFDM)
-//#endif
+#define	CHANNEL_G	(CHANNEL_2GHZ|CHANNEL_OFDM)
 #define	CHANNEL_T	(CHANNEL_5GHZ|CHANNEL_OFDM|CHANNEL_TURBO)
 #define	CHANNEL_TG	(CHANNEL_2GHZ|CHANNEL_OFDM|CHANNEL_TURBO)
 #define	CHANNEL_108A	CHANNEL_T

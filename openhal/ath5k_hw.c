@@ -227,14 +227,14 @@ ath_hal_computetxtime(struct ath_hal *hal, const AR5K_RATE_TABLE *rates,
  * Return the supported 802.11 operation modes
  * TODO:Left here for combatibility, change it in at5k
  */
-u_int/*TODO:Fix this & fix g support*/
+u_int/*TODO:Fix this*/
 ath_hal_getwirelessmodes(struct ath_hal *hal, AR5K_CTRY_CODE country) 
 {
 	switch(hal->ah_version){
 	case AR5K_AR5212:
-		return (AR5K_MODE_11A|AR5K_MODE_11B);
+		return (AR5K_MODE_11A|AR5K_MODE_11B|AR5K_MODE_11G);
 	case AR5K_AR5211:
-		return (AR5K_MODE_11A|AR5K_MODE_11B);
+		return (AR5K_MODE_11A|AR5K_MODE_11B|AR5K_MODE_11G);
 	default :
 		return(AR5K_MODE_11A);
 	}
@@ -594,15 +594,15 @@ ath5k_hw_nic_wakeup(struct ath_hal *hal, u_int16_t flags, AR5K_BOOL initial)
 
 		if (flags & CHANNEL_CCK) {
 			mode |= AR5K_PHY_MODE_MOD_CCK;
-		} else if (flags & CHANNEL_OFDM) {
-			mode |= AR5K_PHY_MODE_MOD_OFDM;
-		} else if (flags & CHANNEL_DYN) {
+		} else if (flags & CHANNEL_G) {
 			/* Dynamic OFDM/CCK is not supported by the AR5211 */
 			if (hal->ah_version == AR5K_AR5211) {
-				mode |= AR5K_PHY_MODE_MOD_CCK;
+				mode |= AR5K_PHY_MODE_MOD_OFDM;
 			} else {
 				mode |= AR5K_PHY_MODE_MOD_DYN;
 			}
+		} else if (flags & CHANNEL_OFDM) {
+			mode |= AR5K_PHY_MODE_MOD_OFDM;
 		} else {
 			AR5K_PRINT("invalid radio frequency mode\n");
 			return (FALSE);
@@ -1062,7 +1062,7 @@ ath5k_hw_reset(struct ath_hal *hal, AR5K_OPMODE op_mode, AR5K_CHANNEL *channel,
 			hal->ah_radio_5ghz_revision < AR5K_SREV_RAD_5112A) {
 				AR5K_REG_WRITE(AR5K_PHY_CCKTXCTL,
 				AR5K_PHY_CCKTXCTL_WORLD);
-			if (channel->channel_flags & CHANNEL_OFDM)
+			if (channel->channel_flags & CHANNEL_A)
 				data = 0xffb81020;
 			else
 				data = 0xffb80d20;
@@ -1286,7 +1286,7 @@ ath5k_hw_reset(struct ath_hal *hal, AR5K_OPMODE op_mode, AR5K_CHANNEL *channel,
 		return (FALSE);
 	}
 
-	/* Wait until the noise floor is calibrated */
+	/* Wait until the noise floor is calibrated and read the value */
 	for (i = 20; i > 0; i--) {
 		udelay(1000);
 		noise_floor = AR5K_REG_READ(AR5K_PHY_NF);
@@ -2627,10 +2627,10 @@ ath5k_hw_get_capabilities(struct ath_hal *hal)
 	
 			if (AR5K_EEPROM_HDR_11B(ee_header))
 				hal->ah_capabilities.cap_mode |= AR5K_MODE_11B;
-#if 0
+
 			if (AR5K_EEPROM_HDR_11G(ee_header))
 				hal->ah_capabilities.cap_mode |= AR5K_MODE_11G;
-#endif
+
 		}
 	}
 
@@ -4816,9 +4816,7 @@ ath_hal_init_channels(struct ath_hal *hal, AR5K_CHANNEL *channels,
 		min = 1; /* 2GHz channel 1 -2412Mhz */
 		max = 26;/* 2GHz channel 26 (non-ieee) -2732Mhz */
 
-		flags = CHANNEL_B /*| CHANNEL_TG |
-		    (hal->ah_version == AR5K_AR5211 ?
-		    CHANNEL_PUREG : CHANNEL_G)*/;
+		flags = CHANNEL_B | CHANNEL_G;
 
  debugchan:
 		for (i = min; (i <= max) && (c < max_channels); i++) {
@@ -4908,12 +4906,10 @@ for loop starts from 1 and all channels are marked as 5GHz M.F.*/
 
 		if ((hal->ah_capabilities.cap_mode & AR5K_MODE_11G) &&
 		   (ath5k_2ghz_channels[i].rc_mode & CHANNEL_OFDM)) {
-			all_channels[c].channel_flags |=
-			    hal->ah_version == AR5K_AR5211 ?
-			    CHANNEL_PUREG : CHANNEL_G;
-			if (ath5k_2ghz_channels[i].rc_mode &
+			all_channels[c].channel_flags |= CHANNEL_G;
+/*			if (ath5k_2ghz_channels[i].rc_mode &
 			    CHANNEL_TURBO)
-				all_channels[c].channel_flags |= CHANNEL_TG;
+				all_channels[c].channel_flags |= CHANNEL_TG;*/
 		}
 
 		/* Write channel and increment counter */
