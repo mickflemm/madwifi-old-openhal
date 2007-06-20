@@ -25,18 +25,6 @@
 /*Definitions for module loading/unloading 
  *combatible with 2.4 and 2.6 kernels*/
 
-#ifndef __MOD_INC_USE_COUNT
-#define AH_MOD_INC_USE_COUNT(_m)                                        \
-        if (!try_module_get(_m)) {                                      \
-                printk(KERN_WARNING "try_module_get failed\n");         \
-                return NULL;                                            \
-        }
-#define AH_MOD_DEC_USE_COUNT(_m)        module_put(_m)
-#else
-#define AH_MOD_INC_USE_COUNT(_m)        MOD_INC_USE_COUNT
-#define AH_MOD_DEC_USE_COUNT(_m)        MOD_DEC_USE_COUNT
-#endif
-
 static char *dev_info = "ath_hal";
 
 MODULE_AUTHOR("Nick Kossifidis");
@@ -57,7 +45,16 @@ _ath_hal_attach(u_int16_t devid, AR5K_SOFTC sc,
 
         *(AR5K_STATUS *)s = status;
         if (ah)
-                AH_MOD_INC_USE_COUNT(THIS_MODULE);
+#ifndef __MOD_INC_USE_COUNT
+		if (!try_module_get(THIS_MODULE)) {
+			printk(KERN_WARNING "try_module_get failed\n");
+			ath_hal_detach(ah);
+			return NULL;
+		}
+#else
+		MOD_INC_USE_COUNT;
+#endif
+
         return ah;
 }
 
@@ -65,7 +62,11 @@ void
 ath_hal_detach(struct ath_hal *ah)
 {
         (*ah->ah_detach)(ah);
-        AH_MOD_DEC_USE_COUNT(THIS_MODULE);
+#ifndef __MOD_INC_USE_COUNT
+	module_put(THIS_MODULE);
+#else
+	MOD_DEC_USE_COUNT;
+#endif
 }
 
 EXPORT_SYMBOL(ath_hal_probe);
