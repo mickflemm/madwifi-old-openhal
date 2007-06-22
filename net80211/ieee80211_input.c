@@ -784,7 +784,7 @@ ieee80211_defrag(struct ieee80211com *ic, struct ieee80211_node *ni,
 		 * we've verified that before
 		 */
 		/* Copy current fragment at end of previous one */
-		memcpy(skbfrag->tail,
+		memcpy(skb_tail_pointer(skbfrag),
 		       skb->data + hdrspace,
 		       skb->len - hdrspace
 		);
