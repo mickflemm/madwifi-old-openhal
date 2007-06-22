@@ -3910,7 +3910,7 @@ ath5k_hw_get_slot_time(struct ath_hal *hal)
 /*
  * Initialize the 2-word tx descriptor on 5210/5211
  */
-AR5K_BOOL
+static AR5K_BOOL
 ath5k_hw_setup_2word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
     u_int packet_length, u_int header_length, AR5K_PKT_TYPE type, u_int tx_power,
     u_int tx_rate0, u_int tx_tries0, u_int key_index, u_int antenna_mode,
@@ -4127,7 +4127,7 @@ ath5k_hw_setup_xr_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Fill the 2-word tx descriptor on 5210/5211
  */
-AR5K_BOOL
+static AR5K_BOOL
 ath5k_hw_fill_2word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
     u_int segment_length, AR5K_BOOL first_segment, AR5K_BOOL last_segment, const struct ath_desc *last_desc)
 {
@@ -4188,7 +4188,7 @@ ath5k_hw_fill_4word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Proccess the tx status descriptor on 5210/5211
  */
-AR5K_STATUS
+static AR5K_STATUS
 ath5k_hw_proc_2word_tx_status(struct ath_hal *hal, struct ath_desc *desc)
 {
 	struct ath5k_hw_tx_status *tx_status;
@@ -4376,7 +4376,7 @@ ath5k_hw_setup_rx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Proccess the rx status descriptor on 5210/5211
  */
-AR5K_STATUS
+static AR5K_STATUS
 ath5k_hw_proc_old_rx_status(struct ath_hal *hal, struct ath_desc *desc,
 			u_int32_t phys_addr, struct ath_desc *next)
 {
