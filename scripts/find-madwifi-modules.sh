@@ -24,7 +24,7 @@ fi
 
 SEARCH="${KDEST}/lib/modules/${KVERS}"
 
-PATTERN="^.*\/(ath_(hal|pci|rate_(onoe|amrr|sample))\.k?o)|(wlan(_(acl|ccmp|scan_(ap|sta)|tkip|wep|xauth))?\.k?o)$"
+PATTERN="^.*\/(ath_(hal|pci|rate_[^.]*)\.k?o)|(wlan(_(acl|ccmp|scan_(ap|sta)|tkip|wep|xauth))?\.k?o)$"
 OLD_MODULES=$(find ${SEARCH} -type f -regex '.*\.k?o' 2>/dev/null | grep -w -E "${PATTERN}")
 
 if [ -n "${OLD_MODULES}" ]; then

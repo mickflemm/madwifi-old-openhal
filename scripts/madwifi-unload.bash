@@ -1,6 +1,7 @@
 #!/bin/bash
 
-for module in ath{_{pci,rate_{amrr,onoe,sample},hal}} wlan{_{wep,tkip,ccmp,acl,xauth,scan_{sta,ap}},}
+for module in ath_{pci,rate_{amrr,minstrel,onoe,sample}} \
+	      wlan_{wep,tkip,ccmp,acl,xauth,scan_{sta,ap}} ath_hal wlan
 do
-	 grep -q ^$module /proc/modules && modprobe -r $module
+	grep -q ^$module /proc/modules && modprobe -r $module || true
 done
