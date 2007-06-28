@@ -23,8 +23,9 @@
  */
 
 #include "ah_devid.h"
-#include "ath5k.h"
 #include "ath5kreg.h"
+#include "ath5k.h"
+
 
 /* 
  * Known pci ids
@@ -79,6 +80,7 @@ AR5K_BOOL	ath5k_hw_nic_wakeup(struct ath_hal *, u_int16_t, AR5K_BOOL);
 u_int16_t	ath5k_hw_radio_revision(struct ath_hal *, AR5K_CHIP);
 void		ath5k_hw_fill(struct ath_hal *);
 AR5K_BOOL	ath5k_hw_txpower(struct ath_hal *, AR5K_CHANNEL *, u_int);
+const char *	ath5k_hw_get_part_name(enum ath5k_srev_type, u_int32_t);
 
 AR5K_HAL_FUNCTIONS(extern, ath5k_hw,);
 
@@ -93,11 +95,15 @@ ieee80211_regchannel ath5k_2ghz_channels[] = IEEE80211_CHANNELS_2GHZ;
 /*
  * Initial register dumps
  */
-static const struct ath5k_ar5212_ini ar5212_ini[] = AR5K_AR5212_INI;
+static const struct ath5k_ini ar5212_ini[] = AR5K_AR5212_INI;
+static const struct ath5k_ini ar5212_rf5111_ini[] = AR5K_AR5212_RF5111_INI;
+static const struct ath5k_ini ar5212_rf5112_ini[] = AR5K_AR5212_RF5112_INI;
 static const struct ath5k_ar5212_ini_mode ar5212_mode[] = AR5K_AR5212_INI_MODE;
+
 static const struct ath5k_ini ar5211_ini[] = AR5K_AR5211_INI;
 static const struct ath5k_ar5211_ini_mode ar5211_mode[] = AR5K_AR5211_INI_MODE;
 static const struct ath5k_ar5211_ini_rf ar5211_rf[] = AR5K_AR5211_INI_RF;
+
 static const struct ath5k_ini ar5210_ini[] = AR5K_AR5210_INI;
 
 /*
@@ -107,11 +113,13 @@ static const struct ath5k_gain_opt rf5111_gain_opt = AR5K_RF5111_GAIN_OPT;
 static const struct ath5k_gain_opt rf5112_gain_opt = AR5K_RF5112_GAIN_OPT;
 
 /*
- * Initial register for the radio chipsets
+ * Initial register settings for the radio chipsets
  */
+/* RF Banks */
 static const struct ath5k_ini_rf rf5111_rf[] = AR5K_RF5111_INI_RF;
 static const struct ath5k_ini_rf rf5112_rf[] = AR5K_RF5112_INI_RF;
 static const struct ath5k_ini_rf rf5112a_rf[] = AR5K_RF5112A_INI_RF;
+/* Common (5111/5112) rf gain table */
 static const struct ath5k_ini_rfgain ath5k_rfg[] = AR5K_INI_RFGAIN;
 
 /*
@@ -128,7 +136,7 @@ static const struct ath5k_ini_rfgain ath5k_rfg[] = AR5K_INI_RFGAIN;
 /*
  * Perform a lookup if the device is supported by the HAL
  * and return the chip name.
- * TODO:Left here for combatibility, change it in at5k
+ * TODO:Left here for combatibility, change it in ath5k
  */
 const char *
 ath_hal_probe(u_int16_t vendor, u_int16_t device)
@@ -341,6 +349,35 @@ ath5k_hw_register_timeout(struct ath_hal *hal, u_int32_t reg, u_int32_t flag,
 	return (TRUE);
 }
 
+/*
+ * Write initial register dump
+ */
+static void
+ath5k_hw_ini_registers(struct ath_hal *hal, int size,
+		const struct ath5k_ini *ini_regs, AR5K_BOOL change_channel)
+{
+	int i;
+
+	/* Write initial registers */
+	for (i = 0; i < size ; i++) {
+		if (change_channel == TRUE &&
+		    ini_regs[i].ini_register >= AR5K_PCU_MIN &&
+		    ini_regs[i].ini_register <= AR5K_PCU_MAX)
+			continue;
+
+		switch (ini_regs[i].ini_mode) {
+		case AR5K_INI_READ:
+			/* Cleared on read */
+			AR5K_REG_READ(ini_regs[i].ini_register);
+			break;
+		case AR5K_INI_WRITE:
+		default:
+			AR5K_REG_WAIT(i);
+			AR5K_REG_WRITE(ini_regs[i].ini_register,
+					ini_regs[i].ini_value);
+		}
+	}
+}
 
 
 /***************************************\
@@ -356,12 +393,12 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 {
 	struct ath_hal *hal = NULL;
 	u_int8_t mac[ETH_ALEN];
-	u_int8_t mac_version = 255; /*Initialize this to something else than ath5k_version*/
+	u_int8_t mac_version = 255; /* Initialize this to something else than ath5k_version */
 	int i;
 	u_int32_t srev;
 	*status = AR5K_EINVAL;
 
-	/*TODO:Use eeprom_magic to verify chipset*/
+	/* TODO:Use eeprom_magic to verify chipset */
 
 	/*
 	 * Check if device is a known one
@@ -371,14 +408,14 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 			mac_version = ath5k_known_products[i].mac_version;
 	}
 
-	/*If there wasn't a match, the device is not supported*/
+	/* If there wasn't a match, the device is not supported */
 	if (mac_version == 255) {
 		*status = AR5K_ENOTSUPP;
 		AR5K_PRINTF("device not supported: 0x%04x\n", device);
 		return (NULL);
 	}
 
-	/*If we passed the test malloc a hal struct*/
+	/* If we passed the test malloc a hal struct */
 	if ((hal = kmalloc(sizeof(struct ath_hal), GFP_KERNEL)) == NULL) {
 		*status = AR5K_ENOMEM;
 		AR5K_PRINT("out of memory\n");
@@ -547,6 +584,12 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 
 	*status = AR5K_OK;
 
+	printk(KERN_INFO "ath_hal: Atheros HW found \n");
+	printk(KERN_INFO "ath_hal: MAC version: %s\n",
+		ath5k_hw_get_part_name(AR5K_VERSION_VER,hal->ah_mac_srev));
+	printk(KERN_INFO "ath_hal: PHY version: %s\n",
+		ath5k_hw_get_part_name(AR5K_VERSION_RAD,hal->ah_radio_5ghz_revision));
+
 	return (hal);
 
  failed:
@@ -597,7 +640,7 @@ ath5k_hw_nic_wakeup(struct ath_hal *hal, u_int16_t flags, AR5K_BOOL initial)
 		} else if (flags & CHANNEL_G) {
 			/* Dynamic OFDM/CCK is not supported by the AR5211 */
 			if (hal->ah_version == AR5K_AR5211) {
-				mode |= AR5K_PHY_MODE_MOD_OFDM;
+				mode |= AR5K_PHY_MODE_MOD_CCK;
 			} else {
 				mode |= AR5K_PHY_MODE_MOD_DYN;
 			}
@@ -944,61 +987,27 @@ ath5k_hw_reset(struct ath_hal *hal, AR5K_OPMODE op_mode, AR5K_CHANNEL *channel,
 	}
 
 	/*
-	 * Write initial register settings
-	 * TODO:Do this in a common way
+	 * Initial register dump common for all modes
 	 */
-	/*For 5212*/
 	if (hal->ah_version == AR5K_AR5212) {
-		for (i = 0; i < AR5K_ELEMENTS(ar5212_ini); i++) {
-			if (change_channel == TRUE &&
-			    ar5212_ini[i].ini_register >= AR5K_PCU_MIN &&
-			    ar5212_ini[i].ini_register <= AR5K_PCU_MAX)
-				continue;
-
-			if ((hal->ah_radio == AR5K_RF5111 &&
-			    ar5212_ini[i].ini_flags & AR5K_INI_FLAG_5111) ||
-			    (hal->ah_radio == AR5K_RF5112 &&
-			    ar5212_ini[i].ini_flags & AR5K_INI_FLAG_5112)) {
-				AR5K_REG_WAIT(i);
-				AR5K_REG_WRITE((u_int32_t)ar5212_ini[i].ini_register,
-				    ar5212_ini[i].ini_value);
-			}
+		ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(ar5212_ini),
+					ar5212_ini, change_channel);
+		if (hal->ah_radio == AR5K_RF5112) {
+			ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(ar5212_rf5112_ini),
+				ar5212_rf5112_ini, change_channel);
+		} else if (hal->ah_radio == AR5K_RF5111) {
+			ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(ar5212_rf5111_ini),
+				ar5212_rf5111_ini, change_channel);
 		}
+	} else if (hal->ah_version == AR5K_AR5211) {
+		ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(ar5211_ini),
+					ar5211_ini, change_channel);
+	} else if (hal->ah_version == AR5K_AR5210) {
+		ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(ar5210_ini),
+					ar5210_ini, change_channel);
 	}
-	/*For 5211*/
-	if (hal->ah_version == AR5K_AR5211) {
-		for (i = 0; i < AR5K_ELEMENTS(ar5211_ini); i++) {
-			if (change_channel == TRUE &&
-			    ar5211_ini[i].ini_register >= AR5K_PCU_MIN &&
-			    ar5211_ini[i].ini_register <= AR5K_PCU_MAX)
-				continue;
 
-			AR5K_REG_WAIT(i);
-			AR5K_REG_WRITE((u_int32_t)ar5211_ini[i].ini_register,
-			    ar5211_ini[i].ini_value);
-		}
-	}
-	/*For 5210*/
-	if (hal->ah_version == AR5K_AR5210)
-		for (i = 0; i < AR5K_ELEMENTS(ar5210_ini); i++) {
-			if (change_channel == TRUE &&
-			    ar5210_ini[i].ini_register >= AR5K_PCU_MIN &&
-			    ar5210_ini[i].ini_register <= AR5K_PCU_MAX)
-				continue;
 
-			switch (ar5210_ini[i].ini_mode) {
-				case AR5K_INI_READ:
-				/* Cleared on read */
-				AR5K_REG_READ(ar5210_ini[i].ini_register);
-				break;
-
-			case AR5K_INI_WRITE:
-			default:
-				AR5K_REG_WRITE(ar5210_ini[i].ini_register,
-						ar5210_ini[i].ini_value);
-		}
-	}
-	
 	/*
 	 * 5211/5212 Specific
 	 */
@@ -4797,9 +4806,11 @@ ath_hal_init_channels(struct ath_hal *hal, AR5K_CHANNEL *channels,
 	AR5K_CHANNEL *all_channels;
 	AR5K_CTRY_CODE country_current;
 
+	/* Allocate and initialize channel array */
 	if ((all_channels = kmalloc(sizeof(AR5K_CHANNEL) * max_channels,
 	    GFP_KERNEL)) == NULL)
 		return (FALSE);
+	memset(all_channels, 0, sizeof(AR5K_CHANNEL) * max_channels);
 
 	i = c = 0;
 	domain_current = hal->ah_regdomain;
@@ -5068,8 +5079,8 @@ ath5k_hw_rf5110_channel(struct ath_hal *hal, AR5K_CHANNEL *channel)
 	 * Set the channel and wait
 	 */
 	data = ath5k_hw_rf5110_chan2athchan(channel);
-	AR5K_PHY_WRITE(0x27, data);
-	AR5K_PHY_WRITE(0x30, 0);
+	AR5K_REG_WRITE(AR5K_RF_BUFFER, data);
+	AR5K_REG_WRITE(AR5K_RF_BUFFER_CONTROL_0, 0);
 	udelay(1000);
 
 	return (TRUE);
@@ -5142,8 +5153,8 @@ ath5k_hw_rf5111_channel(struct ath_hal *hal, AR5K_CHANNEL *channel)
 		    | (clock << 1) | (1 << 10) | 1;
 	}
 
-	AR5K_PHY_WRITE(0x27, (data1 & 0xff) | ((data0 & 0xff) << 8));
-	AR5K_PHY_WRITE(0x34, ((data1 >> 8) & 0xff) | (data0 & 0xff00));
+	AR5K_REG_WRITE(AR5K_RF_BUFFER, (data1 & 0xff) | ((data0 & 0xff) << 8));
+	AR5K_REG_WRITE(AR5K_RF_BUFFER_CONTROL_3, ((data1 >> 8) & 0xff) | (data0 & 0xff00));
 
 	return (TRUE);
 }
@@ -5190,8 +5201,8 @@ ath5k_hw_rf5112_channel(struct ath_hal *hal, AR5K_CHANNEL *channel)
 
 	data = (data0 << 4) | (data1 << 1) | (data2 << 2) | 0x1001;
 
-	AR5K_PHY_WRITE(0x27, data & 0xff);
-	AR5K_PHY_WRITE(0x36, (data >> 8) & 0x7f);
+	AR5K_REG_WRITE(AR5K_RF_BUFFER, data & 0xff);
+	AR5K_REG_WRITE(AR5K_RF_BUFFER_CONTROL_5, (data >> 8) & 0x7f);
 
 	return (TRUE);
 }
@@ -5695,6 +5706,7 @@ ath5k_hw_rf5111_rfregs(struct ath_hal *hal, AR5K_CHANNEL *channel, u_int mode)
 		rf[i] = rf5111_rf[i].rf_value[mode];
 	}
 
+	/* Modify bank 0 */
 	if (channel->channel_flags & CHANNEL_2GHZ) {
 		if (channel->channel_flags & CHANNEL_B)
 			ee_mode = AR5K_EEPROM_MODE_11B;
@@ -5711,6 +5723,7 @@ ath5k_hw_rf5111_rfregs(struct ath_hal *hal, AR5K_CHANNEL *channel, u_int mode)
 			return (FALSE);
 
 		obdb = 1;
+	/* Modify bank 6 */
 	} else {
 		/* For 11a, Turbo and XR */
 		ee_mode = AR5K_EEPROM_MODE_11A;
@@ -5744,6 +5757,7 @@ ath5k_hw_rf5111_rfregs(struct ath_hal *hal, AR5K_CHANNEL *channel, u_int mode)
 		obdb >= 0 ? ee->ee_db[ee_mode][obdb] : 0, 3, 107, 0, TRUE))
 		return (FALSE);
 
+	/* Modify bank 7 */
 	if (!ath5k_hw_rfregs_op(rf, hal->ah_offset[7],
 		ee->ee_i_gain[ee_mode], 6, 29, 0, TRUE))
 		return (FALSE);
@@ -5802,6 +5816,7 @@ ath5k_hw_rf5112_rfregs(struct ath_hal *hal, AR5K_CHANNEL *channel, u_int mode)
 		rf[i] = rf_ini[i].rf_value[mode];
 	}
 
+	/* Modify bank 6 */
 	if (channel->channel_flags & CHANNEL_2GHZ) {
 		if (channel->channel_flags & CHANNEL_B)
 			ee_mode = AR5K_EEPROM_MODE_11B;
@@ -5844,6 +5859,7 @@ ath5k_hw_rf5112_rfregs(struct ath_hal *hal, AR5K_CHANNEL *channel, u_int mode)
 		ee->ee_xpd[ee_mode], 1, 302, 0, TRUE))
 		return (FALSE);
 
+	/* Modify bank 7 */
 	if (!ath5k_hw_rfregs_op(rf, hal->ah_offset[7],
 		ee->ee_i_gain[ee_mode], 6, 14, 0, TRUE))
 		return (FALSE);
@@ -6385,8 +6401,8 @@ ath5k_hw_disable_pspoll(struct ath_hal *hal)
 	return (FALSE);
 }
 
-const char * /*O.K. - TODO:Get rid of this*/
-ath5k_printver(enum ath5k_srev_type type, u_int32_t val)
+const char *
+ath5k_hw_get_part_name(enum ath5k_srev_type type, u_int32_t val)
 {
 	struct ath5k_srev_name names[] = AR5K_SREV_NAME;
 	const char *name = "xxxx";

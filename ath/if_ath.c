@@ -6605,7 +6605,7 @@ ath_announce(struct ath_softc *sc)
 	int i;
 
 	if_printf(dev, "mac %d.%d phy %d.%d",
-		ah->ah_mac_version, ah->ah_mac_version,
+		ah->ah_mac_version, ah->ah_mac_revision,
 		ah->ah_phy_revision >> 4, ah->ah_phy_revision & 0xf);
 	/*
 	 * Print radio revision(s).  We check the wireless modes

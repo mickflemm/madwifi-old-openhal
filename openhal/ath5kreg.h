@@ -1663,7 +1663,7 @@
 #define	AR5K_PHY_ACT_DISABLE		0x00000002
 
 /*
- * PHY signal register [5110]
+ * PHY signal register
  */
 #define	AR5K_PHY_SIG			0x9858
 #define	AR5K_PHY_SIG_FIRSTEP		0x0003f000
@@ -1672,7 +1672,7 @@
 #define	AR5K_PHY_SIG_FIRPWR_S		18
 
 /*
- * PHY coarse agility control register [5110]
+ * PHY coarse agility control register
  */
 #define	AR5K_PHY_AGCCOARSE		0x985c
 #define	AR5K_PHY_AGCCOARSE_LO		0x00007f80
@@ -1717,7 +1717,7 @@
 #define AR5K_PHY_SCAL_32MHZ		0x0000000e
 
 /*
- * PHY PLL control register [5111+]
+ * PHY PLL (Phase Locked Loop) control register
  */
 #define	AR5K_PHY_PLL			0x987c
 #define	AR5K_PHY_PLL_20MHZ		0x13		/* [5111] */
@@ -1733,7 +1733,58 @@
 #define AR5K_PHY_PLL_RF5112		0x00000040
 
 /*
- * PHY RF stage register [5110]
+ * RF Buffer register
+ *
+ * There are some special control registers on the RF chip
+ * that hold various operation settings related mostly to
+ * the analog parts (channel, gain adjustment etc).
+ *
+ * We don't write on those registers directly but
+ * we send a data packet on the buffer register and
+ * then write on another special register to notify hw
+ * to apply the settings. This is done so that control registers
+ * can be dynamicaly programmed during operation and the settings
+ * are applied faster on the hw.
+ *
+ * We sent such data packets during rf initialization and channel change
+ * through ath5k_hw_rf*_rfregs and ath5k_hw_rf*_channel functions.
+ * 
+ * The data packets we send during initializadion are inside ath5k_ini_rf
+ * struct (see ath5k_hw.h) and each one is related to an "rf register bank".
+ * We use *rfregs functions to modify them  acording to current operation
+ * mode and eeprom values and pass them all together to the chip.
+ *
+ * It's obvious from the code that 0x989c is the buffer register but 
+ * for the other special registers that we write to after sending each
+ * packet, i have no idea. So i'll name them BUFFER_CONTROL_X registers
+ * for now. It's interesting that they are also used for some other operations.
+ *
+ * Also check out ath5k_hw.h and U.S. Patent 6677779 B1 (about buffer
+ * registers and control registers)
+ */
+
+#define AR5K_RF_BUFFER			0x989c
+#define AR5K_RF_BUFFER_CONTROL_0	0x98c0	/* Channel on 5110 */
+#define AR5K_RF_BUFFER_CONTROL_1	0x98c4	/* Bank 7 on 5112 */
+#define AR5K_RF_BUFFER_CONTROL_2	0x98cc	/* Bank 7 on 5111 */
+
+#define AR5K_RF_BUFFER_CONTROL_3	0x98d0	/* Bank 2 on 5112 &
+						 * Channel set on 5111  & 
+						 * Used to read radio revision */
+
+#define AR5K_RF_BUFFER_CONTROL_4	0x98d4  /* Bank 0,1,2,6 on 5111 &
+						 * Bank 1 on 5112 &
+						 * Used during activation on 5111 */
+
+#define AR5K_RF_BUFFER_CONTROL_5	0x98d8	/* Bank 3 on 5111 &
+						 * Used during activation on 5111 &
+						 * Channel on 5112 &
+						 * Bank 6 on 5112*/
+
+#define AR5K_RF_BUFFER_CONTROL_6	0x98dc	/* Bank 3 on 5112 */
+
+/*
+ * PHY RF stage register [5210]
  */
 #define AR5K_PHY_RFSTG			0x98d4
 #define AR5K_PHY_RFSTG_DISABLE		0x00000021
@@ -1745,7 +1796,7 @@
 #define	AR5K_PHY_RX_DELAY_M		0x00003fff
 
 /*
- * PHY timing IQ control register [5111+]
+ * PHY timing I(nphase) Q(adrature) control register [5111+]
  */
 #define	AR5K_PHY_IQ			0x9920
 #define	AR5K_PHY_IQ_CORR_Q_Q_COFF	0x0000001f
@@ -1774,7 +1825,7 @@
 
 
 /*
- * PHY TX power registers [5112+]
+ * PHY TX rate power registers [5112+]
  */
 #define	AR5K_PHY_TXPOWER_RATE1			0x9934
 #define	AR5K_PHY_TXPOWER_RATE2			0x9938
@@ -1865,16 +1916,16 @@ after DFS is enabled */
 /*
  * Misc PHY/radio registers [5110 - 5111]
  */
-#define	AR5K_BB_GAIN_BASE		0x9b00
+#define	AR5K_BB_GAIN_BASE		0x9b00	/* BaseBand Amplifier Gain table base address */
 #define AR5K_BB_GAIN(_n)		(AR5K_BB_GAIN_BASE + ((_n) << 2))
-#define	AR5K_RF_GAIN_BASE		0x9a00
+#define	AR5K_RF_GAIN_BASE		0x9a00 /* RF Amplrifier Gain table base address */
 #define AR5K_RF_GAIN(_n)		(AR5K_RF_GAIN_BASE + ((_n) << 2))
 
 /*
  * PHY timing IQ calibration result register [5111+]
  */
-#define	AR5K_PHY_IQRES_CAL_PWR_I	0x9c10
-#define	AR5K_PHY_IQRES_CAL_PWR_Q	0x9c14
+#define	AR5K_PHY_IQRES_CAL_PWR_I	0x9c10 /* I (Inphase) power value */
+#define	AR5K_PHY_IQRES_CAL_PWR_Q	0x9c14 /* Q (Quadrature) power value */
 #define	AR5K_PHY_IQRES_CAL_CORR		0x9c18
 
 /*
@@ -1883,7 +1934,7 @@ after DFS is enabled */
 #define	AR5K_PHY_CURRENT_RSSI		0x9c1c
 
 /*
- * PHY PCDAC TX power register [5112+]
+ * PHY PCDAC TX power register [511+ (?)]
  */
 #define	AR5K_PHY_PCDAC_TXPOWER_BASE	0xa180
 #define	AR5K_PHY_PCDAC_TXPOWER(_n)	(AR5K_PHY_PCDAC_TXPOWER_BASE + ((_n) << 2))
