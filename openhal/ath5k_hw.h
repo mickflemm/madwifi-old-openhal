@@ -1466,74 +1466,17 @@ struct ath5k_ini {
 	{ AR5K_PHY_PCDAC_TXPOWER(29), 0x3aff3aff },	\
 	{ AR5K_PHY_PCDAC_TXPOWER(30), 0x3aff3aff },	\
 	{ AR5K_PHY_PCDAC_TXPOWER(31), 0x3aff3aff },	\
-        /* BB gain table (64bytes) */		\
-	{ AR5K_BB_GAIN(0), 0x00000000 },	\
-	{ AR5K_BB_GAIN(1), 0x00000020 },	\
-	{ AR5K_BB_GAIN(2), 0x00000010 },	\
-	{ AR5K_BB_GAIN(3), 0x00000030 },	\
-	{ AR5K_BB_GAIN(4), 0x00000008 },	\
-	{ AR5K_BB_GAIN(5), 0x00000028 },	\
-	{ AR5K_BB_GAIN(6), 0x00000004 },	\
-	{ AR5K_BB_GAIN(7), 0x00000024 },	\
-	{ AR5K_BB_GAIN(8), 0x00000014 },	\
-	{ AR5K_BB_GAIN(9), 0x00000034 },	\
-	{ AR5K_BB_GAIN(10), 0x0000000c },	\
-	{ AR5K_BB_GAIN(11), 0x0000002c },	\
-	{ AR5K_BB_GAIN(12), 0x00000002 },	\
-	{ AR5K_BB_GAIN(13), 0x00000022 },	\
-	{ AR5K_BB_GAIN(14), 0x00000012 },	\
-	{ AR5K_BB_GAIN(15), 0x00000032 },	\
-	{ AR5K_BB_GAIN(16), 0x0000000a },	\
-	{ AR5K_BB_GAIN(17), 0x0000002a },	\
-	{ AR5K_BB_GAIN(18), 0x00000006 },	\
-	{ AR5K_BB_GAIN(19), 0x00000026 },	\
-	{ AR5K_BB_GAIN(20), 0x00000016 },	\
-	{ AR5K_BB_GAIN(21), 0x00000036 },	\
-	{ AR5K_BB_GAIN(22), 0x0000000e },	\
-	{ AR5K_BB_GAIN(23), 0x0000002e },	\
-	{ AR5K_BB_GAIN(24), 0x00000001 },	\
-	{ AR5K_BB_GAIN(25), 0x00000021 },	\
-	{ AR5K_BB_GAIN(26), 0x00000011 },	\
-	{ AR5K_BB_GAIN(27), 0x00000031 },	\
-	{ AR5K_BB_GAIN(28), 0x00000009 },	\
-	{ AR5K_BB_GAIN(29), 0x00000029 },	\
-	{ AR5K_BB_GAIN(30), 0x00000005 },	\
-	{ AR5K_BB_GAIN(31), 0x00000025 },	\
-	{ AR5K_BB_GAIN(32), 0x00000015 },	\
-	{ AR5K_BB_GAIN(33), 0x00000035 },	\
-	{ AR5K_BB_GAIN(34), 0x0000000d },	\
-	{ AR5K_BB_GAIN(35), 0x0000002d },	\
-	{ AR5K_BB_GAIN(36), 0x00000003 },	\
-	{ AR5K_BB_GAIN(37), 0x00000023 },	\
-	{ AR5K_BB_GAIN(38), 0x00000013 },	\
-	{ AR5K_BB_GAIN(39), 0x00000033 },	\
-	{ AR5K_BB_GAIN(40), 0x0000000b },	\
-	{ AR5K_BB_GAIN(41), 0x0000002b },	\
-	{ AR5K_BB_GAIN(42), 0x0000002b },	\
-	{ AR5K_BB_GAIN(43), 0x0000002b },	\
-	{ AR5K_BB_GAIN(44), 0x0000002b },	\
-	{ AR5K_BB_GAIN(45), 0x0000002b },	\
-	{ AR5K_BB_GAIN(46), 0x0000002b },	\
-	{ AR5K_BB_GAIN(47), 0x0000002b },	\
-	{ AR5K_BB_GAIN(48), 0x0000002b },	\
-	{ AR5K_BB_GAIN(49), 0x0000002b },	\
-	{ AR5K_BB_GAIN(50), 0x0000002b },	\
-	{ AR5K_BB_GAIN(51), 0x0000002b },	\
-	{ AR5K_BB_GAIN(52), 0x0000002b },	\
-	{ AR5K_BB_GAIN(53), 0x0000002b },	\
-	{ AR5K_BB_GAIN(54), 0x0000002b },	\
-	{ AR5K_BB_GAIN(55), 0x0000002b },	\
-	{ AR5K_BB_GAIN(56), 0x0000002b },	\
-	{ AR5K_BB_GAIN(57), 0x0000002b },	\
-	{ AR5K_BB_GAIN(58), 0x0000002b },	\
-	{ AR5K_BB_GAIN(59), 0x0000002b },	\
-	{ AR5K_BB_GAIN(60), 0x0000002b },	\
-	{ AR5K_BB_GAIN(61), 0x0000002b },	\
-	{ AR5K_BB_GAIN(62), 0x00000002 },	\
-	{ AR5K_BB_GAIN(63), 0x00000016 },	\
-        /* PHY activation */			\
-	{ AR5K_RF_BUFFER_CONTROL_4, 0x00000020 },\
-	{ AR5K_RF_BUFFER_CONTROL_5, 0x00601068 },\
+	{ AR5K_PHY_CCKTXCTL, 0x00000000 },	\
+	{ AR5K_PHY(642), 0x503e4646 },		\
+	{ AR5K_PHY_GAIN_2GHZ, 0x6480416c },	\
+	{ AR5K_PHY(644), 0x0199a003 },		\
+	{ AR5K_PHY(645), 0x044cd610 },		\
+	{ AR5K_PHY(646), 0x13800040 },		\
+	{ AR5K_PHY(647), 0x1be00060 },		\
+	{ AR5K_PHY(648), 0x0c53800a },		\
+	{ AR5K_PHY(649), 0x0014df3b },		\
+	{ AR5K_PHY(650), 0x000001b5 },		\
+	{ AR5K_PHY(651), 0x00000020 },		\
 }
 
 /* Initial register settings for AR5212 */
@@ -1559,7 +1502,7 @@ struct ath5k_ini {
 	{ AR5K_DCU_FP,		0x00000000 },	\
 	{ AR5K_DCU_TXP,		0x00000000 },	\
 	{ AR5K_DCU_TX_FILTER,	0x00000000 },	\
-	/* Unknown */				\
+	/* Unknown table */			\
 	{ 0x1078, 0x00000000 },			\
 	{ 0x10b8, 0x00000000 },			\
 	{ 0x10f8, 0x00000000 },			\
@@ -1686,7 +1629,8 @@ struct ath5k_ini {
 	{ AR5K_PHY_ERR_FIL,	0x00000000 },	\
 	{ 0x8110, 0x00000168 },			\
 	{ 0x8114, 0x00000000 },			\
-	/* Some kind of table */		\
+	/* Some kind of table			\
+	 * also notice ...03<-02<-01<-00) */	\
 	{ 0x87c0, 0x03020100 },			\
 	{ 0x87c4, 0x07060504 },			\
 	{ 0x87c8, 0x0b0a0908 },			\
@@ -1782,19 +1726,12 @@ struct ath5k_ini {
 	{ AR5K_PHY(656), 0x38490a20 },		\
 	{ AR5K_PHY(657), 0x00007bb6 },		\
 	{ AR5K_PHY(658), 0x0fff3ffc },		\
-	{ AR5K_BB_GAIN(0), 0x00000000 },	\
-	{ AR5K_BB_GAIN(10), 0x0000000c },	\
-	{ AR5K_BB_GAIN(14), 0x00000012 },	\
-	{ AR5K_BB_GAIN(25), 0x00000021 },	\
-	{ AR5K_BB_GAIN(35), 0x0000002d },	\
-	{ AR5K_BB_GAIN(39), 0x00000033 },	\
+	{ AR5K_PHY_CCKTXCTL, 0x00000000 },	\
 }
-	/* RF5111 specific BB Gain (for 5212/5111 combination) */						
-#define AR5K_AR5212_RF5111_INI {		\
-	{ AR5K_PHY_PAPD_PROBE,	0x00004883 },	\
-	{ AR5K_PHY_CCKTXCTL,	0x00000000 },	\
-	{ 0xa208, 0xd03e6788 },			\
-	{ AR5K_PHY_GAIN_2GHZ,	0x6448416a },	\
+
+/* RF5111 Initial BB Gain settings */
+#define AR5K_RF5111_BBGAIN_INI {		\
+	{ AR5K_BB_GAIN(0), 0x00000000 },	\
 	{ AR5K_BB_GAIN(1), 0x00000020 },	\
 	{ AR5K_BB_GAIN(2), 0x00000010 },	\
 	{ AR5K_BB_GAIN(3), 0x00000030 },	\
@@ -1804,9 +1741,11 @@ struct ath5k_ini {
 	{ AR5K_BB_GAIN(7), 0x00000024 },	\
 	{ AR5K_BB_GAIN(8), 0x00000014 },	\
 	{ AR5K_BB_GAIN(9), 0x00000034 },	\
+	{ AR5K_BB_GAIN(10), 0x0000000c },	\
 	{ AR5K_BB_GAIN(11), 0x0000002c },	\
 	{ AR5K_BB_GAIN(12), 0x00000002 },	\
 	{ AR5K_BB_GAIN(13), 0x00000022 },	\
+	{ AR5K_BB_GAIN(14), 0x00000012 },	\
 	{ AR5K_BB_GAIN(15), 0x00000032 },	\
 	{ AR5K_BB_GAIN(16), 0x0000000a },	\
 	{ AR5K_BB_GAIN(17), 0x0000002a },	\
@@ -1817,6 +1756,7 @@ struct ath5k_ini {
 	{ AR5K_BB_GAIN(22), 0x0000000e },	\
 	{ AR5K_BB_GAIN(23), 0x0000002e },	\
 	{ AR5K_BB_GAIN(24), 0x00000001 },	\
+	{ AR5K_BB_GAIN(25), 0x00000021 },	\
 	{ AR5K_BB_GAIN(26), 0x00000011 },	\
 	{ AR5K_BB_GAIN(27), 0x00000031 },	\
 	{ AR5K_BB_GAIN(28), 0x00000009 },	\
@@ -1826,9 +1766,11 @@ struct ath5k_ini {
 	{ AR5K_BB_GAIN(32), 0x00000015 },	\
 	{ AR5K_BB_GAIN(33), 0x00000035 },	\
 	{ AR5K_BB_GAIN(34), 0x0000000d },	\
+	{ AR5K_BB_GAIN(35), 0x0000002d },	\
 	{ AR5K_BB_GAIN(36), 0x00000003 },	\
 	{ AR5K_BB_GAIN(37), 0x00000023 },	\
-	{ AR5K_BB_GAIN(39), 0x00000013 },	\
+	{ AR5K_BB_GAIN(38), 0x00000013 },	\
+	{ AR5K_BB_GAIN(39), 0x00000033 },	\
 	{ AR5K_BB_GAIN(40), 0x0000000b },	\
 	{ AR5K_BB_GAIN(41), 0x0000002b },	\
 	{ AR5K_BB_GAIN(42), 0x0000002b },	\
@@ -1854,9 +1796,10 @@ struct ath5k_ini {
 	{ AR5K_BB_GAIN(62), 0x00000002 },	\
 	{ AR5K_BB_GAIN(63), 0x00000016 },	\
 }
-	/* RF5112  specific BB Gain (for 5212/5111 combination) */
-#define AR5K_AR5212_RF5112_INI {		\
-	{ AR5K_PHY_PAPD_PROBE, 0x00004882 },	\
+
+/* RF 5112 Initial BB Gain settings */
+#define AR5K_RF5112_BBGAIN_INI {		\
+ 	{ AR5K_BB_GAIN(0), 0x00000000 },	\
 	{ AR5K_BB_GAIN(1), 0x00000001 },	\
 	{ AR5K_BB_GAIN(2), 0x00000002 },	\
 	{ AR5K_BB_GAIN(3), 0x00000003 },	\
@@ -1866,9 +1809,11 @@ struct ath5k_ini {
 	{ AR5K_BB_GAIN(7), 0x00000009 },	\
 	{ AR5K_BB_GAIN(8), 0x0000000a },	\
 	{ AR5K_BB_GAIN(9), 0x0000000b },	\
+	{ AR5K_BB_GAIN(10), 0x0000000c },	\
 	{ AR5K_BB_GAIN(11), 0x0000000d },	\
 	{ AR5K_BB_GAIN(12), 0x00000010 },	\
 	{ AR5K_BB_GAIN(13), 0x00000011 },	\
+	{ AR5K_BB_GAIN(14), 0x00000012 },	\
 	{ AR5K_BB_GAIN(15), 0x00000013 },	\
 	{ AR5K_BB_GAIN(16), 0x00000014 },	\
 	{ AR5K_BB_GAIN(17), 0x00000015 },	\
@@ -1879,6 +1824,7 @@ struct ath5k_ini {
 	{ AR5K_BB_GAIN(22), 0x0000001c },	\
 	{ AR5K_BB_GAIN(23), 0x0000001d },	\
 	{ AR5K_BB_GAIN(24), 0x00000020 },	\
+	{ AR5K_BB_GAIN(25), 0x00000021 },	\
 	{ AR5K_BB_GAIN(26), 0x00000022 },	\
 	{ AR5K_BB_GAIN(27), 0x00000023 },	\
 	{ AR5K_BB_GAIN(28), 0x00000024 },	\
@@ -1888,9 +1834,11 @@ struct ath5k_ini {
 	{ AR5K_BB_GAIN(32), 0x0000002a },	\
 	{ AR5K_BB_GAIN(33), 0x0000002b },	\
 	{ AR5K_BB_GAIN(34), 0x0000002c },	\
+	{ AR5K_BB_GAIN(35), 0x0000002d },	\
 	{ AR5K_BB_GAIN(36), 0x00000030 },	\
 	{ AR5K_BB_GAIN(37), 0x00000031 },	\
 	{ AR5K_BB_GAIN(38), 0x00000032 },	\
+	{ AR5K_BB_GAIN(39), 0x00000033 },	\
 	{ AR5K_BB_GAIN(40), 0x00000034 },	\
 	{ AR5K_BB_GAIN(41), 0x00000035 },	\
 	{ AR5K_BB_GAIN(42), 0x00000035 },	\
@@ -2172,8 +2120,8 @@ struct ath5k_ar5212_ini_mode {
 		{ 0, },								\
 		{ 0x00000000, 0x00000000, 0x00000004, 0x00000004, 0x00000004 }	\
 	} },									\
-	{ 0xa208, AR5K_INI_FLAG_5112, {						\
-		{ 0, },								\
+	{ 0xa208, AR5K_INI_FLAG_BOTH, {						\
+		{ 0xd03e6788, 0xd03e6788, 0xd03e6788, 0xd03e6788, 0xd03e6788 },	\
 		{ 0xd6be6788, 0xd6be6788, 0xd03e6788, 0xd03e6788, 0xd03e6788 }	\
 	} },									\
 	{ 0xa20c, AR5K_INI_FLAG_5112, {						\
@@ -2188,7 +2136,7 @@ struct ath5k_ar5211_ini_rf {
 };
 
 #define AR5K_AR5211_INI_RF	{					\
-/* Static */								\
+/* Static -> moved on ar5211_ini */					\
 	{ 0x0000a204, { 0x00000000, 0x00000000 } },			\
 	{ 0x0000a208, { 0x503e4646, 0x503e4646 } },			\
 	{ 0x0000a20c, { 0x6480416c, 0x6480416c } },			\

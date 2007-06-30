@@ -95,16 +95,20 @@ ieee80211_regchannel ath5k_2ghz_channels[] = IEEE80211_CHANNELS_2GHZ;
 /*
  * Initial register dumps
  */
-static const struct ath5k_ini ar5212_ini[] = AR5K_AR5212_INI;
-static const struct ath5k_ini ar5212_rf5111_ini[] = AR5K_AR5212_RF5111_INI;
-static const struct ath5k_ini ar5212_rf5112_ini[] = AR5K_AR5212_RF5112_INI;
-static const struct ath5k_ar5212_ini_mode ar5212_mode[] = AR5K_AR5212_INI_MODE;
-
+static const struct ath5k_ini ar5210_ini[] = AR5K_AR5210_INI;
 static const struct ath5k_ini ar5211_ini[] = AR5K_AR5211_INI;
 static const struct ath5k_ar5211_ini_mode ar5211_mode[] = AR5K_AR5211_INI_MODE;
+static const struct ath5k_ini ar5212_ini[] = AR5K_AR5212_INI;
+static const struct ath5k_ar5212_ini_mode ar5212_mode[] = AR5K_AR5212_INI_MODE;
+
+/* RF Initial BB gain settings */
+static const struct ath5k_ini rf5111_bbgain_ini[] = AR5K_RF5111_BBGAIN_INI;
+static const struct ath5k_ini rf5112_bbgain_ini[] = AR5K_RF5112_BBGAIN_INI;
+
+/* This is going out soon */
 static const struct ath5k_ar5211_ini_rf ar5211_rf[] = AR5K_AR5211_INI_RF;
 
-static const struct ath5k_ini ar5210_ini[] = AR5K_AR5210_INI;
+
 
 /*
  * Initial gain optimization values
@@ -948,7 +952,7 @@ ath5k_hw_reset(struct ath_hal *hal, AR5K_OPMODE op_mode, AR5K_CHANNEL *channel,
 
 		/*
 		 * Write initial RF registers on 5211
-		 * do we need that ? Is ath5k_hw_rfregs going to work for 5211 (5111) ?
+		 * This is going out soon since it's handled by rf5111_rfregs...
 		 */
 		if (hal->ah_version == AR5K_AR5211)
 			ath5k_hw_ar5211_rfregs(hal, channel, freq, ee_mode);
@@ -993,15 +997,23 @@ ath5k_hw_reset(struct ath_hal *hal, AR5K_OPMODE op_mode, AR5K_CHANNEL *channel,
 		ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(ar5212_ini),
 					ar5212_ini, change_channel);
 		if (hal->ah_radio == AR5K_RF5112) {
-			ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(ar5212_rf5112_ini),
-				ar5212_rf5112_ini, change_channel);
+			AR5K_REG_WRITE(AR5K_PHY_PAPD_PROBE,
+					AR5K_PHY_PAPD_PROBE_INI_5112);
+			ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(rf5112_bbgain_ini),
+				rf5112_bbgain_ini, change_channel);
 		} else if (hal->ah_radio == AR5K_RF5111) {
-			ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(ar5212_rf5111_ini),
-				ar5212_rf5111_ini, change_channel);
+			AR5K_REG_WRITE( AR5K_PHY_GAIN_2GHZ, AR5K_PHY_GAIN_2GHZ_INI_5111); 
+			AR5K_REG_WRITE( AR5K_PHY_PAPD_PROBE,
+				AR5K_PHY_PAPD_PROBE_INI_5111 );
+			ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(rf5111_bbgain_ini),
+				rf5111_bbgain_ini, change_channel);
 		}
 	} else if (hal->ah_version == AR5K_AR5211) {
 		ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(ar5211_ini),
 					ar5211_ini, change_channel);
+		/* AR5211 only comes with 5111 */
+		ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(rf5111_bbgain_ini),
+					rf5111_bbgain_ini, change_channel);
 	} else if (hal->ah_version == AR5K_AR5210) {
 		ath5k_hw_ini_registers(hal, AR5K_ELEMENTS(ar5210_ini),
 					ar5210_ini, change_channel);

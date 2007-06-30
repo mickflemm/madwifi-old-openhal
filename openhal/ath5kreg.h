@@ -1809,7 +1809,9 @@
 
 
 /*
- * PHY PAPD probe register [5111+]
+ * PHY PAPD probe register [5111+ (?)]
+ * Is this only present in 5212 ?
+ * Because it's always 0 in 5211 initialization code
  */
 #define	AR5K_PHY_PAPD_PROBE		0x9930
 #define	AR5K_PHY_PAPD_PROBE_TXPOWER	0x00007e00
@@ -1822,7 +1824,8 @@
 #define	AR5K_PHY_PAPD_PROBE_TYPE_CCK	2
 #define	AR5K_PHY_PAPD_PROBE_GAINF	0xfe000000
 #define	AR5K_PHY_PAPD_PROBE_GAINF_S	25
-
+#define	AR5K_PHY_PAPD_PROBE_INI_5111	0x00004883	/* [5212+] */
+#define	AR5K_PHY_PAPD_PROBE_INI_5112	0x00004882	/* [5212+] */
 
 /*
  * PHY TX rate power registers [5112+]
@@ -1956,15 +1959,16 @@ after DFS is enabled */
 #define AR5K_PHY_MODE_XR		0x00000010	/* [5112+] */
 
 /*
- * PHY CCK transmit control register [5112+]
+ * PHY CCK transmit control register [5111+ (?)]
  */
 #define AR5K_PHY_CCKTXCTL		0xa204
 #define AR5K_PHY_CCKTXCTL_WORLD		0x00000000
 #define AR5K_PHY_CCKTXCTL_JAPAN		0x00000010
  	 
 /*
- * PHY 2GHz gain register [5112+]
+ * PHY 2GHz gain register [5111+]
  */
 #define	AR5K_PHY_GAIN_2GHZ		0xa20c
 #define	AR5K_PHY_GAIN_2GHZ_MARGIN_TXRX	0x00fc0000
 #define	AR5K_PHY_GAIN_2GHZ_MARGIN_TXRX_S	18
+#define	AR5K_PHY_GAIN_2GHZ_INI_5111	0x6480416c
