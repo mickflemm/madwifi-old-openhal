@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATTERN='^\(ath_.*\|wlan_.*\|wlan\)$'
+PATTERN='\(ath_.*\|wlan_.*\|wlan\)$'
 
 MAX_TRIES=10
 
