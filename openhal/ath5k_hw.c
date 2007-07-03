@@ -3436,7 +3436,8 @@ ath5k_hw_set_key(struct ath_hal *hal, u_int16_t entry,
     const AR5K_KEYVAL *keyval, const u_int8_t *mac, int xor_notused)
 {
 	int i;
-	u_int32_t key_v[AR5K_KEYCACHE_SIZE - 2];
+	int keytype;
+	__le32 key_v[5];
 
 	AR5K_TRACE;
 	AR5K_ASSERT_ENTRY(entry, AR5K_KEYTABLE_SIZE);
@@ -3445,27 +3446,22 @@ ath5k_hw_set_key(struct ath_hal *hal, u_int16_t entry,
 
 	switch (keyval->wk_len) {
 	case AR5K_KEYVAL_LENGTH_40:
-		memcpy(&key_v[0], keyval->wk_key, 4);
-		memcpy(&key_v[1], keyval->wk_key + 4, 1);
-		key_v[5] = AR5K_KEYTABLE_TYPE_40;
+		memcpy(&key_v[0], &keyval->wk_key[0], 5);
+		keytype = AR5K_KEYTABLE_TYPE_40;
 		break;
 
 	case AR5K_KEYVAL_LENGTH_104:
-		memcpy(&key_v[0], keyval->wk_key, 4);
-		memcpy(&key_v[1], keyval->wk_key + 4, 2);
-		memcpy(&key_v[2], keyval->wk_key + 6, 4);
-		memcpy(&key_v[3], keyval->wk_key + 10, 2);
-		memcpy(&key_v[4], keyval->wk_key + 12, 1);
-		key_v[5] = AR5K_KEYTABLE_TYPE_104;
+		memcpy(&key_v[0], &keyval->wk_key[0], 6);
+		memcpy(&key_v[2], &keyval->wk_key[6], 6);
+		memcpy(&key_v[4], &keyval->wk_key[12], 1);
+		keytype = AR5K_KEYTABLE_TYPE_104;
 		break;
 
 	case AR5K_KEYVAL_LENGTH_128:
-		memcpy(&key_v[0], keyval->wk_key, 4);
-		memcpy(&key_v[1], keyval->wk_key + 4, 2);
-		memcpy(&key_v[2], keyval->wk_key + 6, 4);
-		memcpy(&key_v[3], keyval->wk_key + 10, 2);
-		memcpy(&key_v[4], keyval->wk_key + 12, 4);
-		key_v[5] = AR5K_KEYTABLE_TYPE_128;
+		memcpy(&key_v[0], &keyval->wk_key[0], 6);
+		memcpy(&key_v[2], &keyval->wk_key[6], 6);
+		memcpy(&key_v[4], &keyval->wk_key[12], 4);
+		keytype = AR5K_KEYTABLE_TYPE_128;
 		break;
 
 	default:
@@ -3474,7 +3470,10 @@ ath5k_hw_set_key(struct ath_hal *hal, u_int16_t entry,
 	}
 
 	for (i = 0; i < AR5K_ELEMENTS(key_v); i++)
-		AR5K_REG_WRITE(AR5K_KEYTABLE_OFF(entry, i), key_v[i]);
+		AR5K_REG_WRITE(AR5K_KEYTABLE_OFF(entry, i),
+			       le32_to_cpu(key_v[i]));
+
+	AR5K_REG_WRITE(AR5K_KEYTABLE_TYPE(entry), keytype);
 
 	return (ath5k_hw_set_key_lladdr(hal, entry, mac));
 }
