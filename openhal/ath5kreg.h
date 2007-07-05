@@ -1586,7 +1586,7 @@
 #define AR5K_KEYTABLE_0_5210		0x9000
 #define AR5K_KEYTABLE_0_5211		0x8800
 #define AR5K_KEYTABLE_5210(_n)		(AR5K_KEYTABLE_0_5210 + ((_n) << 5))
-#define AR5K_KEYTABLE_5211(_n)		(AR5K_KEYTABLE_0_5211 + ((_n) * 32))
+#define AR5K_KEYTABLE_5211(_n)		(AR5K_KEYTABLE_0_5211 + ((_n) << 5))
 #define	AR5K_KEYTABLE(_n)		(hal->ah_version == AR5K_AR5210 ? \
 					AR5K_KEYTABLE_5210(_n) : AR5K_KEYTABLE_5211(_n))
 #define AR5K_KEYTABLE_OFF(_n, x)	(AR5K_KEYTABLE(_n) + (x << 2))
