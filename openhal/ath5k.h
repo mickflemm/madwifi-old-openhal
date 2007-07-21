@@ -1193,13 +1193,13 @@ inline u_int		ath5k_htoclock(u_int, AR5K_BOOL);
 void			ath5k_rt_copy(AR5K_RATE_TABLE *, const AR5K_RATE_TABLE *);
 AR5K_BOOL		ath5k_register_timeout(struct ath_hal *, u_int32_t, u_int32_t,
 					u_int32_t, AR5K_BOOL);
-int			ath5k_eeprom_init(struct ath_hal *);
-int			ath5k_eeprom_read_mac(struct ath_hal *, u_int8_t *);
-AR5K_BOOL		ath5k_eeprom_regulation_domain(struct ath_hal *, AR5K_BOOL,
+int			ath5k_hw_eeprom_init(struct ath_hal *);
+int			ath5k_hw_eeprom_read_mac(struct ath_hal *, u_int8_t *);
+AR5K_BOOL		ath5k_hw_eeprom_regulation_domain(struct ath_hal *, AR5K_BOOL,
 					ieee80211_regdomain_t *);
-int			ath5k_eeprom_read_ants(struct ath_hal *, u_int32_t *, u_int);
-int			ath5k_eeprom_read_modes(struct ath_hal *, u_int32_t *, u_int);
-u_int16_t		ath5k_eeprom_bin2freq(struct ath_hal *, u_int16_t, u_int);
+int			ath5k_hw_eeprom_read_ants(struct ath_hal *, u_int32_t *, u_int);
+int			ath5k_hw_eeprom_read_modes(struct ath_hal *, u_int32_t *, u_int);
+u_int16_t		ath5k_hw_eeprom_bin2freq(struct ath_hal *, u_int16_t, u_int);
 
 AR5K_BOOL		ath5k_hw_channel(struct ath_hal *, AR5K_CHANNEL *);
 AR5K_BOOL		ath5k_hw_rf5110_channel(struct ath_hal *, AR5K_CHANNEL *);
@@ -1222,7 +1222,7 @@ u_int			ath5k_hw_rfregs_op(u_int32_t *, u_int32_t, u_int32_t, u_int32_t,
 u_int32_t		ath5k_hw_rfregs_gainf_corr(struct ath_hal *);
 AR5K_BOOL		ath5k_hw_rfregs_gain_readback(struct ath_hal *);
 int32_t			ath5k_hw_rfregs_gain_adjust(struct ath_hal *);
-AR5K_BOOL		ath5k_hw_rfgain(struct ath_hal *, u_int, u_int);
+AR5K_BOOL		ath5k_hw_rfgain(struct ath_hal *, u_int);
 void			ath5k_txpower_table(struct ath_hal *, AR5K_CHANNEL *, int16_t);
 
 /*added*/

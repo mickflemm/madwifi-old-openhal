@@ -151,22 +151,25 @@ struct ath5k_gain {
 
 /* Struct to hold EEPROM calibration data */
 struct ath5k_eeprom_info {
-	u_int16_t	ee_magic;
-	u_int16_t	ee_protect;
-	u_int16_t	ee_regdomain;
-	u_int16_t	ee_version;
-	u_int16_t	ee_header;
-	u_int16_t	ee_ant_gain;
+	u_int16_t	ee_magic;		/* Magic Number */
+	u_int16_t	ee_protect;		/* Protection bits (ath5kreg.h) */
+	u_int16_t	ee_regdomain;		/* Regulatory Domain */
+	u_int16_t	ee_version;		/* EEPROM Revision */
+	u_int16_t	ee_header;		/* EEPROM Header (ath5kreg.h,get_capabilities) */
+	u_int16_t	ee_ant_gain;		/* Antenna Gain (ath5kreg.h) */
 	u_int16_t	ee_misc0;
 	u_int16_t	ee_misc1;
-	u_int16_t	ee_cck_ofdm_gain_delta;
-	u_int16_t	ee_cck_ofdm_power_delta;
+	u_int16_t	ee_cck_ofdm_gain_delta;	/* CCK to OFDM gain delta */
+	u_int16_t	ee_cck_ofdm_power_delta;/* CCK to OFDM power delta */
 	u_int16_t	ee_scaled_cck_delta;
+
+	/* Used for tx thermal adjustment (eeprom_init, rfregs) */
 	u_int16_t	ee_tx_clip;
 	u_int16_t	ee_pwd_84;
 	u_int16_t	ee_pwd_90;
 	u_int16_t	ee_gain_select;
 
+	/* RF Calibration settings (reset, rfregs) */
 	u_int16_t	ee_i_cal[AR5K_EEPROM_N_MODES];
 	u_int16_t	ee_q_cal[AR5K_EEPROM_N_MODES];
 	u_int16_t	ee_fixed_bias[AR5K_EEPROM_N_MODES];
@@ -186,13 +189,15 @@ struct ath5k_eeprom_info {
 	u_int16_t	ee_x_gain[AR5K_EEPROM_N_MODES];
 	u_int16_t	ee_i_gain[AR5K_EEPROM_N_MODES];
 	u_int16_t	ee_margin_tx_rx[AR5K_EEPROM_N_MODES];
-	u_int16_t	ee_false_detect[AR5K_EEPROM_N_MODES];
-	u_int16_t	ee_cal_pier[AR5K_EEPROM_N_MODES][AR5K_EEPROM_N_2GHZ_CHAN];
-	u_int16_t	ee_channel[AR5K_EEPROM_N_MODES][AR5K_EEPROM_MAX_CHAN];
+	u_int16_t	ee_false_detect[AR5K_EEPROM_N_MODES];	/* Unused */
+	u_int16_t	ee_cal_pier[AR5K_EEPROM_N_MODES][AR5K_EEPROM_N_2GHZ_CHAN]; /* Unused */
+	u_int16_t	ee_channel[AR5K_EEPROM_N_MODES][AR5K_EEPROM_MAX_CHAN];	/* Empty ! */
 
+	/* Conformance test limits (Unused) */
 	u_int16_t	ee_ctls;
 	u_int16_t	ee_ctl[AR5K_EEPROM_MAX_CTLS];
 
+	/* Noise Floor Calibration settings */
 	int16_t		ee_noise_floor_thr[AR5K_EEPROM_N_MODES];
 	int8_t		ee_adc_desired_size[AR5K_EEPROM_N_MODES];
 	int8_t		ee_pga_desired_size[AR5K_EEPROM_N_MODES];
@@ -573,8 +578,10 @@ struct ath5k_hw_tx_status {
 
 #define AR5K_HIGH_ID(_a)	((_a)[4] | (_a)[5] << 8)
 
+
+
 /*
- * Initial register values
+ * INITIAL REGISTER VALUES
  */
 
 /*
@@ -632,9 +639,16 @@ struct ath5k_hw_tx_status {
 	(AR5K_INIT_TIM_OFFSET << 16) | (AR5K_INIT_BEACON_PERIOD)	\
 )
 
+
+
 /*
  * Non-common initial register values which have to be loaded into the
  * card at boot time and after each reset.
+ */
+
+
+/*
+ * RF REGISTERS
  */
 
 /* Register dumps are done per operation mode */
@@ -646,14 +660,11 @@ struct ath5k_hw_tx_status {
 #define AR5K_INI_VAL_XR			0
 #define AR5K_INI_VAL_MAX		5
 
-#define AR5K_INI_PHY_5111		0
-#define AR5K_INI_PHY_5112		1
-#define AR5K_INI_PHY_511X		1
-
 #define AR5K_RF5111_INI_RF_MAX_BANKS	AR5K_MAX_RF_BANKS
 #define AR5K_RF5112_INI_RF_MAX_BANKS	AR5K_MAX_RF_BANKS
 
-/* Struct to hold initial RF register values */
+
+/* Struct to hold initial RF register values (RF Banks)*/
 struct ath5k_ini_rf {
 	u_int8_t	rf_bank;	/* check out ath5kreg.h */
 	u_int16_t	rf_register;	/* register address */
@@ -987,151 +998,164 @@ struct ath5k_ini_rf {
 }
 
 /*
- * Mode-specific RF Gain registers
+ * Mode-specific RF Gain table (64bytes) for RF5111/5112
+ * (RF5110 only comes with AR5210 and only supports a/turbo a 
+ * mode so initial RF Gain values are included in AR5K_AR5210_INI)
  */
 struct ath5k_ini_rfgain {
 	u_int16_t	rfg_register;		/* RF Gain register address */
-	u_int32_t	rfg_value[2][2];	/* [phy (see above)][freq (below)] */
+	u_int32_t	rfg_value[2];		/* Register value [freq (see below)] */
 
 #define AR5K_INI_RFGAIN_5GHZ	0
 #define AR5K_INI_RFGAIN_2GHZ	1
 };
 
-#define AR5K_INI_RFGAIN	{							\
-	{ 0x9a00, {								\
-		/* 5111 5Ghz  5111 2Ghz	       5112 5Ghz   5112 2Ghz */		\
-		{ 0x000001a9, 0x00000000 }, { 0x00000007, 0x00000007 } } },	\
-	{ 0x9a04, {								\
-		{ 0x000001e9, 0x00000040 }, { 0x00000047, 0x00000047 } } },	\
-	{ 0x9a08, {								\
-		{ 0x00000029, 0x00000080 }, { 0x00000087, 0x00000087 } } },	\
-	{ 0x9a0c, {								\
-		{ 0x00000069, 0x00000150 }, { 0x000001a0, 0x000001a0 } } },	\
-	{ 0x9a10, {								\
-		{ 0x00000199, 0x00000190 }, { 0x000001e0, 0x000001e0 } } },	\
-	{ 0x9a14, {								\
-		{ 0x000001d9, 0x000001d0 }, { 0x00000020, 0x00000020 } } },	\
-	{ 0x9a18, {								\
-		{ 0x00000019, 0x00000010 }, { 0x00000060, 0x00000060 } } },	\
-	{ 0x9a1c, {								\
-		{ 0x00000059, 0x00000044 }, { 0x000001a1, 0x000001a1 } } },	\
-	{ 0x9a20, {								\
-		{ 0x00000099, 0x00000084 }, { 0x000001e1, 0x000001e1 } } },	\
-	{ 0x9a24, {								\
-		{ 0x000001a5, 0x00000148 }, { 0x00000021, 0x00000021 } } },	\
-	{ 0x9a28, {								\
-		{ 0x000001e5, 0x00000188 }, { 0x00000061, 0x00000061 } } },	\
-	{ 0x9a2c, {								\
-		{ 0x00000025, 0x000001c8 }, { 0x00000162, 0x00000162 } } },	\
-	{ 0x9a30, {								\
-		{ 0x000001c8, 0x00000014 }, { 0x000001a2, 0x000001a2 } } },	\
-	{ 0x9a34, {								\
-		{ 0x00000008, 0x00000042 }, { 0x000001e2, 0x000001e2 } } },	\
-	{ 0x9a38, {								\
-		{ 0x00000048, 0x00000082 }, { 0x00000022, 0x00000022 } } },	\
-	{ 0x9a3c, {								\
-		{ 0x00000088, 0x00000178 }, { 0x00000062, 0x00000062 } } },	\
-	{ 0x9a40, {								\
-		{ 0x00000198, 0x000001b8 }, { 0x00000163, 0x00000163 } } },	\
-	{ 0x9a44, {								\
-		{ 0x000001d8, 0x000001f8 }, { 0x000001a3, 0x000001a3 } } },	\
-	{ 0x9a48, {								\
-		{ 0x00000018, 0x00000012 }, { 0x000001e3, 0x000001e3 } } },	\
-	{ 0x9a4c, {								\
-		{ 0x00000058, 0x00000052 }, { 0x00000023, 0x00000023 } } },	\
-	{ 0x9a50, {								\
-		{ 0x00000098, 0x00000092 }, { 0x00000063, 0x00000063 } } },	\
-	{ 0x9a54, {								\
-		{ 0x000001a4, 0x0000017c }, { 0x00000184, 0x00000184 } } },	\
-	{ 0x9a58, {								\
-		{ 0x000001e4, 0x000001bc }, { 0x000001c4, 0x000001c4 } } },	\
-	{ 0x9a5c, {								\
-		{ 0x00000024, 0x000001fc }, { 0x00000004, 0x00000004 } } },	\
-	{ 0x9a60, {								\
-		{ 0x00000064, 0x0000000a }, { 0x000001ea, 0x0000000b } } },	\
-	{ 0x9a64, {								\
-		{ 0x000000a4, 0x0000004a }, { 0x0000002a, 0x0000004b } } },	\
-	{ 0x9a68, {								\
-		{ 0x000000e4, 0x0000008a }, { 0x0000006a, 0x0000008b } } },	\
-	{ 0x9a6c, {								\
-		{ 0x0000010a, 0x0000015a }, { 0x000000aa, 0x000001ac } } },	\
-	{ 0x9a70, {								\
-		{ 0x0000014a, 0x0000019a }, { 0x000001ab, 0x000001ec } } },	\
-	{ 0x9a74, {								\
-		{ 0x0000018a, 0x000001da }, { 0x000001eb, 0x0000002c } } },	\
-	{ 0x9a78, {								\
-		{ 0x000001ca, 0x0000000e }, { 0x0000002b, 0x00000012 } } },	\
-	{ 0x9a7c, {								\
-		{ 0x0000000a, 0x0000004e }, { 0x0000006b, 0x00000052 } } },	\
-	{ 0x9a80, {								\
-		{ 0x0000004a, 0x0000008e }, { 0x000000ab, 0x00000092 } } },	\
-	{ 0x9a84, {								\
-		{ 0x0000008a, 0x0000015e }, { 0x000001ac, 0x00000193 } } },	\
-	{ 0x9a88, {								\
-		{ 0x000001ba, 0x0000019e }, { 0x000001ec, 0x000001d3 } } },	\
-	{ 0x9a8c, {								\
-		{ 0x000001fa, 0x000001de }, { 0x0000002c, 0x00000013 } } },	\
-	{ 0x9a90, {								\
-		{ 0x0000003a, 0x00000009 }, { 0x0000003a, 0x00000053 } } },	\
-	{ 0x9a94, {								\
-		{ 0x0000007a, 0x00000049 }, { 0x0000007a, 0x00000093 } } },	\
-	{ 0x9a98, {								\
-		{ 0x00000186, 0x00000089 }, { 0x000000ba, 0x00000194 } } },	\
-	{ 0x9a9c, {								\
-		{ 0x000001c6, 0x00000179 }, { 0x000001bb, 0x000001d4 } } },	\
-	{ 0x9aa0, {								\
-		{ 0x00000006, 0x000001b9 }, { 0x000001fb, 0x00000014 } } },	\
-	{ 0x9aa4, {								\
-		{ 0x00000046, 0x000001f9 }, { 0x0000003b, 0x0000003a } } },	\
-	{ 0x9aa8, {								\
-		{ 0x00000086, 0x00000039 }, { 0x0000007b, 0x0000007a } } },	\
-	{ 0x9aac, {								\
-		{ 0x000000c6, 0x00000079 }, { 0x000000bb, 0x000000ba } } },	\
-	{ 0x9ab0, {								\
-		{ 0x000000c6, 0x000000b9 }, { 0x000001bc, 0x000001bb } } },	\
-	{ 0x9ab4, {								\
-		{ 0x000000c6, 0x000001bd }, { 0x000001fc, 0x000001fb } } },	\
-	{ 0x9ab8, {								\
-		{ 0x000000c6, 0x000001fd }, { 0x0000003c, 0x0000003b } } },	\
-	{ 0x9abc, {								\
-		{ 0x000000c6, 0x0000003d }, { 0x0000007c, 0x0000007b } } },	\
-	{ 0x9ac0, {								\
-		{ 0x000000c6, 0x0000007d }, { 0x000000bc, 0x000000bb } } },	\
-	{ 0x9ac4, {								\
-		{ 0x000000c6, 0x000000bd }, { 0x000000fc, 0x000001bc } } },	\
-	{ 0x9ac8, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000001fc } } },	\
-	{ 0x9acc, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x0000003c } } },	\
-	{ 0x9ad0, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x0000007c } } },	\
-	{ 0x9ad4, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000000bc } } },	\
-	{ 0x9ad8, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000000fc } } },	\
-	{ 0x9adc, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000000fc } } },	\
-	{ 0x9ae0, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000000fc } } },	\
-	{ 0x9ae4, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000000fc } } },	\
-	{ 0x9ae8, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000000fc } } },	\
-	{ 0x9aec, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000000fc } } },	\
-	{ 0x9af0, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000000fc } } },	\
-	{ 0x9af4, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000000fc } } },	\
-	{ 0x9af8, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000000fc } } },	\
-	{ 0x9afc, {								\
-		{ 0x000000c6, 0x000000fd }, { 0x000000fc, 0x000000fc } } },	\
+/* Initial RF Gain settings for RF5111 */
+#define AR5K_RF5111_INI_RFGAIN	{				\
+	/*			      5Ghz	2Ghz	*/	\
+	{ AR5K_RF_GAIN(0),	{ 0x000001a9, 0x00000000 } },	\
+	{ AR5K_RF_GAIN(1),	{ 0x000001e9, 0x00000040 } },	\
+	{ AR5K_RF_GAIN(2),	{ 0x00000029, 0x00000080 } },	\
+	{ AR5K_RF_GAIN(3),	{ 0x00000069, 0x00000150 } },	\
+	{ AR5K_RF_GAIN(4),	{ 0x00000199, 0x00000190 } },	\
+	{ AR5K_RF_GAIN(5),	{ 0x000001d9, 0x000001d0 } },	\
+	{ AR5K_RF_GAIN(6),	{ 0x00000019, 0x00000010 } },	\
+	{ AR5K_RF_GAIN(7),	{ 0x00000059, 0x00000044 } },	\
+	{ AR5K_RF_GAIN(8),	{ 0x00000099, 0x00000084 } },	\
+	{ AR5K_RF_GAIN(9),	{ 0x000001a5, 0x00000148 } },	\
+	{ AR5K_RF_GAIN(10),	{ 0x000001e5, 0x00000188 } },	\
+	{ AR5K_RF_GAIN(11),	{ 0x00000025, 0x000001c8 } },	\
+	{ AR5K_RF_GAIN(12),	{ 0x000001c8, 0x00000014 } },	\
+	{ AR5K_RF_GAIN(13),	{ 0x00000008, 0x00000042 } },	\
+	{ AR5K_RF_GAIN(14),	{ 0x00000048, 0x00000082 } },	\
+	{ AR5K_RF_GAIN(15),	{ 0x00000088, 0x00000178 } },	\
+	{ AR5K_RF_GAIN(16),	{ 0x00000198, 0x000001b8 } },	\
+	{ AR5K_RF_GAIN(17),	{ 0x000001d8, 0x000001f8 } },	\
+	{ AR5K_RF_GAIN(18),	{ 0x00000018, 0x00000012 } },	\
+	{ AR5K_RF_GAIN(19),	{ 0x00000058, 0x00000052 } },	\
+	{ AR5K_RF_GAIN(20),	{ 0x00000098, 0x00000092 } },	\
+	{ AR5K_RF_GAIN(21),	{ 0x000001a4, 0x0000017c } },	\
+	{ AR5K_RF_GAIN(22),	{ 0x000001e4, 0x000001bc } },	\
+	{ AR5K_RF_GAIN(23),	{ 0x00000024, 0x000001fc } },	\
+	{ AR5K_RF_GAIN(24),	{ 0x00000064, 0x0000000a } },	\
+	{ AR5K_RF_GAIN(25),	{ 0x000000a4, 0x0000004a } },	\
+	{ AR5K_RF_GAIN(26),	{ 0x000000e4, 0x0000008a } },	\
+	{ AR5K_RF_GAIN(27),	{ 0x0000010a, 0x0000015a } },	\
+	{ AR5K_RF_GAIN(28),	{ 0x0000014a, 0x0000019a } },	\
+	{ AR5K_RF_GAIN(29),	{ 0x0000018a, 0x000001da } },	\
+	{ AR5K_RF_GAIN(30),	{ 0x000001ca, 0x0000000e } },	\
+	{ AR5K_RF_GAIN(31),	{ 0x0000000a, 0x0000004e } },	\
+	{ AR5K_RF_GAIN(32),	{ 0x0000004a, 0x0000008e } },	\
+	{ AR5K_RF_GAIN(33),	{ 0x0000008a, 0x0000015e } },	\
+	{ AR5K_RF_GAIN(34),	{ 0x000001ba, 0x0000019e } },	\
+	{ AR5K_RF_GAIN(35),	{ 0x000001fa, 0x000001de } },	\
+	{ AR5K_RF_GAIN(36),	{ 0x0000003a, 0x00000009 } },	\
+	{ AR5K_RF_GAIN(37),	{ 0x0000007a, 0x00000049 } },	\
+	{ AR5K_RF_GAIN(38),	{ 0x00000186, 0x00000089 } },	\
+	{ AR5K_RF_GAIN(39),	{ 0x000001c6, 0x00000179 } },	\
+	{ AR5K_RF_GAIN(40),	{ 0x00000006, 0x000001b9 } },	\
+	{ AR5K_RF_GAIN(41),	{ 0x00000046, 0x000001f9 } },	\
+	{ AR5K_RF_GAIN(42),	{ 0x00000086, 0x00000039 } },	\
+	{ AR5K_RF_GAIN(43),	{ 0x000000c6, 0x00000079 } },	\
+	{ AR5K_RF_GAIN(44),	{ 0x000000c6, 0x000000b9 } },	\
+	{ AR5K_RF_GAIN(45),	{ 0x000000c6, 0x000001bd } },	\
+	{ AR5K_RF_GAIN(46),	{ 0x000000c6, 0x000001fd } },	\
+	{ AR5K_RF_GAIN(47),	{ 0x000000c6, 0x0000003d } },	\
+	{ AR5K_RF_GAIN(48),	{ 0x000000c6, 0x0000007d } },	\
+	{ AR5K_RF_GAIN(49),	{ 0x000000c6, 0x000000bd } },	\
+	{ AR5K_RF_GAIN(50),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(51),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(52),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(53),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(54),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(55),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(56),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(57),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(58),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(59),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(60),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(61),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(62),	{ 0x000000c6, 0x000000fd } },	\
+	{ AR5K_RF_GAIN(63),	{ 0x000000c6, 0x000000fd } },	\
+}
+
+/* Initial RF Gain settings for RF5112 */
+#define AR5K_RF5112_INI_RFGAIN	{				\
+	/*			      5Ghz	2Ghz	*/	\
+	{ AR5K_RF_GAIN(0),	{ 0x00000007, 0x00000007 } },	\
+	{ AR5K_RF_GAIN(1),	{ 0x00000047, 0x00000047 } },	\
+	{ AR5K_RF_GAIN(2),	{ 0x00000087, 0x00000087 } },	\
+	{ AR5K_RF_GAIN(3),	{ 0x000001a0, 0x000001a0 } },	\
+	{ AR5K_RF_GAIN(4),	{ 0x000001e0, 0x000001e0 } },	\
+	{ AR5K_RF_GAIN(5),	{ 0x00000020, 0x00000020 } },	\
+	{ AR5K_RF_GAIN(6),	{ 0x00000060, 0x00000060 } },	\
+	{ AR5K_RF_GAIN(7),	{ 0x000001a1, 0x000001a1 } },	\
+	{ AR5K_RF_GAIN(8),	{ 0x000001e1, 0x000001e1 } },	\
+	{ AR5K_RF_GAIN(9),	{ 0x00000021, 0x00000021 } },	\
+	{ AR5K_RF_GAIN(10),	{ 0x00000061, 0x00000061 } },	\
+	{ AR5K_RF_GAIN(11),	{ 0x00000162, 0x00000162 } },	\
+	{ AR5K_RF_GAIN(12),	{ 0x000001a2, 0x000001a2 } },	\
+	{ AR5K_RF_GAIN(13),	{ 0x000001e2, 0x000001e2 } },	\
+	{ AR5K_RF_GAIN(14),	{ 0x00000022, 0x00000022 } },	\
+	{ AR5K_RF_GAIN(15),	{ 0x00000062, 0x00000062 } },	\
+	{ AR5K_RF_GAIN(16),	{ 0x00000163, 0x00000163 } },	\
+	{ AR5K_RF_GAIN(17),	{ 0x000001a3, 0x000001a3 } },	\
+	{ AR5K_RF_GAIN(18),	{ 0x000001e3, 0x000001e3 } },	\
+	{ AR5K_RF_GAIN(19),	{ 0x00000023, 0x00000023 } },	\
+	{ AR5K_RF_GAIN(20),	{ 0x00000063, 0x00000063 } },	\
+	{ AR5K_RF_GAIN(21),	{ 0x00000184, 0x00000184 } },	\
+	{ AR5K_RF_GAIN(22),	{ 0x000001c4, 0x000001c4 } },	\
+	{ AR5K_RF_GAIN(23),	{ 0x00000004, 0x00000004 } },	\
+	{ AR5K_RF_GAIN(24),	{ 0x000001ea, 0x0000000b } },	\
+	{ AR5K_RF_GAIN(25),	{ 0x0000002a, 0x0000004b } },	\
+	{ AR5K_RF_GAIN(26),	{ 0x0000006a, 0x0000008b } },	\
+	{ AR5K_RF_GAIN(27),	{ 0x000000aa, 0x000001ac } },	\
+	{ AR5K_RF_GAIN(28),	{ 0x000001ab, 0x000001ec } },	\
+	{ AR5K_RF_GAIN(29),	{ 0x000001eb, 0x0000002c } },	\
+	{ AR5K_RF_GAIN(30),	{ 0x0000002b, 0x00000012 } },	\
+	{ AR5K_RF_GAIN(31),	{ 0x0000006b, 0x00000052 } },	\
+	{ AR5K_RF_GAIN(32),	{ 0x000000ab, 0x00000092 } },	\
+	{ AR5K_RF_GAIN(33),	{ 0x000001ac, 0x00000193 } },	\
+	{ AR5K_RF_GAIN(34),	{ 0x000001ec, 0x000001d3 } },	\
+	{ AR5K_RF_GAIN(35),	{ 0x0000002c, 0x00000013 } },	\
+	{ AR5K_RF_GAIN(36),	{ 0x0000003a, 0x00000053 } },	\
+	{ AR5K_RF_GAIN(37),	{ 0x0000007a, 0x00000093 } },	\
+	{ AR5K_RF_GAIN(38),	{ 0x000000ba, 0x00000194 } },	\
+	{ AR5K_RF_GAIN(39),	{ 0x000001bb, 0x000001d4 } },	\
+	{ AR5K_RF_GAIN(40),	{ 0x000001fb, 0x00000014 } },	\
+	{ AR5K_RF_GAIN(41),	{ 0x0000003b, 0x0000003a } },	\
+	{ AR5K_RF_GAIN(42),	{ 0x0000007b, 0x0000007a } },	\
+	{ AR5K_RF_GAIN(43),	{ 0x000000bb, 0x000000ba } },	\
+	{ AR5K_RF_GAIN(44),	{ 0x000001bc, 0x000001bb } },	\
+	{ AR5K_RF_GAIN(45),	{ 0x000001fc, 0x000001fb } },	\
+	{ AR5K_RF_GAIN(46),	{ 0x0000003c, 0x0000003b } },	\
+	{ AR5K_RF_GAIN(47),	{ 0x0000007c, 0x0000007b } },	\
+	{ AR5K_RF_GAIN(48),	{ 0x000000bc, 0x000000bb } },	\
+	{ AR5K_RF_GAIN(49),	{ 0x000000fc, 0x000001bc } },	\
+	{ AR5K_RF_GAIN(50),	{ 0x000000fc, 0x000001fc } },	\
+	{ AR5K_RF_GAIN(51),	{ 0x000000fc, 0x0000003c } },	\
+	{ AR5K_RF_GAIN(52),	{ 0x000000fc, 0x0000007c } },	\
+	{ AR5K_RF_GAIN(53),	{ 0x000000fc, 0x000000bc } },	\
+	{ AR5K_RF_GAIN(54),	{ 0x000000fc, 0x000000fc } },	\
+	{ AR5K_RF_GAIN(55),	{ 0x000000fc, 0x000000fc } },	\
+	{ AR5K_RF_GAIN(56),	{ 0x000000fc, 0x000000fc } },	\
+	{ AR5K_RF_GAIN(57),	{ 0x000000fc, 0x000000fc } },	\
+	{ AR5K_RF_GAIN(58),	{ 0x000000fc, 0x000000fc } },	\
+	{ AR5K_RF_GAIN(59),	{ 0x000000fc, 0x000000fc } },	\
+	{ AR5K_RF_GAIN(60),	{ 0x000000fc, 0x000000fc } },	\
+	{ AR5K_RF_GAIN(61),	{ 0x000000fc, 0x000000fc } },	\
+	{ AR5K_RF_GAIN(62),	{ 0x000000fc, 0x000000fc } },	\
+	{ AR5K_RF_GAIN(63),	{ 0x000000fc, 0x000000fc } },	\
 }
 
 
+
 /*
- * Mode-independet initial register writes
+ * MAC/PHY REGISTERS
+ */
+
+/*
+ * Mode-independed initial register writes
  */
 
 struct ath5k_ini {
@@ -1281,7 +1305,7 @@ struct ath5k_ini {
 	{ AR5K_BB_GAIN(61), 0x0000002f },	\
 	{ AR5K_BB_GAIN(62), 0x0000002f },	\
 	{ AR5K_BB_GAIN(63), 0x0000002f },	\
-	/* RF gain table (64btes) */		\
+	/* 5110 RF gain table (64btes) */	\
 	{ AR5K_RF_GAIN(0), 0x0000001d },	\
 	{ AR5K_RF_GAIN(1), 0x0000005d },	\
 	{ AR5K_RF_GAIN(2), 0x0000009d },	\
@@ -1639,6 +1663,7 @@ struct ath5k_ini {
 	{ 0x87d4, 0x17161514 },			\
 	{ 0x87d8, 0x1b1a1918 },			\
 	{ 0x87dc, 0x1f1e1d1c },			\
+	/* loop ? */				\
 	{ 0x87e0, 0x03020100 },			\
 	{ 0x87e4, 0x07060504 },			\
 	{ 0x87e8, 0x0b0a0908 },			\
@@ -1729,8 +1754,14 @@ struct ath5k_ini {
 	{ AR5K_PHY_CCKTXCTL, 0x00000000 },	\
 }
 
-/* RF5111 Initial BB Gain settings */
-#define AR5K_RF5111_BBGAIN_INI {		\
+/*
+ * Initial BaseBand Gain settings for RF5111/5112
+ * (only AR5210 comes with RF5110 so initial
+ * BB Gain settings are included in AR5K_AR5210_INI)
+ */
+
+/* RF5111 Initial BaseBand Gain settings */
+#define AR5K_RF5111_INI_BBGAIN {		\
 	{ AR5K_BB_GAIN(0), 0x00000000 },	\
 	{ AR5K_BB_GAIN(1), 0x00000020 },	\
 	{ AR5K_BB_GAIN(2), 0x00000010 },	\
@@ -1797,8 +1828,8 @@ struct ath5k_ini {
 	{ AR5K_BB_GAIN(63), 0x00000016 },	\
 }
 
-/* RF 5112 Initial BB Gain settings */
-#define AR5K_RF5112_BBGAIN_INI {		\
+/* RF 5112 Initial BaseBand Gain settings */
+#define AR5K_RF5112_INI_BBGAIN {		\
  	{ AR5K_BB_GAIN(0), 0x00000000 },	\
 	{ AR5K_BB_GAIN(1), 0x00000001 },	\
 	{ AR5K_BB_GAIN(2), 0x00000002 },	\
@@ -1865,331 +1896,232 @@ struct ath5k_ini {
 	{ AR5K_BB_GAIN(63), 0x0000001a },	\
 }
 
-struct ath5k_ar5210_ini_mode{
-	u_int16_t mode_register;
-	u_int32_t mode_base, mode_turbo;
-};
 
-#define AR5K_AR5210_INI_MODE(_aifs) {				\
-	{ AR5K_SLOT_TIME,					\
-	    AR5K_INIT_SLOT_TIME,				\
-	    AR5K_INIT_SLOT_TIME_TURBO },			\
-	{ AR5K_SLOT_TIME,					\
-	    AR5K_INIT_ACK_CTS_TIMEOUT,				\
-	    AR5K_INIT_ACK_CTS_TIMEOUT_TURBO },			\
-	{ AR5K_USEC_5210,					\
-	    AR5K_INIT_TRANSMIT_LATENCY,				\
-	    AR5K_INIT_TRANSMIT_LATENCY_TURBO},			\
-	{ AR5K_IFS0,						\
-	    ((AR5K_INIT_SIFS + (_aifs) * AR5K_INIT_SLOT_TIME)	\
-	    << AR5K_IFS0_DIFS_S) | AR5K_INIT_SIFS,		\
-	    ((AR5K_INIT_SIFS_TURBO + (_aifs) * AR5K_INIT_SLOT_TIME_TURBO) \
-	    << AR5K_IFS0_DIFS_S) | AR5K_INIT_SIFS_TURBO },	\
-	{ AR5K_IFS1,						\
-	    AR5K_INIT_PROTO_TIME_CNTRL,				\
-	    AR5K_INIT_PROTO_TIME_CNTRL_TURBO },			\
-	{ AR5K_PHY(17),						\
-	    (AR5K_REG_READ(AR5K_PHY(17)) & ~0x7F) | 0x1C,	\
-	    (AR5K_REG_READ(AR5K_PHY(17)) & ~0x7F) | 0x38 },	\
-	{ AR5K_PHY_FRAME_CTL_5210,				\
-	    AR5K_PHY_FRAME_CTL_SERVICE_ERR |			\
-	    AR5K_PHY_FRAME_CTL_TXURN_ERR |			\
-	    AR5K_PHY_FRAME_CTL_ILLLEN_ERR |			\
-	    AR5K_PHY_FRAME_CTL_ILLRATE_ERR |			\
-	    AR5K_PHY_FRAME_CTL_PARITY_ERR |			\
-	    AR5K_PHY_FRAME_CTL_TIMING_ERR | 0x1020,		\
-	    AR5K_PHY_FRAME_CTL_SERVICE_ERR |			\
-	    AR5K_PHY_FRAME_CTL_TXURN_ERR |			\
-	    AR5K_PHY_FRAME_CTL_ILLLEN_ERR |			\
-	    AR5K_PHY_FRAME_CTL_ILLRATE_ERR |			\
-	    AR5K_PHY_FRAME_CTL_PARITY_ERR |			\
-	/*PHY_TURBO is PHY_FRAME_CTL on 5210*/			\
-	    AR5K_PHY_TURBO_MODE |				\
-	    AR5K_PHY_TURBO_SHORT |				\
-	    AR5K_PHY_FRAME_CTL_TIMING_ERR | 0x2020 },		\
-}
+/*
+ * Mode specific initial register values
+ */
 
-struct ath5k_ar5211_ini_mode {
+struct ath5k_ini_mode {
 	u_int16_t	mode_register;
-	u_int32_t	mode_value[4];
+	u_int32_t	mode_value[5];
 };
 
-#define AR5K_AR5211_INI_MODE {						\
-	{ 0x0030, { 0x00000017, 0x00000017, 0x00000017, 0x00000017 } },	\
-	{ 0x1040, { 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f } },	\
-	{ 0x1044, { 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f } },	\
-	{ 0x1048, { 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f } },	\
-	{ 0x104c, { 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f } },	\
-	{ 0x1050, { 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f } },	\
-	{ 0x1054, { 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f } },	\
-	{ 0x1058, { 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f } },	\
-	{ 0x105c, { 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f } },	\
-	{ 0x1060, { 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f } },	\
-	{ 0x1064, { 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f } },	\
-	{ 0x1070, { 0x00000168, 0x000001e0, 0x000001b8, 0x00000168 } },	\
-	{ 0x1030, { 0x00000230, 0x000001e0, 0x000000b0, 0x00000230 } },	\
-	{ 0x10b0, { 0x00000d98, 0x00001180, 0x00001f48, 0x00000d98 } },	\
-	{ 0x10f0, { 0x0000a0e0, 0x00014068, 0x00005880, 0x0000a0e0 } },	\
-	{ 0x8014, { 0x04000400, 0x08000800, 0x20003000, 0x04000400 } },	\
-	{ 0x801c, { 0x0e8d8fa7, 0x0e8d8fcf, 0x01608f95, 0x0e8d8fa7 } },	\
-	{ 0x9804, { 0x00000000, 0x00000003, 0x00000000, 0x00000000 } },	\
-	{ 0x9820, { 0x02020200, 0x02020200, 0x02010200, 0x02020200 } },	\
-	{ 0x9824, { 0x00000e0e, 0x00000e0e, 0x00000707, 0x00000e0e } },	\
-	{ 0x9828, { 0x0a020001, 0x0a020001, 0x05010000, 0x0a020001 } },	\
-	{ 0x9834, { 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e } },	\
-	{ 0x9838, { 0x00000007, 0x00000007, 0x0000000b, 0x0000000b } },	\
-	{ 0x9844, { 0x1372169c, 0x137216a5, 0x137216a8, 0x1372169c } },	\
-	{ 0x9848, { 0x0018ba67, 0x0018ba67, 0x0018ba69, 0x0018ba69 } },	\
-	{ 0x9850, { 0x0c28b4e0, 0x0c28b4e0, 0x0c28b4e0, 0x0c28b4e0 } },	\
-	{ 0x9858, { 0x7e800d2e, 0x7e800d2e, 0x7ec00d2e, 0x7e800d2e } },	\
-	{ 0x985c, { 0x31375d5e, 0x31375d5e, 0x313a5d5e, 0x31375d5e } },	\
-	{ 0x9860, { 0x0000bd10, 0x0000bd10, 0x0000bd38, 0x0000bd10 } },	\
-	{ 0x9864, { 0x0001ce00, 0x0001ce00, 0x0001ce00, 0x0001ce00 } },	\
-	{ 0x9914, { 0x00002710, 0x00002710, 0x0000157c, 0x00002710 } },	\
-	{ 0x9918, { 0x00000190, 0x00000190, 0x00000084, 0x00000190 } },	\
-	{ 0x9944, { 0x6fe01020, 0x6fe01020, 0x6fe00920, 0x6fe01020 } },	\
-	{ 0xa180, { 0x05ff14ff, 0x05ff14ff, 0x05ff14ff, 0x05ff19ff } },	\
-	{ 0x98d4, { 0x00000010, 0x00000014, 0x00000010, 0x00000010 } },	\
+/* Initial mode-specific settings for AR5211
+ * XXX: how about gTurbo ? RF5111 supports it, how about AR5211 ? */
+#define AR5K_AR5211_INI_MODE {								\
+	{ AR5K_TXCFG,									\
+	/*         mode a/XR  mode aTurbo   mode b   mode g(OFDM?) mode gTurbo (N/A) */	\
+ 		{ 0x00000017, 0x00000017, 0x00000017, 0x00000017, 0x00000017 } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(0),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(1),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(2),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(3),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(4),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(5),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(6),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(7),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(8),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(9),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_DCU_GBL_IFS_SLOT,							\
+		{ 0x00000168, 0x000001e0, 0x000001b8, 0x00000168, 0x00000168 } },	\
+	{ AR5K_DCU_GBL_IFS_SIFS,							\
+		{ 0x00000230, 0x000001e0, 0x000000b0, 0x00000230, 0x00000230 } },	\
+	{ AR5K_DCU_GBL_IFS_EIFS,							\
+		{ 0x00000d98, 0x00001180, 0x00001f48, 0x00000d98, 0x00000d98 } },	\
+	{ AR5K_DCU_GBL_IFS_MISC,							\
+		{ 0x0000a0e0, 0x00014068, 0x00005880, 0x0000a0e0, 0x0000a0e0 } },	\
+	{ AR5K_TIME_OUT,								\
+		{ 0x04000400, 0x08000800, 0x20003000, 0x04000400, 0x04000400 } },	\
+	{ AR5K_USEC_5211,								\
+		{ 0x0e8d8fa7, 0x0e8d8fcf, 0x01608f95, 0x0e8d8fa7, 0x0e8d8fa7 } },	\
+	{ AR5K_PHY_TURBO,								\
+		{ 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x00000000 } },	\
+	{ 0x9820,									\
+		{ 0x02020200, 0x02020200, 0x02010200, 0x02020200, 0x02020200 } },	\
+	{ 0x9824,									\
+		{ 0x00000e0e, 0x00000e0e, 0x00000707, 0x00000e0e, 0x00000e0e } },	\
+	{ 0x9828,									\
+		{ 0x0a020001, 0x0a020001, 0x05010000, 0x0a020001, 0x0a020001 } },	\
+	{ 0x9834,									\
+		{ 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e } },	\
+	{ 0x9838,									\
+		{ 0x00000007, 0x00000007, 0x0000000b, 0x0000000b, 0x0000000b } },	\
+	{ 0x9844,									\
+		{ 0x1372169c, 0x137216a5, 0x137216a8, 0x1372169c, 0x1372169c } },	\
+	{ 0x9848,									\
+		{ 0x0018ba67, 0x0018ba67, 0x0018ba69, 0x0018ba69, 0x0018ba69 } },	\
+	{ 0x9850,									\
+		{ 0x0c28b4e0, 0x0c28b4e0, 0x0c28b4e0, 0x0c28b4e0, 0x0c28b4e0 } },	\
+	{ AR5K_PHY_SIG,									\
+		{ 0x7e800d2e, 0x7e800d2e, 0x7ec00d2e, 0x7e800d2e, 0x7e800d2e } },	\
+	{ AR5K_PHY_AGCCOARSE,								\
+		{ 0x31375d5e, 0x31375d5e, 0x313a5d5e, 0x31375d5e, 0x31375d5e } },	\
+	{ AR5K_PHY_AGCCTL,								\
+		{ 0x0000bd10, 0x0000bd10, 0x0000bd38, 0x0000bd10, 0x0000bd10 } },	\
+	{ AR5K_PHY_NF,									\
+		{ 0x0001ce00, 0x0001ce00, 0x0001ce00, 0x0001ce00, 0x0001ce00 } },	\
+	{ AR5K_PHY_RX_DELAY,								\
+		{ 0x00002710, 0x00002710, 0x0000157c, 0x00002710, 0x00002710 } },	\
+	{ 0x9918,									\
+		{ 0x00000190, 0x00000190, 0x00000084, 0x00000190, 0x00000190 } },	\
+	{ AR5K_PHY_FRAME_CTL_5211,							\
+		{ 0x6fe01020, 0x6fe01020, 0x6fe00920, 0x6fe01020, 0x6fe01020 } },	\
+	{ AR5K_PHY_PCDAC_TXPOWER(0),							\
+		{ 0x05ff14ff, 0x05ff14ff, 0x05ff14ff, 0x05ff19ff, 0x05ff19ff } },	\
+	{ AR5K_RF_BUFFER_CONTROL_4,							\
+		{ 0x00000010, 0x00000014, 0x00000010, 0x00000010, 0x00000010 } },	\
 }
 
-struct ath5k_ar5212_ini_mode {
-	u_int16_t	mode_register;
-	u_int8_t	mode_flags;
-	u_int32_t	mode_value[2][5];
-};
-
-#define AR5K_INI_FLAG_511X	0x00
-#define AR5K_INI_FLAG_5111	0x01
-#define AR5K_INI_FLAG_5112	0x02
-#define AR5K_INI_FLAG_BOTH	(AR5K_INI_FLAG_5111 | AR5K_INI_FLAG_5112)
-
-#define AR5K_AR5212_INI_MODE {							\
-	{ 0x0030, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x00008107, 0x00008107, 0x00008107, 0x00008107, 0x00008107 }	\
-	} },									\
-	{ 0x1040, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f }	\
-	} },									\
-	{ 0x1044, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f }	\
-	} },									\
-	{ 0x1048, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f }	\
-	} },									\
-	{ 0x104c, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f }	\
-	} },									\
-	{ 0x1050, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f }	\
-	} },									\
-	{ 0x1054, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f }	\
-	} },									\
-	{ 0x1058, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f }	\
-	} },									\
-	{ 0x105c, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f }	\
-	} },									\
-	{ 0x1060, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f }	\
-	} },									\
-	{ 0x1064, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f }	\
-	} },									\
-	{ 0x1030, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x00000230, 0x000001e0, 0x000000b0, 0x00000160, 0x000001e0 }	\
-	} },									\
-	{ 0x1070, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x00000168, 0x000001e0, 0x000001b8, 0x0000018c, 0x000001e0 }	\
-	} },									\
-	{ 0x10b0, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x00000e60, 0x00001180, 0x00001f1c, 0x00003e38, 0x00001180 }	\
-	} },									\
-	{ 0x10f0, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x0000a0e0, 0x00014068, 0x00005880, 0x0000b0e0, 0x00014068 }	\
-	} },									\
-	{ 0x8014, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x03e803e8, 0x06e006e0, 0x04200420, 0x08400840, 0x06e006e0 }	\
-	} },									\
-	{ 0x9804, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x00000003 }	\
-	} },									\
-	{ 0x9820, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x02020200, 0x02020200, 0x02010200, 0x02020200, 0x02020200 }	\
-	} },									\
-	{ 0x9834, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e }	\
-	} },									\
-	{ 0x9838, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x00000007, 0x00000007, 0x0000000b, 0x0000000b, 0x0000000b }	\
-	} },									\
-	{ 0x9844, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x1372161c, 0x13721c25, 0x13721728, 0x137216a2, 0x13721c25 }	\
-	} },									\
-	{ 0x9850, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x0de8b4e0, 0x0de8b4e0, 0x0de8b4e0, 0x0de8b4e0, 0x0de8b4e0 }	\
-	} },									\
-	{ 0x9858, AR5K_INI_FLAG_511X, {						\
- 		{ 0, },								\
-		{ 0x7e800d2e, 0x7e800d2e, 0x7ee84d2e, 0x7ee84d2e, 0x7e800d2e }	\
-	} },									\
-	{ 0x9860, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x00009d10, 0x00009d10, 0x00009d18, 0x00009d10, 0x00009d10 }	\
-	} },									\
-	{ 0x9864, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x0001ce00, 0x0001ce00, 0x0001ce00, 0x0001ce00, 0x0001ce00 }	\
-	} },									\
-	{ 0x9868, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x409a4190, 0x409a4190, 0x409a4190, 0x409a4190, 0x409a4190 }	\
-	} },									\
-	{ 0x9918, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x000001b8, 0x000001b8, 0x00000084, 0x00000108, 0x000001b8 }	\
-	} },									\
-	{ 0x9924, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x10058a05, 0x10058a05, 0x10058a05, 0x10058a05, 0x10058a05 }	\
-	} },									\
-	{ 0xa180, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x10ff14ff, 0x10ff14ff, 0x10ff10ff, 0x10ff19ff, 0x10ff19ff }	\
-	} },									\
-	{ 0xa230, AR5K_INI_FLAG_511X, {						\
-		{ 0, },								\
-		{ 0x00000000, 0x00000000, 0x00000000, 0x00000108, 0x00000000 }	\
-	} },									\
-	{ 0x801c, AR5K_INI_FLAG_BOTH, {						\
-		{ 0x128d8fa7, 0x09880fcf, 0x04e00f95, 0x128d8fab, 0x09880fcf }, \
-		{ 0x128d93a7, 0x098813cf, 0x04e01395, 0x128d93ab, 0x098813cf }	\
-	} },									\
-	{ 0x9824, AR5K_INI_FLAG_BOTH, {						\
-		{ 0x00000e0e, 0x00000e0e, 0x00000707, 0x00000e0e, 0x00000e0e },	\
-		{ 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e }	\
-	} },									\
-	{ 0x9828, AR5K_INI_FLAG_BOTH, {						\
-		{ 0x0a020001, 0x0a020001, 0x05010100, 0x0a020001, 0x0a020001 },	\
-		{ 0x0a020001, 0x0a020001, 0x05020100, 0x0a020001, 0x0a020001 }	\
-	} },									\
-	{ 0x9848, AR5K_INI_FLAG_BOTH, {						\
-		{ 0x0018da5a, 0x0018da5a, 0x0018ca69, 0x0018ca69, 0x0018ca69 },	\
-		{ 0x0018da6d, 0x0018da6d, 0x0018ca75, 0x0018ca75, 0x0018ca75 }	\
-	} },									\
-	{ 0x985c, AR5K_INI_FLAG_BOTH, {						\
-		{ 0x3137665e, 0x3137665e, 0x3137665e, 0x3137665e, 0x3137615e },	\
-		{ 0x3137665e, 0x3137665e, 0x3137665e, 0x3137665e, 0x3137665e }	\
-	} },									\
-	{ 0x986c, AR5K_INI_FLAG_BOTH, {						\
-		{ 0x050cb081, 0x050cb081, 0x050cb081, 0x050cb080, 0x050cb080 },	\
-		{ 0x050cb081, 0x050cb081, 0x050cb081, 0x050cb081, 0x050cb081 }	\
-	} },									\
-	{ 0x9914, AR5K_INI_FLAG_BOTH, {						\
-		{ 0x00002710, 0x00002710, 0x0000157c, 0x00002af8, 0x00002710 },	\
-		{ 0x000007d0, 0x000007d0, 0x0000044c, 0x00000898, 0x000007d0 }	\
-	} },									\
-	{ 0x9944, AR5K_INI_FLAG_BOTH, {						\
-		{ 0xffb81020, 0xffb81020, 0xffb80d20, 0xffb81020, 0xffb81020 },	\
-		{ 0xffb81020, 0xffb81020, 0xffb80d10, 0xffb81010, 0xffb81010 }	\
-	} },									\
-	{ 0xa204, AR5K_INI_FLAG_5112, {						\
-		{ 0, },								\
-		{ 0x00000000, 0x00000000, 0x00000004, 0x00000004, 0x00000004 }	\
-	} },									\
-	{ 0xa208, AR5K_INI_FLAG_BOTH, {						\
-		{ 0xd03e6788, 0xd03e6788, 0xd03e6788, 0xd03e6788, 0xd03e6788 },	\
-		{ 0xd6be6788, 0xd6be6788, 0xd03e6788, 0xd03e6788, 0xd03e6788 }	\
-	} },									\
-	{ 0xa20c, AR5K_INI_FLAG_5112, {						\
-		{ 0, },								\
-		{ 0x642c0140, 0x642c0140, 0x6442c160, 0x6442c160, 0x6442c160 }	\
-	} },									\
+/* Initial mode-specific settings for AR5212 */
+#define AR5K_AR5212_INI_MODE {								\
+	{ AR5K_TXCFG,									\
+	/*         mode a/XR  mode aTurbo   mode b   mode g (DYN) mode gTurbo */	\
+		{ 0x00008107, 0x00008107, 0x00008107, 0x00008107, 0x00008107 } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(0),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(1),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(2),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(3),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(4),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(5),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(6),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(7),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(8),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_QUEUE_DFS_LOCAL_IFS(9),							\
+		{ 0x002ffc0f, 0x002ffc0f, 0x002ffc1f, 0x002ffc0f, 0x002ffc0f } },	\
+	{ AR5K_DCU_GBL_IFS_SIFS,							\
+		{ 0x00000230, 0x000001e0, 0x000000b0, 0x00000160, 0x000001e0 } },	\
+	{ AR5K_DCU_GBL_IFS_SLOT,							\
+		{ 0x00000168, 0x000001e0, 0x000001b8, 0x0000018c, 0x000001e0 } },	\
+	{ AR5K_DCU_GBL_IFS_EIFS,							\
+		{ 0x00000e60, 0x00001180, 0x00001f1c, 0x00003e38, 0x00001180 } },	\
+	{ AR5K_DCU_GBL_IFS_MISC,							\
+		{ 0x0000a0e0, 0x00014068, 0x00005880, 0x0000b0e0, 0x00014068 } },	\
+	{ AR5K_TIME_OUT,								\
+		{ 0x03e803e8, 0x06e006e0, 0x04200420, 0x08400840, 0x06e006e0 } },	\
 }
 
-struct ath5k_ar5211_ini_rf {
-	u_int16_t	rf_register;
-	u_int32_t	rf_value[2];
-};
-
-#define AR5K_AR5211_INI_RF	{					\
-/* Static -> moved on ar5211_ini */					\
-	{ 0x0000a204, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000a208, { 0x503e4646, 0x503e4646 } },			\
-	{ 0x0000a20c, { 0x6480416c, 0x6480416c } },			\
-	{ 0x0000a210, { 0x0199a003, 0x0199a003 } },			\
-	{ 0x0000a214, { 0x044cd610, 0x044cd610 } },			\
-	{ 0x0000a218, { 0x13800040, 0x13800040 } },			\
-	{ 0x0000a21c, { 0x1be00060, 0x1be00060 } },			\
-	{ 0x0000a220, { 0x0c53800a, 0x0c53800a } },			\
-	{ 0x0000a224, { 0x0014df3b, 0x0014df3b } },			\
-	{ 0x0000a228, { 0x000001b5, 0x000001b5 } },			\
-	{ 0x0000a22c, { 0x00000020, 0x00000020 } },			\
-/* Bank 6 ? */								\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00380000, 0x00380000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x000400f9, 0x000400f9 } },			\
-	{ 0x000098d4, { 0x00000000, 0x00000004 } },			\
-/* Bank 7 ? */								\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x10000000, 0x10000000 } },			\
-	{ 0x0000989c, { 0x04000000, 0x04000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x00000000 } },			\
-	{ 0x0000989c, { 0x00000000, 0x0a000000 } },			\
-	{ 0x0000989c, { 0x00380080, 0x02380080 } },			\
-	{ 0x0000989c, { 0x00020006, 0x00000006 } },			\
-	{ 0x0000989c, { 0x00000092, 0x00000092 } },			\
-	{ 0x0000989c, { 0x000000a0, 0x000000a0 } },			\
-	{ 0x0000989c, { 0x00040007, 0x00040007 } },			\
-	{ 0x000098d4, { 0x0000001a, 0x0000001a } },			\
-	{ 0x0000989c, { 0x00000048, 0x00000048 } },			\
-	{ 0x0000989c, { 0x00000010, 0x00000010 } },			\
-	{ 0x0000989c, { 0x00000008, 0x00000008 } },			\
-	{ 0x0000989c, { 0x0000000f, 0x0000000f } },			\
-	{ 0x0000989c, { 0x000000f2, 0x00000062 } },			\
-	{ 0x0000989c, { 0x0000904f, 0x0000904c } },			\
-	{ 0x0000989c, { 0x0000125a, 0x0000129a } },			\
-	{ 0x000098cc, { 0x0000000e, 0x0000000f } },			\
+/* Initial mode-specific settings for AR5212 + RF5111 */
+#define AR5K_AR5212_RF5111_INI_MODE {							\
+	{ AR5K_USEC_5211,								\
+	/*         mode a/XR  mode aTurbo   mode b     mode g     mode gTurbo */	\
+		{ 0x128d8fa7, 0x09880fcf, 0x04e00f95, 0x128d8fab, 0x09880fcf } },	\
+	{ AR5K_PHY_TURBO,								\
+		{ 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x00000003 } },	\
+	{ 0x9820,									\
+		{ 0x02020200, 0x02020200, 0x02010200, 0x02020200, 0x02020200 } },	\
+	{ 0x9824,									\
+		{ 0x00000e0e, 0x00000e0e, 0x00000707, 0x00000e0e, 0x00000e0e } },	\
+	{ 0x9828,									\
+		{ 0x0a020001, 0x0a020001, 0x05010100, 0x0a020001, 0x0a020001 } },	\
+	{ 0x9834,									\
+		{ 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e } },	\
+	{ 0x9838,									\
+		{ 0x00000007, 0x00000007, 0x0000000b, 0x0000000b, 0x0000000b } },	\
+	{ 0x9844,									\
+		{ 0x1372161c, 0x13721c25, 0x13721728, 0x137216a2, 0x13721c25 } },	\
+	{ 0x9848,									\
+		{ 0x0018da5a, 0x0018da5a, 0x0018ca69, 0x0018ca69, 0x0018ca69 } },	\
+	{ 0x9850,									\
+		{ 0x0de8b4e0, 0x0de8b4e0, 0x0de8b4e0, 0x0de8b4e0, 0x0de8b4e0 } },	\
+	{ AR5K_PHY_SIG,									\
+		{ 0x7e800d2e, 0x7e800d2e, 0x7ee84d2e, 0x7ee84d2e, 0x7e800d2e } },	\
+	{ AR5K_PHY_AGCCOARSE,								\
+		{ 0x3137665e, 0x3137665e, 0x3137665e, 0x3137665e, 0x3137615e } },	\
+	{ AR5K_PHY_AGCCTL,								\
+		{ 0x00009d10, 0x00009d10, 0x00009d18, 0x00009d10, 0x00009d10 } },	\
+	{ AR5K_PHY_NF,									\
+		{ 0x0001ce00, 0x0001ce00, 0x0001ce00, 0x0001ce00, 0x0001ce00 } },	\
+	{ AR5K_PHY_ADCSAT,								\
+		{ 0x409a4190, 0x409a4190, 0x409a4190, 0x409a4190, 0x409a4190 } },	\
+	{ 0x986c,									\
+		{ 0x050cb081, 0x050cb081, 0x050cb081, 0x050cb080, 0x050cb080 } },	\
+	{ AR5K_PHY_RX_DELAY,								\
+		{ 0x00002710, 0x00002710, 0x0000157c, 0x00002af8, 0x00002710 } },	\
+	{ 0x9918,									\
+		{ 0x000001b8, 0x000001b8, 0x00000084, 0x00000108, 0x000001b8 } },	\
+	{ 0x9924,									\
+		{ 0x10058a05, 0x10058a05, 0x10058a05, 0x10058a05, 0x10058a05 } },	\
+	{ AR5K_PHY_FRAME_CTL_5211,							\
+		{ 0xffb81020, 0xffb81020, 0xffb80d20, 0xffb81020, 0xffb81020 } },	\
+	{ AR5K_PHY_PCDAC_TXPOWER(0),							\
+		{ 0x10ff14ff, 0x10ff14ff, 0x10ff10ff, 0x10ff19ff, 0x10ff19ff } },	\
+	{ 0xa230,									\
+		{ 0x00000000, 0x00000000, 0x00000000, 0x00000108, 0x00000000 } },	\
+	{ 0xa208,									\
+		{ 0xd03e6788, 0xd03e6788, 0xd03e6788, 0xd03e6788, 0xd03e6788 } },	\
 }
+
+/* Initial mode-specific settings for AR5212 + RF5112 */
+#define AR5K_AR5212_RF5112_INI_MODE {							\
+	{ AR5K_USEC_5211,								\
+	/*         mode a/XR  mode aTurbo   mode b     mode g     mode gTurbo */	\
+		{ 0x128d93a7, 0x098813cf, 0x04e01395, 0x128d93ab, 0x098813cf } },	\
+	{ AR5K_PHY_TURBO,								\
+		{ 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x00000003 } },	\
+	{ 0x9820,									\
+		{ 0x02020200, 0x02020200, 0x02010200, 0x02020200, 0x02020200 } },	\
+	{ 0x9824,									\
+		{ 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e } },	\
+	{ 0x9828,									\
+		{ 0x0a020001, 0x0a020001, 0x05020100, 0x0a020001, 0x0a020001 } },	\
+	{ 0x9834,									\
+		{ 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e, 0x00000e0e } },	\
+	{ 0x9838,									\
+		{ 0x00000007, 0x00000007, 0x0000000b, 0x0000000b, 0x0000000b } },	\
+	{ 0x9844,									\
+		{ 0x1372161c, 0x13721c25, 0x13721728, 0x137216a2, 0x13721c25 } },	\
+	{ 0x9848,									\
+		{ 0x0018da6d, 0x0018da6d, 0x0018ca75, 0x0018ca75, 0x0018ca75 } },	\
+	{ 0x9850,									\
+		{ 0x0de8b4e0, 0x0de8b4e0, 0x0de8b4e0, 0x0de8b4e0, 0x0de8b4e0 } },	\
+	{ AR5K_PHY_SIG,									\
+		{ 0x7e800d2e, 0x7e800d2e, 0x7ee84d2e, 0x7ee84d2e, 0x7e800d2e } },	\
+	{ AR5K_PHY_AGCCOARSE,								\
+		{ 0x3137665e, 0x3137665e, 0x3137665e, 0x3137665e, 0x3137665e } },	\
+	{ AR5K_PHY_AGCCTL,								\
+		{ 0x00009d10, 0x00009d10, 0x00009d18, 0x00009d10, 0x00009d10 } },	\
+	{ AR5K_PHY_NF,									\
+		{ 0x0001ce00, 0x0001ce00, 0x0001ce00, 0x0001ce00, 0x0001ce00 } },	\
+	{ AR5K_PHY_ADCSAT,								\
+		{ 0x409a4190, 0x409a4190, 0x409a4190, 0x409a4190, 0x409a4190 } },	\
+	{ 0x986c,									\
+		{ 0x050cb081, 0x050cb081, 0x050cb081, 0x050cb081, 0x050cb081 } },	\
+	{ AR5K_PHY_RX_DELAY,								\
+		{ 0x000007d0, 0x000007d0, 0x0000044c, 0x00000898, 0x000007d0 } },	\
+	{ 0x9918,									\
+		{ 0x000001b8, 0x000001b8, 0x00000084, 0x00000108, 0x000001b8 } },	\
+	{ 0x9924,									\
+		{ 0x10058a05, 0x10058a05, 0x10058a05, 0x10058a05, 0x10058a05 } },	\
+	{ AR5K_PHY_FRAME_CTL_5211,							\
+		{ 0xffb81020, 0xffb81020, 0xffb80d10, 0xffb81010, 0xffb81010 } },	\
+	{ AR5K_PHY_PCDAC_TXPOWER(0),							\
+		{ 0x10ff14ff, 0x10ff14ff, 0x10ff10ff, 0x10ff19ff, 0x10ff19ff } },	\
+	{ 0xa230,									\
+		{ 0x00000000, 0x00000000, 0x00000000, 0x00000108, 0x00000000 } },	\
+	{ AR5K_PHY_CCKTXCTL,								\
+		{ 0x00000000, 0x00000000, 0x00000004, 0x00000004, 0x00000004 } },	\
+	{ 0xa208,									\
+		{ 0xd6be6788, 0xd6be6788, 0xd03e6788, 0xd03e6788, 0xd03e6788 } },	\
+	{ AR5K_PHY_GAIN_2GHZ,								\
+		{ 0x642c0140, 0x642c0140, 0x6442c160, 0x6442c160, 0x6442c160 } },	\
+}
+
