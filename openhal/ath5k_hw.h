@@ -541,7 +541,7 @@ struct ath5k_hw_tx_status {
 		udelay(1);
 
 #define AR5K_EEPROM_READ(_o, _v)	{				\
-	if ((ret = hal->ah_eeprom_read(hal, (_o),			\
+	if ((ret = ath5k_hw_eeprom_read(hal, (_o),			\
 		 &(_v))) != 0)						\
 		return (ret);						\
 }

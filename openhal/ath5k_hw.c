@@ -539,7 +539,7 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 	ath5k_hw_set_opmode(hal);
 		
 #ifdef AR5K_DEBUG
-	hal->ah_dump_state(hal);
+	ath5k_hw_dump_state(hal);
 #endif
 
 	/*
@@ -553,7 +553,7 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 	}
 
 	/* Get misc capabilities */
-	if (hal->ah_get_capabilities(hal) != TRUE) {
+	if (ath5k_hw_get_capabilities(hal) != TRUE) {
 		*status = AR5K_EEREAD;
 		AR5K_PRINTF("unable to get device capabilities: 0x%04x\n",
 		    device);
@@ -568,7 +568,7 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 		goto failed;
 	}
 
-	hal->ah_set_lladdr(hal, mac);
+	ath5k_hw_set_lladdr(hal, mac);
 
 	/* Get rate tables */
 	if (hal->ah_capabilities.cap_mode & AR5K_MODE_11A)
@@ -2516,6 +2516,7 @@ ath5k_hw_eeprom_init(struct ath_hal *hal)
 
 /*
  * Read the MAC address from eeprom
+ * TODO: Update ath5kregs.h to include these offsets
  */
 int
 ath5k_hw_eeprom_read_mac(struct ath_hal *hal, u_int8_t *mac)
@@ -2528,12 +2529,12 @@ ath5k_hw_eeprom_read_mac(struct ath_hal *hal, u_int8_t *mac)
 	memset(mac, 0, ETH_ALEN);
 	memset(&mac_d, 0, ETH_ALEN);
 
-	if (hal->ah_eeprom_read(hal, 0x20, &data) != 0)
+	if (ath5k_hw_eeprom_read(hal, 0x20, &data) != 0)
 		return (AR5K_EIO);
 
 	for (offset = 0x1f, octet = 0, total = 0;
 	     offset >= 0x1d; offset--) {
-		if (hal->ah_eeprom_read(hal, offset, &data) != 0)
+		if (ath5k_hw_eeprom_read(hal, offset, &data) != 0)
 			return (AR5K_EIO);
 
 		total += data;
@@ -2572,7 +2573,7 @@ ath5k_hw_eeprom_regulation_domain(struct ath_hal *hal, AR5K_BOOL write,
 	if (hal->ah_capabilities.cap_eeprom.ee_protect &
 	    AR5K_EEPROM_PROTECT_WR_128_191)
 		return (FALSE);
-	if (hal->ah_eeprom_write(hal, AR5K_EEPROM_REG_DOMAIN,
+	if (ath5k_hw_eeprom_write(hal, AR5K_EEPROM_REG_DOMAIN,
 	    ee_regdomain) != 0)
 		return (FALSE);
 
