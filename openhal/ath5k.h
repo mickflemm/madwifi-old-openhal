@@ -1168,66 +1168,225 @@ struct ath_hal {
 
 };
 
+
 /*
  * Prototypes
  */
 
+/* General */
 const char*		ath_hal_probe(u_int16_t, u_int16_t);
-struct ath_hal*		ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG,
-					AR5K_BUS_HANDLE, AR5K_STATUS *);
 u_int16_t		ath_hal_computetxtime(struct ath_hal *, const AR5K_RATE_TABLE *,
 					u_int32_t, u_int16_t, AR5K_BOOL);
-u_int			ath_hal_mhz2ieee(u_int, u_int);
-u_int			ath_hal_ieee2mhz(u_int, u_int);
-AR5K_BOOL		ath_hal_init_channels(struct ath_hal *, AR5K_CHANNEL *,
-					u_int, u_int *, AR5K_CTRY_CODE, u_int16_t, 
-					AR5K_BOOL, AR5K_BOOL);
-const char*		ath5k_printver(enum ath5k_srev_type, u_int32_t);
-void			ath5k_radar_alert(struct ath_hal *);
-ieee80211_regdomain_t	ath5k_regdomain_to_ieee(u_int16_t);
-u_int16_t		ath5k_regdomain_from_ieee(ieee80211_regdomain_t);
-u_int16_t		ath5k_get_regdomain(struct ath_hal *);
+extern	u_int		ath_hal_getwirelessmodes(struct ath_hal*, AR5K_CTRY_CODE);
 u_int32_t		ath5k_bitswap(u_int32_t, u_int);
-inline u_int		ath5k_clocktoh(u_int, AR5K_BOOL);
 inline u_int		ath5k_htoclock(u_int, AR5K_BOOL);
+inline u_int		ath5k_clocktoh(u_int, AR5K_BOOL);
 void			ath5k_rt_copy(AR5K_RATE_TABLE *, const AR5K_RATE_TABLE *);
-AR5K_BOOL		ath5k_register_timeout(struct ath_hal *, u_int32_t, u_int32_t,
-					u_int32_t, AR5K_BOOL);
+extern const AR5K_RATE_TABLE * ath5k_hw_get_rate_table(struct ath_hal *, u_int mode);
+
+/* Attach/detach */
+struct ath_hal*		ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG,
+					AR5K_BUS_HANDLE, AR5K_STATUS *);
+AR5K_BOOL		ath5k_hw_nic_wakeup(struct ath_hal *, u_int16_t, AR5K_BOOL);
+u_int16_t		ath5k_hw_radio_revision(struct ath_hal *, AR5K_CHIP);
+extern void		ath5k_hw_detach(struct ath_hal *);	
+
+/* Reset */
+extern AR5K_BOOL	ath5k_hw_reset(struct ath_hal *, AR5K_OPMODE, AR5K_CHANNEL *,
+					AR5K_BOOL change_channel, AR5K_STATUS *status);
+AR5K_BOOL		ath5k_hw_nic_reset(struct ath_hal *, u_int32_t);
+extern AR5K_BOOL	ath5k_hw_set_power(struct ath_hal*, AR5K_POWER_MODE mode,
+					AR5K_BOOL set_chip, u_int16_t sleep_duration);
+extern AR5K_POWER_MODE 	ath5k_hw_get_power_mode(struct ath_hal*);
+
+/* DMA related */
+/* rx */
+extern void		ath5k_hw_start_rx(struct ath_hal*);
+extern AR5K_BOOL 	ath5k_hw_stop_rx_dma(struct ath_hal*);
+extern u_int32_t	ath5k_hw_get_rx_buf(struct ath_hal*);
+extern void		ath5k_hw_put_rx_buf(struct ath_hal*, u_int32_t rxdp);
+/* tx */
+extern AR5K_BOOL 	ath5k_hw_tx_start(struct ath_hal *, u_int queue);
+extern AR5K_BOOL	ath5k_hw_stop_tx_dma(struct ath_hal *, u_int queue);
+extern u_int32_t	ath5k_hw_get_tx_buf(struct ath_hal *, u_int queue);
+extern AR5K_BOOL	ath5k_hw_put_tx_buf(struct ath_hal *, u_int, u_int32_t phys_addr);
+extern AR5K_BOOL	ath5k_hw_update_tx_triglevel(struct ath_hal*, AR5K_BOOL level);
+/* Interrupts */
+extern AR5K_BOOL 	ath5k_hw_is_intr_pending(struct ath_hal *);
+extern AR5K_BOOL 	ath5k_hw_get_isr(struct ath_hal *, u_int32_t *);
+extern u_int32_t	ath5k_hw_get_intr(struct ath_hal *);
+extern AR5K_INT		ath5k_hw_set_intr(struct ath_hal *, AR5K_INT);
+extern void		ath5k_hw_radar_alert(struct ath_hal *, AR5K_BOOL enable);
+
+/* EEPROM */
+extern AR5K_BOOL	ath5k_hw_eeprom_is_busy(struct ath_hal *);
+extern int		ath5k_hw_eeprom_read(struct ath_hal *, u_int32_t offset, u_int16_t *data);
+extern int 		ath5k_hw_eeprom_write(struct ath_hal *, u_int32_t offset, u_int16_t data);
+u_int16_t		ath5k_hw_eeprom_bin2freq(struct ath_hal *, u_int16_t, u_int);
+int			ath5k_hw_eeprom_read_ants(struct ath_hal *, u_int32_t *, u_int);
+int			ath5k_hw_eeprom_read_modes(struct ath_hal *, u_int32_t *, u_int);
 int			ath5k_hw_eeprom_init(struct ath_hal *);
 int			ath5k_hw_eeprom_read_mac(struct ath_hal *, u_int8_t *);
 AR5K_BOOL		ath5k_hw_eeprom_regulation_domain(struct ath_hal *, AR5K_BOOL,
-					ieee80211_regdomain_t *);
-int			ath5k_hw_eeprom_read_ants(struct ath_hal *, u_int32_t *, u_int);
-int			ath5k_hw_eeprom_read_modes(struct ath_hal *, u_int32_t *, u_int);
-u_int16_t		ath5k_hw_eeprom_bin2freq(struct ath_hal *, u_int16_t, u_int);
+							ieee80211_regdomain_t *);
+extern AR5K_BOOL	ath5k_hw_set_regdomain(struct ath_hal*, u_int16_t, AR5K_STATUS *);
+extern AR5K_BOOL	ath5k_hw_get_capabilities(struct ath_hal *);
 
-AR5K_BOOL		ath5k_hw_channel(struct ath_hal *, AR5K_CHANNEL *);
-AR5K_BOOL		ath5k_hw_rf5110_channel(struct ath_hal *, AR5K_CHANNEL *);
-u_int32_t		ath5k_hw_rf5110_chan2athchan(AR5K_CHANNEL *);
-AR5K_BOOL		ath5k_hw_rf5111_channel(struct ath_hal *, AR5K_CHANNEL *);
-AR5K_BOOL		ath5k_hw_rf5111_chan2athchan(u_int, struct ath5k_athchan_2ghz *);
-AR5K_BOOL		ath5k_hw_rf5112_channel(struct ath_hal *, AR5K_CHANNEL *);
+/* PCU */
+extern void		ath5k_hw_set_opmode(struct ath_hal *);
+extern void		ath5k_hw_set_pcu_config(struct ath_hal *);
+/* BSSID */
+extern void 		ath5k_hw_get_lladdr(struct ath_hal *, u_int8_t *);	
+extern AR5K_BOOL	ath5k_hw_set_lladdr(struct ath_hal *, const u_int8_t*);
+extern void		ath5k_hw_set_associd(struct ath_hal*, const u_int8_t *bssid,
+						u_int16_t assocId);
+extern AR5K_BOOL	ath5k_hw_set_bssid_mask(struct ath_hal *, const u_int8_t*);
+/* rx */
+extern void		ath5k_hw_start_rx_pcu(struct ath_hal*);
+extern void		ath5k_hw_stop_pcu_recv(struct ath_hal*);
+extern void		ath5k_hw_set_mcast_filter(struct ath_hal*, u_int32_t filter0,
+						u_int32_t filter1);
+extern AR5K_BOOL	ath5k_hw_set_mcast_filterindex(struct ath_hal*, u_int32_t index);
+extern AR5K_BOOL	ath5k_hw_clear_mcast_filter_idx(struct ath_hal*,u_int32_t index);
+extern u_int32_t	ath5k_hw_get_rx_filter(struct ath_hal*);
+extern void		ath5k_hw_set_rx_filter(struct ath_hal*, u_int32_t);
+/* beacon */
+extern u_int32_t	ath5k_hw_get_tsf32(struct ath_hal*);
+extern u_int64_t	ath5k_hw_get_tsf64(struct ath_hal*);
+extern void		ath5k_hw_reset_tsf(struct ath_hal*);
+extern void		ath5k_hw_init_beacon(struct ath_hal *, u_int32_t nexttbtt, u_int32_t intval);
+extern void		ath5k_hw_set_beacon_timers(struct ath_hal *, const AR5K_BEACON_STATE *);
+extern void		ath5k_hw_reset_beacon(struct ath_hal *);
+extern AR5K_BOOL	ath5k_hw_wait_for_beacon(struct ath_hal *, AR5K_BUS_ADDR);
+extern void		ath5k_hw_update_mib_counters(struct ath_hal*, AR5K_MIB_STATS*);
+extern void		ath5k_hw_proc_mib_event(struct ath_hal *, const AR5K_NODE_STATS *) ;
+/* ack/cts */
+extern AR5K_BOOL	ath5k_hw_set_ack_timeout(struct ath_hal *, u_int);
+extern u_int		ath5k_hw_get_ack_timeout(struct ath_hal*);
+extern AR5K_BOOL	ath5k_hw_set_cts_timeout(struct ath_hal*, u_int);
+extern u_int		ath5k_hw_get_cts_timeout(struct ath_hal*);
+/* keytable */
+extern AR5K_BOOL	ath5k_hw_is_cipher_supported(struct ath_hal*, AR5K_CIPHER);
+extern u_int32_t	ath5k_hw_get_keycache_size(struct ath_hal*);
+extern AR5K_BOOL	ath5k_hw_reset_key(struct ath_hal*, u_int16_t);
+extern AR5K_BOOL	ath5k_hw_is_key_valid(struct ath_hal *, u_int16_t);
+extern AR5K_BOOL	ath5k_hw_set_key(struct ath_hal*, u_int16_t, const AR5K_KEYVAL *,
+					const u_int8_t *, int);
+extern AR5K_BOOL	ath5k_hw_set_key_lladdr(struct ath_hal*, u_int16_t, const u_int8_t *);
+
+/* QCU / DCU */
+extern int		ath5k_hw_setup_tx_queue(struct ath_hal *, AR5K_TX_QUEUE, AR5K_TXQ_INFO *);
+extern AR5K_BOOL	ath5k_hw_setup_tx_queueprops(struct ath_hal *, int queue,
+						const AR5K_TXQ_INFO *);
+extern AR5K_BOOL	ath5k_hw_get_tx_queueprops(struct ath_hal *, int, AR5K_TXQ_INFO *);
+extern AR5K_BOOL	ath5k_hw_release_tx_queue(struct ath_hal *, u_int queue);
+extern AR5K_BOOL	ath5k_hw_reset_tx_queue(struct ath_hal *, u_int queue);
+extern u_int32_t	ath5k_hw_num_tx_pending(struct ath_hal *, u_int);
+extern AR5K_BOOL	ath5k_hw_set_slot_time(struct ath_hal*, u_int);
+extern u_int		ath5k_hw_get_slot_time(struct ath_hal*);
+
+/* Descriptors */
+/* tx */
+extern AR5K_BOOL	ath5k_hw_setup_2word_tx_desc(struct ath_hal *, struct ath_desc *,
+				u_int packet_length, u_int header_length, AR5K_PKT_TYPE type,
+				u_int txPower, u_int tx_rate0, u_int tx_tries0, u_int key_index,
+				u_int antenna_mode, u_int flags, u_int rtscts_rate,
+				u_int rtscts_duration);
+extern AR5K_BOOL	ath5k_hw_setup_4word_tx_desc(struct ath_hal *, struct ath_desc *,
+				u_int packet_length, u_int header_length, AR5K_PKT_TYPE type,
+				u_int txPower, u_int tx_rate0, u_int tx_tries0, u_int key_index,
+				u_int antenna_mode, u_int flags, u_int rtscts_rate,
+				u_int rtscts_duration);
+extern AR5K_BOOL	ath5k_hw_setup_xr_tx_desc(struct ath_hal *, struct ath_desc *,
+				u_int tx_rate1, u_int tx_tries1, u_int tx_rate2,
+				u_int tx_tries2,u_int tx_rate3, u_int tx_tries3);
+extern AR5K_BOOL	ath5k_hw_fill_2word_tx_desc(struct ath_hal *, struct ath_desc *, u_int segLen,
+				AR5K_BOOL firstSeg, AR5K_BOOL lastSeg, const struct ath_desc *);
+extern AR5K_BOOL	ath5k_hw_fill_4word_tx_desc(struct ath_hal *, struct ath_desc *, u_int segLen,
+				AR5K_BOOL firstSeg, AR5K_BOOL lastSeg, const struct ath_desc *);
+extern AR5K_STATUS	ath5k_hw_proc_2word_tx_status(struct ath_hal *, struct ath_desc *);
+extern AR5K_STATUS	ath5k_hw_proc_4word_tx_status(struct ath_hal *, struct ath_desc *);
+/* rx */
+extern AR5K_BOOL	ath5k_hw_setup_rx_desc(struct ath_hal *, struct ath_desc *,
+						u_int32_t size,	u_int flags);
+extern AR5K_STATUS	ath5k_hw_proc_old_rx_status(struct ath_hal *, struct ath_desc *,
+						u_int32_t phyAddr, struct ath_desc *next);
+extern AR5K_STATUS	ath5k_hw_proc_new_rx_status(struct ath_hal *, struct ath_desc *,
+						u_int32_t phyAddr, struct ath_desc *next);
+
+
+/* GPIO */
+extern void		ath5k_hw_set_ledstate(struct ath_hal*, AR5K_LED_STATE);
+extern AR5K_BOOL	ath5k_hw_set_gpio_output(struct ath_hal *, u_int32_t gpio);
+extern AR5K_BOOL	ath5k_hw_set_gpio_input(struct ath_hal *, u_int32_t gpio);
+extern u_int32_t	ath5k_hw_get_gpio(struct ath_hal *, u_int32_t gpio);
+extern AR5K_BOOL	ath5k_hw_set_gpio(struct ath_hal *, u_int32_t gpio, u_int32_t val);
+extern void		ath5k_hw_set_gpio_intr(struct ath_hal*, u_int, u_int32_t);	
+u_int16_t		ath5k_regdomain_from_ieee(ieee80211_regdomain_t);
+ieee80211_regdomain_t	ath5k_regdomain_to_ieee(u_int16_t);
+u_int16_t		ath5k_get_regdomain(struct ath_hal *);
+extern u_int16_t	ath5k_hw_get_regdomain(struct ath_hal*);
+
+/* Channel/RF setup */
+u_int			ath_hal_mhz2ieee(u_int, u_int);
+u_int			ath_hal_ieee2mhz(u_int, u_int);
 AR5K_BOOL		ath5k_check_channel(struct ath_hal *, u_int16_t, u_int flags);
-
+AR5K_BOOL		ath_hal_init_channels(struct ath_hal *, AR5K_CHANNEL *,
+						u_int, u_int *, AR5K_CTRY_CODE, u_int16_t, 
+						AR5K_BOOL, AR5K_BOOL);
+extern AR5K_BOOL	ath5k_hw_phy_calibrate(struct ath_hal*, AR5K_CHANNEL *);
+AR5K_BOOL		ath5k_hw_channel(struct ath_hal *, AR5K_CHANNEL *);
+u_int32_t		ath5k_hw_rf5110_chan2athchan(AR5K_CHANNEL *);
+AR5K_BOOL		ath5k_hw_rf5110_channel(struct ath_hal *, AR5K_CHANNEL *);
+AR5K_BOOL		ath5k_hw_rf5111_chan2athchan(u_int, struct ath5k_athchan_2ghz *);
+AR5K_BOOL		ath5k_hw_rf5111_channel(struct ath_hal *, AR5K_CHANNEL *);
+AR5K_BOOL		ath5k_hw_rf5112_channel(struct ath_hal *, AR5K_CHANNEL *);
 AR5K_BOOL		ath5k_hw_phy_calibrate(struct ath_hal *hal, AR5K_CHANNEL *channel);
 AR5K_BOOL		ath5k_hw_rf5110_calibrate(struct ath_hal *hal, AR5K_CHANNEL *channel);
 AR5K_BOOL		ath5k_hw_rf511x_calibrate(struct ath_hal *hal, AR5K_CHANNEL *channel);
-
+extern AR5K_BOOL	ath5k_hw_phy_disable(struct ath_hal *);
+extern void		ath5k_hw_set_def_antenna(struct ath_hal *, u_int);
+extern u_int		ath5k_hw_get_def_antenna(struct ath_hal *);
+u_int			ath5k_hw_rfregs_op(u_int32_t *, u_int32_t, u_int32_t, u_int32_t,
+						u_int32_t, u_int32_t, AR5K_BOOL);
+u_int32_t		ath5k_hw_rfregs_gainf_corr(struct ath_hal *);
+AR5K_BOOL		ath5k_hw_rfregs_gain_readback(struct ath_hal *);
+int32_t			ath5k_hw_rfregs_gain_adjust(struct ath_hal *);
 AR5K_BOOL		ath5k_hw_rfregs(struct ath_hal *, AR5K_CHANNEL *, u_int);
 AR5K_BOOL		ath5k_hw_rf5111_rfregs(struct ath_hal *, AR5K_CHANNEL *, u_int);
 AR5K_BOOL		ath5k_hw_rf5112_rfregs(struct ath_hal *, AR5K_CHANNEL *, u_int);
 void	 		ath5k_hw_ar5211_rfregs(struct ath_hal *, AR5K_CHANNEL *, u_int, u_int);
-u_int			ath5k_hw_rfregs_op(u_int32_t *, u_int32_t, u_int32_t, u_int32_t,
-					u_int32_t, u_int32_t, AR5K_BOOL);
-u_int32_t		ath5k_hw_rfregs_gainf_corr(struct ath_hal *);
-AR5K_BOOL		ath5k_hw_rfregs_gain_readback(struct ath_hal *);
-int32_t			ath5k_hw_rfregs_gain_adjust(struct ath_hal *);
 AR5K_BOOL		ath5k_hw_rfgain(struct ath_hal *, u_int);
-void			ath5k_txpower_table(struct ath_hal *, AR5K_CHANNEL *, int16_t);
+extern AR5K_RFGAIN	ath5k_hw_get_rf_gain(struct ath_hal*);
+void			ath5k_hw_txpower_table(struct ath_hal *, AR5K_CHANNEL *, int16_t);
+AR5K_BOOL		ath5k_hw_txpower(struct ath_hal *, AR5K_CHANNEL *, u_int);
+extern AR5K_BOOL	ath5k_hw_set_txpower_limit(struct ath_hal *, u_int);
 
-/*added*/
-extern	u_int  ath_hal_getwirelessmodes(struct ath_hal*, AR5K_CTRY_CODE);
-void ath_hal_detach(struct ath_hal *ah);
+
+/* Misc */
+extern void		ath5k_hw_dump_state(struct ath_hal *);
+extern AR5K_BOOL 	ath5k_hw_has_veol(struct ath_hal *);
+extern void		ath5k_hw_get_tx_inter_queue(struct ath_hal *, u_int32_t *);
+extern void		ath5k_hw_set_rx_signal(struct ath_hal *, const AR5K_NODE_STATS *);
+extern AR5K_BOOL	ath5k_hw_get_diag_state(struct ath_hal *, int request,const void *args,
+				u_int32_t argsize, void **result, u_int32_t *resultsize);
+extern AR5K_BOOL	ath5k_hw_detect_card_present(struct ath_hal*);
+extern AR5K_STATUS 	ath5k_hw_get_capability(struct ath_hal *, AR5K_CAPABILITY_TYPE,
+						u_int32_t, u_int32_t *);
+extern AR5K_BOOL	ath5k_hw_set_capability(struct ath_hal *, AR5K_CAPABILITY_TYPE, u_int32_t,\
+						u_int32_t,AR5K_STATUS *) ;
+extern AR5K_BOOL	ath5k_hw_query_pspoll_support(struct ath_hal*);
+extern AR5K_BOOL	ath5k_hw_init_pspoll(struct ath_hal*);
+extern AR5K_BOOL	ath5k_hw_enable_pspoll(struct ath_hal *, u_int8_t *, u_int16_t);
+extern AR5K_BOOL	ath5k_hw_disable_pspoll(struct ath_hal *);
+const char *		ath5k_hw_get_part_name(enum ath5k_srev_type, u_int32_t);
+void			ath5k_radar_alert(struct ath_hal *);
+void			ath5k_hw_fill(struct ath_hal *);
+
+
+
+/*ah_osdep.c*/
 struct ath_hal * _ath_hal_attach(u_int16_t devid, AR5K_SOFTC sc, AR5K_BUS_TAG t,
 					AR5K_BUS_HANDLE h, void* s);
+void ath_hal_detach(struct ath_hal *hal);
 #endif /* _AR5K_H */

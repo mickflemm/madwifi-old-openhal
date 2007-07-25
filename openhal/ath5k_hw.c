@@ -74,16 +74,6 @@ static const AR5K_RATE_TABLE ath5k_rt_11g = AR5K_RATES_11G;
 static const AR5K_RATE_TABLE ath5k_rt_turbo = AR5K_RATES_TURBO;
 static const AR5K_RATE_TABLE ath5k_rt_xr = AR5K_RATES_XR;
 
-/*Prototypes*/
-AR5K_BOOL	ath5k_hw_nic_reset(struct ath_hal *, u_int32_t);
-AR5K_BOOL	ath5k_hw_nic_wakeup(struct ath_hal *, u_int16_t, AR5K_BOOL);
-u_int16_t	ath5k_hw_radio_revision(struct ath_hal *, AR5K_CHIP);
-void		ath5k_hw_fill(struct ath_hal *);
-AR5K_BOOL	ath5k_hw_txpower(struct ath_hal *, AR5K_CHANNEL *, u_int);
-const char *	ath5k_hw_get_part_name(enum ath5k_srev_type, u_int32_t);
-
-AR5K_HAL_FUNCTIONS(extern, ath5k_hw,);
-
 /*
  * Supported channels
  */
@@ -239,7 +229,7 @@ ath_hal_computetxtime(struct ath_hal *hal, const AR5K_RATE_TABLE *rates,
 
 /*
  * Return the supported 802.11 operation modes
- * TODO:Left here for combatibility, change it in at5k
+ * TODO:Left here for combatibility, change it in ath5k
  */
 u_int/*TODO:Fix this*/
 ath_hal_getwirelessmodes(struct ath_hal *hal, AR5K_CTRY_CODE country) 
@@ -292,6 +282,33 @@ ath5k_hw_rtcopy(AR5K_RATE_TABLE *dst, const AR5K_RATE_TABLE *src)
 	memset(dst, 0, sizeof(AR5K_RATE_TABLE));
 	dst->rate_count = src->rate_count;
 	memcpy(dst->rates, src->rates, sizeof(dst->rates));
+}
+
+/*
+ * Get the rate table for a specific operation mode
+ */
+const AR5K_RATE_TABLE *
+ath5k_hw_get_rate_table(struct ath_hal *hal, u_int mode)
+{
+
+	AR5K_TRACE;
+
+	switch (mode) {
+	case AR5K_MODE_11A:
+		return (&hal->ah_rt_11a);
+	case AR5K_MODE_TURBO:
+		return (&hal->ah_rt_turbo);
+	case AR5K_MODE_11B:
+		return (&hal->ah_rt_11b);
+	case AR5K_MODE_11G:
+		return (&hal->ah_rt_11g);
+	case AR5K_MODE_XR:
+		return (&hal->ah_rt_xr);
+	default:
+		return (NULL);
+	}
+
+	return (NULL);
 }
 
 /*
@@ -806,33 +823,6 @@ ath5k_hw_radio_revision(struct ath_hal *hal, AR5K_CHIP chip)
 	AR5K_REG_WRITE(AR5K_PHY(0), AR5K_PHY_SHIFT_5GHZ);
 
 	return (ret);
-}
-
-/*
- * Get the rate table for a specific operation mode
- */
-const AR5K_RATE_TABLE *
-ath5k_hw_get_rate_table(struct ath_hal *hal, u_int mode)
-{
-
-	AR5K_TRACE;
-
-	switch (mode) {
-	case AR5K_MODE_11A:
-		return (&hal->ah_rt_11a);
-	case AR5K_MODE_TURBO:
-		return (&hal->ah_rt_turbo);
-	case AR5K_MODE_11B:
-		return (&hal->ah_rt_11b);
-	case AR5K_MODE_11G:
-		return (&hal->ah_rt_11g);
-	case AR5K_MODE_XR:
-		return (&hal->ah_rt_xr);
-	default:
-		return (NULL);
-	}
-
-	return (NULL);
 }
 
 /*
@@ -3977,7 +3967,7 @@ ath5k_hw_get_slot_time(struct ath_hal *hal)
 /*
  * Initialize the 2-word tx descriptor on 5210/5211
  */
-static AR5K_BOOL
+AR5K_BOOL
 ath5k_hw_setup_2word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
     u_int packet_length, u_int header_length, AR5K_PKT_TYPE type, u_int tx_power,
     u_int tx_rate0, u_int tx_tries0, u_int key_index, u_int antenna_mode,
@@ -4074,7 +4064,7 @@ ath5k_hw_setup_2word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Initialize the 4-word tx descriptor on 5212
  */
-static AR5K_BOOL
+AR5K_BOOL
 ath5k_hw_setup_4word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 	u_int packet_length, u_int header_length, AR5K_PKT_TYPE type, u_int tx_power,
 	u_int tx_rate0, u_int tx_tries0, u_int key_index, u_int antenna_mode,
@@ -4159,7 +4149,7 @@ ath5k_hw_setup_4word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Initialize a 4-word XR tx descriptor on 5212
  */
-static AR5K_BOOL
+AR5K_BOOL
 ath5k_hw_setup_xr_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
     u_int tx_rate1, u_int tx_tries1, u_int tx_rate2, u_int tx_tries2,
     u_int tx_rate3, u_int tx_tries3)
@@ -4194,7 +4184,7 @@ ath5k_hw_setup_xr_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Fill the 2-word tx descriptor on 5210/5211
  */
-static AR5K_BOOL
+AR5K_BOOL
 ath5k_hw_fill_2word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
     u_int segment_length, AR5K_BOOL first_segment, AR5K_BOOL last_segment, const struct ath_desc *last_desc)
 {
@@ -4223,7 +4213,7 @@ ath5k_hw_fill_2word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
  * Fill the 4-word tx descriptor on 5212
  * XXX: Added an argument *last_desc -need revision
  */
-static AR5K_BOOL
+AR5K_BOOL
 ath5k_hw_fill_4word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 	u_int segment_length, AR5K_BOOL first_segment, AR5K_BOOL last_segment,
 	const struct ath_desc *last_desc)
@@ -4255,7 +4245,7 @@ ath5k_hw_fill_4word_tx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Proccess the tx status descriptor on 5210/5211
  */
-static AR5K_STATUS
+AR5K_STATUS
 ath5k_hw_proc_2word_tx_status(struct ath_hal *hal, struct ath_desc *desc)
 {
 	struct ath5k_hw_tx_status *tx_status;
@@ -4314,7 +4304,7 @@ ath5k_hw_proc_2word_tx_status(struct ath_hal *hal, struct ath_desc *desc)
 /*
  * Proccess a tx descriptor on 5212
  */
-static AR5K_STATUS
+AR5K_STATUS
 ath5k_hw_proc_4word_tx_status(struct ath_hal *hal, struct ath_desc *desc)
 {
 	struct ath5k_hw_tx_status *tx_status;
@@ -4443,7 +4433,7 @@ ath5k_hw_setup_rx_desc(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Proccess the rx status descriptor on 5210/5211
  */
-static AR5K_STATUS
+AR5K_STATUS
 ath5k_hw_proc_old_rx_status(struct ath_hal *hal, struct ath_desc *desc,
 			u_int32_t phys_addr, struct ath_desc *next)
 {
@@ -4518,7 +4508,7 @@ ath5k_hw_proc_old_rx_status(struct ath_hal *hal, struct ath_desc *desc,
 /*
  * Proccess the rx status descriptor on 5212
  */
-static AR5K_STATUS
+AR5K_STATUS
 ath5k_hw_proc_new_rx_status(struct ath_hal *hal, struct ath_desc *desc,
 			u_int32_t phys_addr, struct ath_desc *next)
 {
@@ -6016,7 +6006,7 @@ ath5k_hw_get_rf_gain(struct ath_hal *hal)
  * Initialize the tx power table (not fully implemented)
  */
 void
-ath5k_txpower_table(struct ath_hal *hal, AR5K_CHANNEL *channel, int16_t max_power)
+ath5k_hw_txpower_table(struct ath_hal *hal, AR5K_CHANNEL *channel, int16_t max_power)
 {
 	u_int16_t txpower, *rates;
 	int i, min, max, n;
@@ -6070,7 +6060,7 @@ ath5k_hw_txpower(struct ath_hal *hal, AR5K_CHANNEL *channel, u_int txpower)
 	hal->ah_txpower.txp_tpc = tpc;
 
 	/* Initialize TX power table */
-	ath5k_txpower_table(hal, channel, txpower);
+	ath5k_hw_txpower_table(hal, channel, txpower);
 
 	/* 
 	 * Write TX power values
