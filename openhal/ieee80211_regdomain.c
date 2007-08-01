@@ -84,7 +84,7 @@ ieee80211_name2countrycode(const char *name)
 	if((value = bsearch(&key, &ieee80211_r_ctry,
 		sizeof(ieee80211_r_ctry) / sizeof(ieee80211_r_ctry[0]),
 		sizeof(struct ieee80211_countryname),
-		ieee80211_regdomain_compare_cn)) != 0)
+		ieee80211_regdomain_compare_cn)) != NULL)
 		return(value->cn_code);
 
 	return(CTRY_DEFAULT);
@@ -98,7 +98,7 @@ ieee80211_name2regdomain(const char *name)
 	if((value = bsearch(&key, &ieee80211_r_names,
 		sizeof(ieee80211_r_names) / sizeof(ieee80211_r_names[0]),
 		sizeof(struct ieee80211_regdomainname),
-		ieee80211_regdomain_compare_rn)) != 0)
+		ieee80211_regdomain_compare_rn)) != NULL)
 		return((u_int32_t)value->rn_domain);
 
 	return((u_int32_t)DMN_DEFAULT);
