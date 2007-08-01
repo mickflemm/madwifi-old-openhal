@@ -1,7 +1,7 @@
-Linux OpenHAL 20072703
+Linux OpenHAL 20070108
 ======================
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
- * This is a port of the ar5k hal for atheros device drivers that is         *
+ * This is a port/fork of the ar5k hal for atheros device drivers that is    *
  * source-compatible with the Madwifi driver for linux.			     *
  *									     *
  * Code ported, modified for combatibility and some bugs were fixed by 	     *
@@ -9,9 +9,9 @@ Linux OpenHAL 20072703
  * <mickflemm'at'gmail.com> and Pavel Roskin so ar5k can work propertly      *
  * on Linux.								     *
  *									     *
- * Currently only the 5212 code has been tested due to lack of hardware.     *
+ * Currently 5210 code has not been tested due to lack of hardware.          *
  *									     *
- * Some code from John Bicket's port (roofnet project) was taken, you can    *
+ * Some code from John Bicket's port (roofnet project) was used, you can     *
  * can find his OpenHAL here -> http://pdos.csail.mit.edu/~jbicket/openhal/  *
  *									     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -53,7 +53,7 @@ Regulatory domain restrictions are enabled by default to follow ETSI and FCC sta
 If you want to be legal you shouldn't disable regdomains, althow if you want to
 experiment etc there are 2 ways you can override regdomains:
 
-a) Change SUPERCHANNEL to 1 (opt_ah.h)
+a) Change CHAN_DEBUG to 1 (opt_ah.h)
 b) Change your card's regulatory domain (EEPROM) to 0x00
 
 WARNING: Whatever you do with your hardware is YOUR resposibility, don't blame the developers
@@ -79,21 +79,6 @@ Its aims include:
 The Athens Wireless Metropolitan Network
 http://www.awmn.net
 
-
-Building 
-========
-To build OpenHAL with MadWiFi, place the OpenHAL source directory in the
-MadWiFi directory. Edit Makefile.inc and set the following:
-
-HAL=${DEPTH}/<OpenHAL directory>
-ATH_HAL=${DEPTH}/<OpenHAL directory>
-
-After that, go to the top directory and build like you normally would. 
-
-WARNING: Don't delete the empty files included (ah_desc.h etc)
-
-Note: Currenty works for MadWiFi-old
-
 Use
 =====
 You 'll have to set everything propertly for things to work
@@ -113,5 +98,21 @@ but not in a normal way -needs revision.
 TODO
 ====
 * Lot's of tests and fixes.
-* Make it combatible with newer versions of MadWiFi (after the merge).
-* Test 5210/5211 code.
+* Fix tx power setting.
+* Test 5210 code.
+
+
+What works
+==========
+Tested combinations:
+AR5213 + RF5111 (Wistron CM6)
+AR5213 + RF5112a (Wistron CM9)
+AR5211 + RF5111 (Toshiba/Askey)
+RF5413 (don't remember vendor but it was a mini-pci one)
+
+They all seem to work fine except 5211 which has trouble working as an AP
+(probably during faulty tx power setting). Also 5413 had poor signal quality
+in comparison to binary HAL. We also got reports of 5424 non-working (droping
+packets etc) at all.
+
+Please we need your feedback !

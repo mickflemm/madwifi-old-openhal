@@ -17,13 +17,11 @@ EXTRA_CFLAGS += $(INCS)
 
 ifneq ($(VERSION).$(PATCHLEVEL),2.4)
 obj-$(CONFIG_ATHEROS) += ath_hal.o
-ath_hal-objs := ah_osdep.o ar5xxx.o ar5212.o ar5211.o ar5210.o \
-	ieee80211_regdomain.o
+ath_hal-objs := ah_osdep.o ath5k_hw.o ieee80211_regdomain.o
 endif
 
 ifeq ($(VERSION).$(PATCHLEVEL),2.4)
-obj-$(CONFIG_ATHEROS) := ah_osdep.o ar5xxx.o ar5212.o ar5211.o ar5210.o \
-	ieee80211_regdomain.o
+obj-$(CONFIG_ATHEROS) := ah_osdep.o ath5k_hw.o ieee80211_regdomain.o
 export-objs := ah_osdep.o
 list-multi := ath_hal.o
 O_TARGET := ath_hal.o

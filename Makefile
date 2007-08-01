@@ -50,9 +50,9 @@ ifneq (svnversion.h,$(MAKECMDGOALS))
 include $(TOP)/Makefile.inc
 endif
 
-DIRS_MODULES = $(ATH) $(ATH_RATE) $(HAL) $(WLAN)
+DIRS_MODULES = $(HAL) $(ATH) $(ATH_RATE) $(WLAN)
 
-obj-y := ath/ openhal/ $(ATH_RATE)/ net80211/
+obj-y := openhal/ ath/ $(ATH_RATE)/ net80211/
 
 all: modules tools
 

@@ -156,7 +156,7 @@ ath_rate_setupxtxdesc(struct ath_softc *sc, struct ath_node *an,
 	try2 = (rate2 == 0) ? 0 : 2;
 	try3 = (rate3 == 0) ? 0 : 2;
 	
-	ath_hal_setupxtxdesc(sc->sc_ah, ds
+	ath5k_hw_setup_xr_tx_desc(sc->sc_ah, ds
 		, rate1, try1	/* series 1 */
 		, rate2, try2	/* series 2 */
 		, rate3, try3	/* series 3 */

@@ -403,129 +403,10 @@ void	ath_sysctl_unregister(void);
 /*
  * HAL definitions to comply with local coding convention.
  */
-#define	ath_hal_reset(_ah, _opmode, _chan, _outdoor, _pstatus) \
-	((*(_ah)->ah_reset)((_ah), (_opmode), (_chan), (_outdoor), (_pstatus)))
-#define	ath_hal_getratetable(_ah, _mode) \
-	((*(_ah)->ah_getRateTable)((_ah), (_mode)))
-#define	ath_hal_getmac(_ah, _mac) \
-	((*(_ah)->ah_getMacAddress)((_ah), (_mac)))
-#define	ath_hal_setmac(_ah, _mac) \
-	((*(_ah)->ah_setMacAddress)((_ah), (_mac)))
-#define	ath_hal_intrset(_ah, _mask) \
-	((*(_ah)->ah_setInterrupts)((_ah), (_mask)))
-#define	ath_hal_intrget(_ah) \
-	((*(_ah)->ah_getInterrupts)((_ah)))
-#define	ath_hal_intrpend(_ah) \
-	((*(_ah)->ah_isInterruptPending)((_ah)))
-#define	ath_hal_getisr(_ah, _pmask) \
-	((*(_ah)->ah_getPendingInterrupts)((_ah), (_pmask)))
-#define	ath_hal_updatetxtriglevel(_ah, _inc) \
-	((*(_ah)->ah_updateTxTrigLevel)((_ah), (_inc)))
-#define	ath_hal_setpower(_ah, _mode, _sleepduration) \
-	((*(_ah)->ah_setPowerMode)((_ah), (_mode), TRUE, (_sleepduration)))
-#define	ath_hal_keycachesize(_ah) \
-	((*(_ah)->ah_getKeyCacheSize)((_ah)))
-#define	ath_hal_keyreset(_ah, _ix) \
-	((*(_ah)->ah_resetKeyCacheEntry)((_ah), (_ix)))
-#define	ath_hal_keyset(_ah, _ix, _pk, _mac) \
-	((*(_ah)->ah_setKeyCacheEntry)((_ah), (_ix), (_pk), (_mac), FALSE))
-#define	ath_hal_keyisvalid(_ah, _ix) \
-	(((*(_ah)->ah_isKeyCacheEntryValid)((_ah), (_ix))))
-#define	ath_hal_keysetmac(_ah, _ix, _mac) \
-	((*(_ah)->ah_setKeyCacheEntryMac)((_ah), (_ix), (_mac)))
-#define	ath_hal_getrxfilter(_ah) \
-	((*(_ah)->ah_getRxFilter)((_ah)))
-#define	ath_hal_setrxfilter(_ah, _filter) \
-	((*(_ah)->ah_setRxFilter)((_ah), (_filter)))
-#define	ath_hal_setmcastfilter(_ah, _mfilt0, _mfilt1) \
-	((*(_ah)->ah_setMulticastFilter)((_ah), (_mfilt0), (_mfilt1)))
-#define	ath_hal_waitforbeacon(_ah, _bf) \
-	((*(_ah)->ah_waitForBeaconDone)((_ah), (_bf)->bf_daddr))
-#define	ath_hal_putrxbuf(_ah, _bufaddr) \
-	((*(_ah)->ah_setRxDP)((_ah), (_bufaddr)))
-#define	ath_hal_gettsf32(_ah) \
-	((*(_ah)->ah_getTsf32)((_ah)))
-#define	ath_hal_gettsf64(_ah) \
-	((*(_ah)->ah_getTsf64)((_ah)))
-#define	ath_hal_resettsf(_ah) \
-	((*(_ah)->ah_resetTsf)((_ah)))
-#define	ath_hal_rxena(_ah) \
-	((*(_ah)->ah_enableReceive)((_ah)))
-#define	ath_hal_puttxbuf(_ah, _q, _bufaddr) \
-	((*(_ah)->ah_setTxDP)((_ah), (_q), (_bufaddr)))
-#define	ath_hal_gettxbuf(_ah, _q) \
-	((*(_ah)->ah_getTxDP)((_ah), (_q)))
-#define	ath_hal_numtxpending(_ah, _q) \
-	((*(_ah)->ah_numTxPending)((_ah), (_q)))
-#define	ath_hal_getrxbuf(_ah) \
-	((*(_ah)->ah_getRxDP)((_ah)))
-#define	ath_hal_txstart(_ah, _q) \
-	((*(_ah)->ah_startTxDma)((_ah), (_q)))
-#define	ath_hal_setchannel(_ah, _chan) \
-	((*(_ah)->ah_setChannel)((_ah), (_chan)))
-#define	ath_hal_calibrate(_ah, _chan) \
-	((*(_ah)->ah_perCalibration)((_ah), (_chan)))
-#define	ath_hal_setledstate(_ah, _state) \
-	((*(_ah)->ah_setLedState)((_ah), (_state)))
-#define	ath_hal_beaconinit(_ah, _nextb, _bperiod) \
-	((*(_ah)->ah_beaconInit)((_ah), (_nextb), (_bperiod)))
-#define	ath_hal_beaconreset(_ah) \
-	((*(_ah)->ah_resetStationBeaconTimers)((_ah)))
-#define	ath_hal_beacontimers(_ah, _bs) \
-	((*(_ah)->ah_setStationBeaconTimers)((_ah), (_bs)))
-#define	ath_hal_setassocid(_ah, _bss, _associd) \
-	((*(_ah)->ah_writeAssocid)((_ah), (_bss), (_associd)))
-#define	ath_hal_phydisable(_ah) \
-	((*(_ah)->ah_phyDisable)((_ah)))
-#define	ath_hal_setopmode(_ah) \
-	((*(_ah)->ah_setPCUConfig)((_ah)))
-#define	ath_hal_stoptxdma(_ah, _qnum) \
-	((*(_ah)->ah_stopTxDma)((_ah), (_qnum)))
-#define	ath_hal_stoppcurecv(_ah) \
-	((*(_ah)->ah_stopPcuReceive)((_ah)))
-#define	ath_hal_startpcurecv(_ah) \
-	((*(_ah)->ah_startPcuReceive)((_ah)))
-#define	ath_hal_stopdmarecv(_ah) \
-	((*(_ah)->ah_stopDmaReceive)((_ah)))
-#define	ath_hal_getdiagstate(_ah, _id, _indata, _insize, _outdata, _outsize) \
-	((*(_ah)->ah_getDiagState)((_ah), (_id), \
-		(_indata), (_insize), (_outdata), (_outsize)))
-#define	ath_hal_setuptxqueue(_ah, _type, _irq) \
-	((*(_ah)->ah_setupTxQueue)((_ah), (_type), (_irq)))
-#define	ath_hal_resettxqueue(_ah, _q) \
-	((*(_ah)->ah_resetTxQueue)((_ah), (_q)))
-#define	ath_hal_releasetxqueue(_ah, _q) \
-	((*(_ah)->ah_releaseTxQueue)((_ah), (_q)))
-#define	ath_hal_gettxqueueprops(_ah, _q, _qi) \
-	((*(_ah)->ah_getTxQueueProps)((_ah), (_q), (_qi)))
-#define	ath_hal_settxqueueprops(_ah, _q, _qi) \
-	((*(_ah)->ah_setTxQueueProps)((_ah), (_q), (_qi)))
-#define	ath_hal_getrfgain(_ah) \
-	((*(_ah)->ah_getRfGain)((_ah)))
-#define	ath_hal_getdefantenna(_ah) \
-	((*(_ah)->ah_getDefAntenna)((_ah)))
-#define	ath_hal_setdefantenna(_ah, _ant) \
-	((*(_ah)->ah_setDefAntenna)((_ah), (_ant)))
-#define	ath_hal_rxmonitor(_ah, _arg) \
-	((*(_ah)->ah_rxMonitor)((_ah), (_arg)))
-#define	ath_hal_mibevent(_ah, _stats) \
-	((*(_ah)->ah_procMibEvent)((_ah), (_stats)))
-#define	ath_hal_setslottime(_ah, _us) \
-	((*(_ah)->ah_setSlotTime)((_ah), (_us)))
-#define	ath_hal_getslottime(_ah) \
-	((*(_ah)->ah_getSlotTime)((_ah)))
-#define	ath_hal_setacktimeout(_ah, _us) \
-	((*(_ah)->ah_setAckTimeout)((_ah), (_us)))
-#define	ath_hal_getacktimeout(_ah) \
-	((*(_ah)->ah_getAckTimeout)((_ah)))
-#define	ath_hal_setctstimeout(_ah, _us) \
-	((*(_ah)->ah_setCTSTimeout)((_ah), (_us)))
-#define	ath_hal_getctstimeout(_ah) \
-	((*(_ah)->ah_getCTSTimeout)((_ah)))
 #define	ath_hal_getcapability(_ah, _cap, _param, _result) \
-	((*(_ah)->ah_getCapability)((_ah), (_cap), (_param), (_result)))
+	ath5k_hw_get_capability((_ah), (_cap), (_param), (_result))
 #define	ath_hal_setcapability(_ah, _cap, _param, _v, _status) \
-	((*(_ah)->ah_setCapability)((_ah), (_cap), (_param), (_v), (_status)))
+	ath5k_hw_set_capability((_ah), (_cap), (_param), (_v), (_status))
 #define	ath_hal_ciphersupported(_ah, _cipher) \
 	(ath_hal_getcapability(_ah, AR5K_CAP_CIPHER, _cipher, NULL) == AR5K_OK)
 #define	ath_hal_getregdomain(_ah, _prd) \
@@ -552,8 +433,10 @@ void	ath_sysctl_unregister(void);
 	(ath_hal_getcapability(_ah, AR5K_CAP_VEOL, 0, NULL) == AR5K_OK)
 #define	ath_hal_hastxpowlimit(_ah) \
 	(ath_hal_getcapability(_ah, AR5K_CAP_TXPOW, 0, NULL) == AR5K_OK)
+/*
 #define	ath_hal_settxpowlimit(_ah, _pow) \
 	((*(_ah)->ah_setTxPowerLimit)((_ah), (_pow)))
+*/
 #define	ath_hal_gettxpowlimit(_ah, _ppow) \
 	(ath_hal_getcapability(_ah, AR5K_CAP_TXPOW, 1, _ppow) == AR5K_OK)
 #define	ath_hal_getmaxtxpow(_ah, _ppow) \
@@ -579,32 +462,11 @@ void	ath_sysctl_unregister(void);
 #define ath_hal_getmcastkeysearch(_ah)  0
 #endif
 
-#define	ath_hal_setuprxdesc(_ah, _ds, _size, _intreq) \
-	((*(_ah)->ah_setupRxDesc)((_ah), (_ds), (_size), (_intreq)))
-#define	ath_hal_rxprocdesc(_ah, _ds, _dspa, _dsnext) \
-	((*(_ah)->ah_procRxDesc)((_ah), (_ds), (_dspa), (_dsnext)))
-#define	ath_hal_setuptxdesc(_ah, _ds, _plen, _hlen, _atype, _txpow, \
-		_txr0, _txtr0, _keyix, _ant, _flags, \
-		_rtsrate, _rtsdura) \
-	((*(_ah)->ah_setupTxDesc)((_ah), (_ds), (_plen), (_hlen), (_atype), \
-		(_txpow), (_txr0), (_txtr0), (_keyix), (_ant), \
-		(_flags), (_rtsrate), (_rtsdura)))
-#define	ath_hal_setupxtxdesc(_ah, _ds, \
-		_txr1, _txtr1, _txr2, _txtr2, _txr3, _txtr3) \
-	((*(_ah)->ah_setupXTxDesc)((_ah), (_ds), \
-		(_txr1), (_txtr1), (_txr2), (_txtr2), (_txr3), (_txtr3)))
-#define	ath_hal_filltxdesc(_ah, _ds, _l, _first, _last, _ds0) \
-	((*(_ah)->ah_fillTxDesc)((_ah), (_ds), (_l), (_first), (_last), (_ds0)))
-#define	ath_hal_txprocdesc(_ah, _ds) \
-	((*(_ah)->ah_procTxDesc)((_ah), (_ds)))
+/*
 #define	ath_hal_updateCTSForBursting(_ah, _ds, _prevds, _prevdsWithCTS, \
 		_gatingds,  _txOpLimit, _ctsDuration) \
 	((*(_ah)->ah_updateCTSForBursting)((_ah), (_ds), (_prevds), \
 		(_prevdsWithCTS), (_gatingds), (_txOpLimit), (_ctsDuration)))
-
-#define ath_hal_gpioCfgOutput(_ah, _gpio) \
-        ((*(_ah)->ah_gpioCfgOutput)((_ah), (_gpio)))
-#define ath_hal_gpioset(_ah, _gpio, _b) \
-        ((*(_ah)->ah_gpioSet)((_ah), (_gpio), (_b)))
+*/
 
 #endif /* _DEV_ATH_ATHVAR_H */

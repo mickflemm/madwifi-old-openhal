@@ -123,7 +123,7 @@ ath_rate_setupxtxdesc(struct ath_softc *sc, struct ath_node *an,
 {
 	struct amrr_node *amn = ATH_NODE_AMRR(an);
 
-	ath_hal_setupxtxdesc(sc->sc_ah, ds
+	ath5k_hw_setup_xr_tx_desc(sc->sc_ah, ds
 		, amn->amn_tx_rate1sp, amn->amn_tx_try1	/* series 1 */
 		, amn->amn_tx_rate2sp, amn->amn_tx_try2	/* series 2 */
 		, amn->amn_tx_rate3sp, amn->amn_tx_try3	/* series 3 */

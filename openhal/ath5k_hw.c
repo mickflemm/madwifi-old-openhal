@@ -509,8 +509,10 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 	 */
 	hal->ah_version	= mac_version;
 
-	/*Fill the hal struct with the needed functions*/
-	ath5k_hw_fill(hal);
+	if (hal->ah_version == AR5K_AR5212)
+		hal->ah_magic = AR5K_EEPROM_MAGIC_5212;
+	else if (hal->ah_version == AR5K_AR5211)
+		hal->ah_magic = AR5K_EEPROM_MAGIC_5211;
 
 	/* Bring device out of sleep and reset it's units */
 	if (ath5k_hw_nic_wakeup(hal, AR5K_INIT_MODE, TRUE) != TRUE)
@@ -6238,7 +6240,7 @@ ath5k_hw_get_tx_inter_queue(struct ath_hal *hal, u_int32_t *i)
 }
 
 void /*Added AR5K_NODE_STATS argument*/
-ath5k_hw_set_rx_signal(struct ath_hal *hal, const AR5K_NODE_STATS *stats)
+ath5k_hw_set_rx_signal_monitor(struct ath_hal *hal, const AR5K_NODE_STATS *stats)
 {
 	AR5K_TRACE;
 	/* Signal state monitoring is not yet supported */
@@ -6440,169 +6442,4 @@ ath5k_radar_alert(struct ath_hal *hal)
 
 	AR5K_PRINTF("Possible radar activity detected at %u MHz (tick %u)\n",
 	    hal->ah_radar.r_last_alert, hal->ah_current_channel.freq);*/
-}
-
-/*
- * Fill the hal struct, left here for combatibility
- */
-void /*Functions added*/
-ath5k_hw_fill(struct ath_hal *hal)
-{
-	if (hal->ah_version == AR5K_AR5212)
-		hal->ah_magic = AR5K_EEPROM_MAGIC_5212;
-	else if (hal->ah_version == AR5K_AR5211)
-		hal->ah_magic = AR5K_EEPROM_MAGIC_5211;
-
-	/*
-	 * Init/Exit functions
-	 */
-	AR5K_HAL_FUNCTION(hal, hw, get_rate_table);
-	AR5K_HAL_FUNCTION(hal, hw, detach);
-
-	/*
-	 * Reset functions
-	 */
-	AR5K_HAL_FUNCTION(hal, hw, reset);
-	AR5K_HAL_FUNCTION(hal, hw, set_opmode);
-	AR5K_HAL_FUNCTION(hal, hw, phy_calibrate);
-
-	/*
-	 * TX functions
-	 */
-	AR5K_HAL_FUNCTION(hal, hw, update_tx_triglevel);
-	AR5K_HAL_FUNCTION(hal, hw, setup_tx_queue);
-	AR5K_HAL_FUNCTION(hal, hw, setup_tx_queueprops);
-	AR5K_HAL_FUNCTION(hal, hw, release_tx_queue);
-	AR5K_HAL_FUNCTION(hal, hw, reset_tx_queue);
-	AR5K_HAL_FUNCTION(hal, hw, get_tx_buf);
-	AR5K_HAL_FUNCTION(hal, hw, put_tx_buf);
-	AR5K_HAL_FUNCTION(hal, hw, tx_start);
-	AR5K_HAL_FUNCTION(hal, hw, stop_tx_dma);
-	if (hal->ah_version == AR5K_AR5212) {
-		hal->ah_setup_tx_desc = ath5k_hw_setup_4word_tx_desc;
-		hal->ah_setup_xtx_desc = ath5k_hw_setup_xr_tx_desc;
-		hal->ah_fill_tx_desc = ath5k_hw_fill_4word_tx_desc;
-		hal->ah_proc_tx_desc = ath5k_hw_proc_4word_tx_status;
-	} else if (hal->ah_version != AR5K_AR5212) {
-		hal->ah_setup_tx_desc = ath5k_hw_setup_2word_tx_desc;
-		hal->ah_setup_xtx_desc = ath5k_hw_setup_xr_tx_desc;
-		hal->ah_fill_tx_desc = ath5k_hw_fill_2word_tx_desc;
-		hal->ah_proc_tx_desc = ath5k_hw_proc_2word_tx_status;
-	}
-	AR5K_HAL_FUNCTION(hal, hw, has_veol);
-
-	/*
-	 * RX functions
-	 */
-	AR5K_HAL_FUNCTION(hal, hw, get_rx_buf);
-	AR5K_HAL_FUNCTION(hal, hw, put_rx_buf);
-	AR5K_HAL_FUNCTION(hal, hw, start_rx);
-	AR5K_HAL_FUNCTION(hal, hw, stop_rx_dma);
-	AR5K_HAL_FUNCTION(hal, hw, start_rx_pcu);
-	AR5K_HAL_FUNCTION(hal, hw, stop_pcu_recv);
-	AR5K_HAL_FUNCTION(hal, hw, set_mcast_filter);
-	AR5K_HAL_FUNCTION(hal, hw, set_mcast_filterindex);
-	AR5K_HAL_FUNCTION(hal, hw, clear_mcast_filter_idx);
-	AR5K_HAL_FUNCTION(hal, hw, get_rx_filter);
-	AR5K_HAL_FUNCTION(hal, hw, set_rx_filter);
-	AR5K_HAL_FUNCTION(hal, hw, setup_rx_desc);
-	if (hal->ah_version == AR5K_AR5212)
-		hal->ah_proc_rx_desc = ath5k_hw_proc_new_rx_status;
-	else if (hal->ah_version <= AR5K_AR5211)
-		hal->ah_proc_rx_desc = ath5k_hw_proc_old_rx_status;
-	AR5K_HAL_FUNCTION(hal, hw, set_rx_signal);
-
-	/*
-	 * Misc functions
-	 */
-	AR5K_HAL_FUNCTION(hal, hw, dump_state);
-	AR5K_HAL_FUNCTION(hal, hw, get_diag_state);
-	AR5K_HAL_FUNCTION(hal, hw, get_lladdr);
-	AR5K_HAL_FUNCTION(hal, hw, set_lladdr);
-	AR5K_HAL_FUNCTION(hal, hw, set_regdomain);
-	AR5K_HAL_FUNCTION(hal, hw, set_ledstate);
-	AR5K_HAL_FUNCTION(hal, hw, set_associd);
-	AR5K_HAL_FUNCTION(hal, hw, set_gpio_input);
-	AR5K_HAL_FUNCTION(hal, hw, set_gpio_output);
-	AR5K_HAL_FUNCTION(hal, hw, get_gpio);
-	AR5K_HAL_FUNCTION(hal, hw, set_gpio);
-	AR5K_HAL_FUNCTION(hal, hw, set_gpio_intr);
-	AR5K_HAL_FUNCTION(hal, hw, get_tsf32);
-	AR5K_HAL_FUNCTION(hal, hw, get_tsf64);
-	AR5K_HAL_FUNCTION(hal, hw, reset_tsf);
-	AR5K_HAL_FUNCTION(hal, hw, get_regdomain);
-	AR5K_HAL_FUNCTION(hal, hw, detect_card_present);
-	AR5K_HAL_FUNCTION(hal, hw, update_mib_counters);
-	AR5K_HAL_FUNCTION(hal, hw, get_rf_gain);
-	AR5K_HAL_FUNCTION(hal, hw, set_slot_time);
-	AR5K_HAL_FUNCTION(hal, hw, get_slot_time);
-	AR5K_HAL_FUNCTION(hal, hw, set_ack_timeout);
-	AR5K_HAL_FUNCTION(hal, hw, get_ack_timeout);
-	AR5K_HAL_FUNCTION(hal, hw, set_cts_timeout);
-	AR5K_HAL_FUNCTION(hal, hw, get_cts_timeout);
-
-	/*
-	 * Key table (WEP) functions
-	 */
-	AR5K_HAL_FUNCTION(hal, hw, is_cipher_supported);
-	AR5K_HAL_FUNCTION(hal, hw, get_keycache_size);
-	AR5K_HAL_FUNCTION(hal, hw, reset_key);
-	AR5K_HAL_FUNCTION(hal, hw, is_key_valid);
-	AR5K_HAL_FUNCTION(hal, hw, set_key);
-	AR5K_HAL_FUNCTION(hal, hw, set_key_lladdr);
-
-	/*
-	 * Power management functions
-	 */
-	AR5K_HAL_FUNCTION(hal, hw, set_power);
-	AR5K_HAL_FUNCTION(hal, hw, get_power_mode);
-	AR5K_HAL_FUNCTION(hal, hw, query_pspoll_support);
-	AR5K_HAL_FUNCTION(hal, hw, init_pspoll);
-	AR5K_HAL_FUNCTION(hal, hw, enable_pspoll);
-	AR5K_HAL_FUNCTION(hal, hw, disable_pspoll);
-
-	/*
-	 * Beacon functions
-	 */
-	AR5K_HAL_FUNCTION(hal, hw, init_beacon);
-	AR5K_HAL_FUNCTION(hal, hw, set_beacon_timers);
-	AR5K_HAL_FUNCTION(hal, hw, reset_beacon);
-	AR5K_HAL_FUNCTION(hal, hw, wait_for_beacon);
-
-	/*
-	 * Interrupt functions
-	 */
-	AR5K_HAL_FUNCTION(hal, hw, is_intr_pending);
-	AR5K_HAL_FUNCTION(hal, hw, get_isr);
-	AR5K_HAL_FUNCTION(hal, hw, get_intr);
-	AR5K_HAL_FUNCTION(hal, hw, set_intr);
-
-	/*
-	 * Chipset functions (ar5k-specific, non-HAL)
-	 */
-	AR5K_HAL_FUNCTION(hal, hw, get_capabilities);
-	AR5K_HAL_FUNCTION(hal, hw, radar_alert);
-
-	/*
-	 * EEPROM access
-	 */
-	AR5K_HAL_FUNCTION(hal, hw, eeprom_is_busy);
-	AR5K_HAL_FUNCTION(hal, hw, eeprom_read);
-	AR5K_HAL_FUNCTION(hal, hw, eeprom_write);
-
-	/* Functions not found in OpenBSD */
-	AR5K_HAL_FUNCTION(hal, hw, get_tx_queueprops);
-	AR5K_HAL_FUNCTION(hal, hw, get_capability);
-	AR5K_HAL_FUNCTION(hal, hw, num_tx_pending);
-	AR5K_HAL_FUNCTION(hal, hw, phy_disable);
-	AR5K_HAL_FUNCTION(hal, hw, set_pcu_config);
-	AR5K_HAL_FUNCTION(hal, hw, set_txpower_limit);
-	AR5K_HAL_FUNCTION(hal, hw, set_def_antenna);
-	AR5K_HAL_FUNCTION(hal, hw, get_def_antenna);
-	AR5K_HAL_FUNCTION(hal, hw, set_bssid_mask);
-	/*Totaly unimplemented*/
-	AR5K_HAL_FUNCTION(hal, hw, set_capability);
-	AR5K_HAL_FUNCTION(hal, hw, proc_mib_event);
-	AR5K_HAL_FUNCTION(hal, hw, get_tx_inter_queue);
-
 }

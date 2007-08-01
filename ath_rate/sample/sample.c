@@ -397,7 +397,7 @@ ath_rate_setupxtxdesc(struct ath_softc *sc, struct ath_node *an,
 	} else {
 		rate_code = sn->rates[ndx].rate_code;
 	}
-	ath_hal_setupxtxdesc(sc->sc_ah, ds
+	ath5k_hw_setup_xr_tx_desc(sc->sc_ah, ds
 			     , rate_code, 3	        /* series 1 */
 			     , sn->rates[0].rate_code, 3	/* series 2 */
 			     , 0, 0	                /* series 3 */
