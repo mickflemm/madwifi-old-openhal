@@ -5423,6 +5423,8 @@ ath5k_hw_rf5110_calibrate(struct ath_hal *hal, AR5K_CHANNEL *channel)
 
 /*
  * Perform a PHY calibration on RF5111/5112
+ * -Fix BPSK/QAM Constellation (I/Q correction)
+ * -Calculate Noise Floor
  */
 AR5K_BOOL
 ath5k_hw_rf511x_calibrate(struct ath_hal *hal, AR5K_CHANNEL *channel)

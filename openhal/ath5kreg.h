@@ -1723,12 +1723,12 @@
  * PHY PLL (Phase Locked Loop) control register
  */
 #define	AR5K_PHY_PLL			0x987c
-#define	AR5K_PHY_PLL_20MHZ		0x13		/* [5111] */
-#define	AR5K_PHY_PLL_40MHZ_5211		0x18
+#define	AR5K_PHY_PLL_20MHZ		0x13		/* For half rate (?) [5111+] */
+#define	AR5K_PHY_PLL_40MHZ_5211		0x18		/* For 802.11a */
 #define	AR5K_PHY_PLL_40MHZ_5212		0x000000aa
 #define	AR5K_PHY_PLL_40MHZ		(hal->ah_version == AR5K_AR5211 ? \
 					AR5K_PHY_PLL_40MHZ_5211 : AR5K_PHY_PLL_40MHZ_5212)
-#define	AR5K_PHY_PLL_44MHZ_5211		0x19
+#define	AR5K_PHY_PLL_44MHZ_5211		0x19		/* For 802.11b/g */
 #define	AR5K_PHY_PLL_44MHZ_5212		0x000000ab
 #define	AR5K_PHY_PLL_44MHZ		(hal->ah_version == AR5K_AR5211 ? \
 					AR5K_PHY_PLL_44MHZ_5211 : AR5K_PHY_PLL_44MHZ_5212)
@@ -1802,14 +1802,14 @@
 /*
  * PHY timing I(nphase) Q(adrature) control register [5111+]
  */
-#define	AR5K_PHY_IQ			0x9920
-#define	AR5K_PHY_IQ_CORR_Q_Q_COFF	0x0000001f
-#define	AR5K_PHY_IQ_CORR_Q_I_COFF	0x000007e0
+#define	AR5K_PHY_IQ			0x9920		/* Register address */
+#define	AR5K_PHY_IQ_CORR_Q_Q_COFF	0x0000001f /* Mask for q correction info */
+#define	AR5K_PHY_IQ_CORR_Q_I_COFF	0x000007e0 /* Mask for i correction info */
 #define	AR5K_PHY_IQ_CORR_Q_I_COFF_S	5
-#define	AR5K_PHY_IQ_CORR_ENABLE		0x00000800
+#define	AR5K_PHY_IQ_CORR_ENABLE		0x00000800 /* Enable i/q correction */
 #define	AR5K_PHY_IQ_CAL_NUM_LOG_MAX	0x0000f000
 #define	AR5K_PHY_IQ_CAL_NUM_LOG_MAX_S	12
-#define	AR5K_PHY_IQ_RUN			0x00010000
+#define	AR5K_PHY_IQ_RUN			0x00010000 /* Run i/q calibration */
 
 
 /*
@@ -1852,12 +1852,12 @@
 #define	AR5K_PHY_FRAME_CTL_TX_CLIP	0x00000038
 #define	AR5K_PHY_FRAME_CTL_TX_CLIP_S	3
 /*---[5110/5111]---*/
-#define	AR5K_PHY_FRAME_CTL_TIMING_ERR	0x01000000
-#define	AR5K_PHY_FRAME_CTL_PARITY_ERR	0x02000000
-#define	AR5K_PHY_FRAME_CTL_ILLRATE_ERR	0x04000000
-#define	AR5K_PHY_FRAME_CTL_ILLLEN_ERR	0x08000000
+#define	AR5K_PHY_FRAME_CTL_TIMING_ERR	0x01000000	/* Detect timing errors */
+#define	AR5K_PHY_FRAME_CTL_PARITY_ERR	0x02000000	/* Detect parity errors */
+#define	AR5K_PHY_FRAME_CTL_ILLRATE_ERR	0x04000000	/* Detect illegal rate */
+#define	AR5K_PHY_FRAME_CTL_ILLLEN_ERR	0x08000000	/* Detect illegal length */
 #define	AR5K_PHY_FRAME_CTL_SERVICE_ERR	0x20000000
-#define	AR5K_PHY_FRAME_CTL_TXURN_ERR	0x40000000
+#define	AR5K_PHY_FRAME_CTL_TXURN_ERR	0x40000000	/* Detect tx underrun */
 #define AR5K_PHY_FRAME_CTL_INI		AR5K_PHY_FRAME_CTL_SERVICE_ERR |		\
 					AR5K_PHY_FRAME_CTL_TXURN_ERR |			\
 					AR5K_PHY_FRAME_CTL_ILLLEN_ERR |			\
@@ -1939,7 +1939,7 @@ after DFS is enabled */
  */
 #define	AR5K_PHY_IQRES_CAL_PWR_I	0x9c10 /* I (Inphase) power value */
 #define	AR5K_PHY_IQRES_CAL_PWR_Q	0x9c14 /* Q (Quadrature) power value */
-#define	AR5K_PHY_IQRES_CAL_CORR		0x9c18
+#define	AR5K_PHY_IQRES_CAL_CORR		0x9c18 /* I/Q Correlation */
 
 /*
  * PHY current RSSI register [5111+]
@@ -1947,7 +1947,7 @@ after DFS is enabled */
 #define	AR5K_PHY_CURRENT_RSSI		0x9c1c
 
 /*
- * PHY PCDAC TX power register [511+ (?)]
+ * PHY PCDAC TX power table
  */
 #define	AR5K_PHY_PCDAC_TXPOWER_BASE	0xa180
 #define	AR5K_PHY_PCDAC_TXPOWER(_n)	(AR5K_PHY_PCDAC_TXPOWER_BASE + ((_n) << 2))
@@ -1955,18 +1955,18 @@ after DFS is enabled */
 /*
  * PHY mode register [5111+]
  */
-#define	AR5K_PHY_MODE			0x0a200
-#define	AR5K_PHY_MODE_MOD		0x00000001
-#define AR5K_PHY_MODE_MOD_OFDM		0
-#define AR5K_PHY_MODE_MOD_CCK		1
-#define AR5K_PHY_MODE_FREQ		0x00000002
-#define	AR5K_PHY_MODE_FREQ_5GHZ		0
-#define	AR5K_PHY_MODE_FREQ_2GHZ		2
-#define AR5K_PHY_MODE_MOD_DYN		0x00000004	/* [5112+] */
-#define AR5K_PHY_MODE_RAD		0x00000008	/* [5112+] */
-#define AR5K_PHY_MODE_RAD_RF5111	0
-#define AR5K_PHY_MODE_RAD_RF5112	8
-#define AR5K_PHY_MODE_XR		0x00000010	/* [5112+] */
+#define	AR5K_PHY_MODE			0x0a200			/* Register address */
+#define	AR5K_PHY_MODE_MOD		0x00000001	/* Mask for PHY Modulation */
+#define AR5K_PHY_MODE_MOD_OFDM		0		/* OFDM Modulation */
+#define AR5K_PHY_MODE_MOD_CCK		1		/* CCK Modulation */
+#define AR5K_PHY_MODE_FREQ		0x00000002	/* Mask for Frequency mode */
+#define	AR5K_PHY_MODE_FREQ_5GHZ		0		/* 5Ghz */
+#define	AR5K_PHY_MODE_FREQ_2GHZ		2		/* 2Ghz */
+#define AR5K_PHY_MODE_MOD_DYN		0x00000004	/* Mask for Dynamic OFDM/CCK mode [5112+] */
+#define AR5K_PHY_MODE_RAD		0x00000008	/* [5212+] */
+#define AR5K_PHY_MODE_RAD_RF5111	0		/* For RF5111 phys */
+#define AR5K_PHY_MODE_RAD_RF5112	8		/* For RF5112 phys */
+#define AR5K_PHY_MODE_XR		0x00000010	/* XR Mode [5112+] */
 
 /*
  * PHY CCK transmit control register [5111+ (?)]

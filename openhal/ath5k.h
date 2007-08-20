@@ -652,9 +652,9 @@ typedef struct {
 	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,	\
 	3, 2, 1, 0, 255, 255, 255, 255 }, {				\
 	{ 1, MODULATION_CCK, 1000, 27, 130, 0 },	\
-	{ 1, MODULATION_CCK, 2000, 26, 132, 1 },	\
-	{ 1, MODULATION_CCK, 5500, 25, 139, 1 },	\
-	{ 1, MODULATION_CCK, 11000, 24, 150, 1 } }	\
+	{ 1, MODULATION_CCK_SP, 2000, 26, 132, 1 },	\
+	{ 1, MODULATION_CCK_SP, 5500, 25, 139, 1 },	\
+	{ 1, MODULATION_CCK_SP, 11000, 24, 150, 1 } }	\
 }
 
 #define AR5K_RATES_11G { 12, {					\
@@ -662,9 +662,9 @@ typedef struct {
 	11, 9, 7, 5, 255, 255, 255, 255, 255, 255, 255, 255,	\
 	3, 2, 1, 0, 255, 255, 255, 255 }, {			\
 	{ 1, MODULATION_CCK, 1000, 27, 2, 0 },		\
-	{ 1, MODULATION_CCK, 2000, 26, 4, 1 },		\
-	{ 1, MODULATION_CCK, 5500, 25, 11, 1 },		\
-	{ 1, MODULATION_CCK, 11000, 24, 22, 1 },	\
+	{ 1, MODULATION_CCK_SP, 2000, 26, 4, 1 },	\
+	{ 1, MODULATION_CCK_SP, 5500, 25, 11, 1 },	\
+	{ 1, MODULATION_CCK_SP, 11000, 24, 22, 1 },	\
 	{ 0, MODULATION_OFDM, 6000, 11, 12, 4 },	\
 	{ 0, MODULATION_OFDM, 9000, 15, 18, 4 },	\
 	{ 1, MODULATION_OFDM, 12000, 10, 24, 6 },	\
