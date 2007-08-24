@@ -258,9 +258,9 @@ MODULE_PARM(countrycode, "i");
 MODULE_PARM(outdoor, "i");
 MODULE_PARM(xchanmode, "i");
 #else
-module_param(countrycode, int, 0);
-module_param(outdoor, int, 0);
-module_param(xchanmode, int, 0);
+module_param(countrycode,	int, 0600);
+module_param(outdoor,		int, 0600);
+module_param(xchanmode,		int, 0600);
 #endif
 MODULE_PARM_DESC(countrycode, "Override default country code");
 MODULE_PARM_DESC(outdoor, "Enable/disable outdoor use");
