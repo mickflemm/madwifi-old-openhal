@@ -5394,7 +5394,7 @@ ath5k_hw_rf5110_calibrate(struct ath_hal *hal, AR5K_CHANNEL *channel)
 		noise_floor = AR5K_REG_READ(AR5K_PHY_NF);
 
 		if (AR5K_PHY_NF_RVAL(noise_floor) &
-		AR5K_PHY_NF_ACTIVE)
+				AR5K_PHY_NF_ACTIVE)
 			noise_floor = AR5K_PHY_NF_AVAL(noise_floor);
 	
 		if (noise_floor <= AR5K_TUNE_NOISE_FLOOR)

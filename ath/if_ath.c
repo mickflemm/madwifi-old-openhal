@@ -279,7 +279,7 @@ enum {
 	DIDmsg_lnxind_wlansniffrm_rssi		= 0x00040044,
 	DIDmsg_lnxind_wlansniffrm_sq		= 0x00050044,
 	DIDmsg_lnxind_wlansniffrm_signal	= 0x00060044,
-	DIDmsg_lnxind_wlansniffrm_noise	= 0x00070044,
+	DIDmsg_lnxind_wlansniffrm_noise		= 0x00070044,
 	DIDmsg_lnxind_wlansniffrm_rate		= 0x00080044,
 	DIDmsg_lnxind_wlansniffrm_istx		= 0x00090044,
 	DIDmsg_lnxind_wlansniffrm_frmlen	= 0x000A0044
@@ -339,12 +339,12 @@ ath_attach(u_int16_t devid, struct net_device *dev)
 	ATH_LOCK_INIT(sc);
 	ATH_TXBUF_LOCK_INIT(sc);
 
-	ATH_INIT_TQUEUE(&sc->sc_rxtq,	ath_rx_tasklet,		dev);
-	ATH_INIT_TQUEUE(&sc->sc_rxorntq,ath_rxorn_tasklet,	dev);
-	ATH_INIT_TQUEUE(&sc->sc_fataltq,ath_fatal_tasklet,	dev);
-	ATH_INIT_TQUEUE(&sc->sc_bmisstq,ath_bmiss_tasklet,	dev);
-	ATH_INIT_TQUEUE(&sc->sc_bstuckq,ath_bstuck_tasklet,	dev);
-	ATH_INIT_TQUEUE(&sc->sc_radartq,ath_radar_tasklet,	dev);
+	ATH_INIT_TQUEUE(&sc->sc_rxtq,	 ath_rx_tasklet,	dev);
+	ATH_INIT_TQUEUE(&sc->sc_rxorntq, ath_rxorn_tasklet,	dev);
+	ATH_INIT_TQUEUE(&sc->sc_fataltq, ath_fatal_tasklet,	dev);
+	ATH_INIT_TQUEUE(&sc->sc_bmisstq, ath_bmiss_tasklet,	dev);
+	ATH_INIT_TQUEUE(&sc->sc_bstuckq, ath_bstuck_tasklet,	dev);
+	ATH_INIT_TQUEUE(&sc->sc_radartq, ath_radar_tasklet,	dev);
 	
 	/*
 	 * Attach the hal
@@ -493,7 +493,7 @@ ath_attach(u_int16_t devid, struct net_device *dev)
 	 * CAB queue is handled by these specially so don't
 	 * include them when checking the txq setup mask.
 	 */
-	switch (sc->sc_txqsetup &~ (1<<sc->sc_cabq->axq_qnum)) {
+	switch (sc->sc_txqsetup & ~(1 << sc->sc_cabq->axq_qnum)) {
 	case 0x01:
 		ATH_INIT_TQUEUE(&sc->sc_txtq, ath_tx_tasklet_q0, dev);
 		break;
@@ -1485,13 +1485,8 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 		sc->sc_stats.ast_tx_noack++;
 	}
 	
-	testmac[0] = 0x41; /* A */
-	testmac[1] = 0x54; /* T */
-	testmac[2] = 0x48; /* H */
-	testmac[3] = 0x54; /* T */
-	testmac[4] = 0x53; /* S */
-	testmac[5] = 0x54; /* T */
-
+	testmac = {'A', 'T', 'H', 'T', 'S', 'T'};
+	
 	if (IEEE80211_ADDR_EQ(wh->i_addr1, testmac)) {
 		flags |= AR5K_TXDESC_NOACK;	/* no ack for test packets */
 		sc->sc_stats.ast_tx_noack++;

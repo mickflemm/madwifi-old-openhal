@@ -885,10 +885,10 @@
 /*
  * EEPROM access registers
  *
- * Here we got a difference between 5210/5211-12
+ * Here we have a difference between 5210/5211-12
  * read data register for 5210 is at 0x6800 and
  * status register is at 0x6c00. There is also
- * no eeprom command register on 5210 and the
+ * no EEPROM command register on 5210 and the
  * offsets are different.
  *
  * To read eeprom data for a specific offset:
@@ -1003,7 +1003,7 @@
 #define AR5K_EEPROM_OBDB0_2GHZ		0x00ec
 #define AR5K_EEPROM_OBDB1_2GHZ		0x00ed
 
-/* Misc values available since EEPROM 4.0 */
+/* Misc. values available since EEPROM 4.0 */
 #define AR5K_EEPROM_MISC0		0x00c4
 #define AR5K_EEPROM_EARSTART(_v)	((_v) & 0xfff)
 #define AR5K_EEPROM_EEMAP(_v)		(((_v) >> 14) & 0x3)
