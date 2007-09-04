@@ -487,10 +487,27 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 	hal->ah_software_retry = FALSE;
 	hal->ah_ant_diversity = AR5K_TUNE_ANT_DIVERSITY;
 
-	switch (device) {
-		case PCI_PRODUCT_ATHEROS_AR2413:
-		case PCI_PRODUCT_ATHEROS_AR5413:
-		case PCI_PRODUCT_ATHEROS_AR5424:
+	/*
+	 * Set the mac revision based on the pci id
+	 */
+	hal->ah_version	= mac_version;
+
+	if (hal->ah_version == AR5K_AR5212)
+		hal->ah_magic = AR5K_EEPROM_MAGIC_5212;
+	else if (hal->ah_version == AR5K_AR5211)
+		hal->ah_magic = AR5K_EEPROM_MAGIC_5211;
+
+	/* Get MAC revision */
+	srev = AR5K_REG_READ(AR5K_SREV);
+	hal->ah_mac_srev = srev;
+	hal->ah_mac_version = AR5K_REG_MS(srev, AR5K_SREV_VER);
+	hal->ah_mac_revision = AR5K_REG_MS(srev, AR5K_SREV_REV);
+
+	switch (srev) {
+		case AR5K_SREV_VER_AR2424:
+		case AR5K_SREV_VER_AR5424:
+		case AR5K_SREV_VER_AR5413:
+		case AR5K_SREV_VER_AR5414:
 			/*
 			 * Known single chip solutions
 			 */
@@ -504,25 +521,11 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 			break;
 	}
 
-	/*
-	 * Set the mac revision based on the pci id
-	 */
-	hal->ah_version	= mac_version;
-
-	if (hal->ah_version == AR5K_AR5212)
-		hal->ah_magic = AR5K_EEPROM_MAGIC_5212;
-	else if (hal->ah_version == AR5K_AR5211)
-		hal->ah_magic = AR5K_EEPROM_MAGIC_5211;
-
 	/* Bring device out of sleep and reset it's units */
 	if (ath5k_hw_nic_wakeup(hal, AR5K_INIT_MODE, TRUE) != TRUE)
 		goto failed;
 
-	/* Get MAC, PHY and RADIO revisions */
-	srev = AR5K_REG_READ(AR5K_SREV);
-	hal->ah_mac_srev = srev;
-	hal->ah_mac_version = AR5K_REG_MS(srev, AR5K_SREV_VER);
-	hal->ah_mac_revision = AR5K_REG_MS(srev, AR5K_SREV_REV);
+	/* Get PHY and RADIO revisions */
 	hal->ah_phy_revision = 
 		AR5K_REG_READ(AR5K_PHY_CHIP_ID) & 0x00ffffffff;
 	hal->ah_radio_5ghz_revision =
@@ -622,11 +625,30 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 
 	*status = AR5K_OK;
 
-	printk(KERN_INFO "ath_hal: Atheros HW found \n");
-	printk(KERN_INFO "ath_hal: MAC version: %s\n",
-		ath5k_hw_get_part_name(AR5K_VERSION_VER,hal->ah_mac_srev));
-	printk(KERN_INFO "ath_hal: PHY version: %s\n",
-		ath5k_hw_get_part_name(AR5K_VERSION_RAD,hal->ah_radio_5ghz_revision));
+	printk(KERN_INFO "ath_hal: MAC revision: %s (0x%x)\n",
+		ath5k_hw_get_part_name(AR5K_VERSION_VER,hal->ah_mac_srev),
+					hal->ah_mac_srev);
+	if((AR5K_MODE_11B & hal->ah_capabilities.cap_mode) &&
+	(AR5K_MODE_11A & hal->ah_capabilities.cap_mode)){
+		printk(KERN_INFO "ath_hal: PHY revision: %s (0x%x)\n",
+			ath5k_hw_get_part_name(AR5K_VERSION_RAD,
+						hal->ah_radio_5ghz_revision),
+						hal->ah_radio_5ghz_revision);
+	}
+	if((AR5K_MODE_11B & hal->ah_capabilities.cap_mode) &&
+	!(AR5K_MODE_11A & hal->ah_capabilities.cap_mode)){
+		printk(KERN_INFO "ath_hal: 2Ghz PHY revision: %s (0x%x)\n",
+			ath5k_hw_get_part_name(AR5K_VERSION_RAD,
+						hal->ah_radio_2ghz_revision),
+						hal->ah_radio_2ghz_revision);
+	}
+	if(!(AR5K_MODE_11B & hal->ah_capabilities.cap_mode) &&
+	(AR5K_MODE_11A & hal->ah_capabilities.cap_mode)){
+		printk(KERN_INFO "ath_hal: 5Ghz PHY revision: %s (0x%x)\n",
+			ath5k_hw_get_part_name(AR5K_VERSION_RAD,
+						hal->ah_radio_5ghz_revision),
+						hal->ah_radio_5ghz_revision);
+	}
 	printk(KERN_INFO "ath_hal: EEPROM version: %x.%x\n",
 		(hal->ah_ee_version & 0xF000) >> 12, hal->ah_ee_version & 0xFFF);
 
@@ -6400,18 +6422,10 @@ const char *
 ath5k_hw_get_part_name(enum ath5k_srev_type type, u_int32_t val)
 {
 	struct ath5k_srev_name names[] = AR5K_SREV_NAME;
-	const char *name = "xxxx";
+	const char *name = "xxxxx";
 	int i;
 
 	for (i = 0; i < AR5K_ELEMENTS(names); i++) {
-		if (type == AR5K_VERSION_DEV) {
-			if (names[i].sr_type == type &&
-				names[i].sr_val == val) {
-				name = names[i].sr_name;
-				break;
-			}
-			continue;
-		}
 		if (names[i].sr_type != type ||
 		    names[i].sr_val == AR5K_SREV_UNKNOWN)
 			continue;

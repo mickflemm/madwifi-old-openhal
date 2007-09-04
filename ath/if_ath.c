@@ -1485,7 +1485,12 @@ ath_start_raw(struct sk_buff *skb, struct net_device *dev)
 		sc->sc_stats.ast_tx_noack++;
 	}
 	
-	testmac = {'A', 'T', 'H', 'T', 'S', 'T'};
+	testmac[0] = 0x41; /* A */
+	testmac[1] = 0x54; /* T */
+	testmac[2] = 0x48; /* H */
+	testmac[3] = 0x54; /* T */
+	testmac[4] = 0x53; /* S */
+	testmac[5] = 0x54; /* T */
 	
 	if (IEEE80211_ADDR_EQ(wh->i_addr1, testmac)) {
 		flags |= AR5K_TXDESC_NOACK;	/* no ack for test packets */
