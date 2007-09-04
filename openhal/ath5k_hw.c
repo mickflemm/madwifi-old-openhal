@@ -503,6 +503,13 @@ ath5k_hw_init(u_int16_t device, AR5K_SOFTC sc, AR5K_BUS_TAG st,
 	hal->ah_mac_version = AR5K_REG_MS(srev, AR5K_SREV_VER);
 	hal->ah_mac_revision = AR5K_REG_MS(srev, AR5K_SREV_REV);
 
+	/* Return on unsupported devices */
+	if((srev >= AR5K_SREV_VER_AR5416)){
+		printk(KERN_ERR "ath_hal: Device not supported (0x%x)\n", srev);
+		*status = AR5K_ENOTSUPP;
+		goto failed;
+	}
+
 	switch (srev) {
 		case AR5K_SREV_VER_AR2424:
 		case AR5K_SREV_VER_AR5424:
